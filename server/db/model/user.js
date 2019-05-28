@@ -8,23 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const koa = require("koa");
-const connection_1 = require("./db/connection");
-const util_1 = require("./util");
-const login_1 = require("./routers/login");
-const app = new koa();
-//全局挂载db
-app.use((ctx, next) => __awaiter(this, void 0, void 0, function* () {
-    ctx.db = yield connection_1.getDB();
-    ctx.redis = connection_1.getRedis();
-    yield next();
-}));
-//使用body中间件
-app.use(util_1.body());
-//挂载路由
-app.use(login_1.default.routes()).use(login_1.default.allowedMethods());
-let hostname = "172.18.249.80";
-let port = "2233";
-app.listen(port, hostname, () => {
-    console.log("mf server is running!");
+const common_1 = require("../common");
+//获取企业用户信息
+exports.getCompanyInfo = (ctx) => __awaiter(this, void 0, void 0, function* () {
+    let mysql = ctx.db;
+    let { account, password } = ctx.params;
+    let columns = ["id", "name", "permission", "end_date", "address", "phone", "state"].join(",");
+    let sql = `select ${columns} from company where account = ? and password = ?`;
+    let [rows] = yield mysql.execute(sql, [account, password]);
+    return common_1.each(rows);
 });
