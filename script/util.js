@@ -24,6 +24,7 @@ const copyFile = (op, dp) => {
         fs.writeFileSync(dp, r);
     }
 }
+
 /**
  * 复制文件或目录的方法
  * @param {String} 原始路径 
@@ -63,6 +64,24 @@ const copy = (originPath, distPath) => {
     }
 }
 
+//删除某一个目录下的所有文件夹、文件
+//该方法未校验路径合法性
+const rmdirsSync = (targetPath) => {
+    let files = fs.readdirSync(targetPath);
+    files.forEach(_path => {
+        _path = path.join(targetPath, _path);
+        let stats = fs.statSync(_path);
+        if (stats.isDirectory()) {
+            rmdirsSync(_path);
+        } else {
+            //删除文件
+            fs.unlinkSync(_path);
+        }
+    });
+    fs.rmdirSync(targetPath);
+}
+
 module.exports = {
-    copy
+    copy,
+    rmdirsSync
 }

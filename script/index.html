@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <input type="file" class="file" /><br/>
+    <span>解压后的文件夹名称：</span><input type="text" class="name" value="dist"/><br/>
+    <span>上传的项目名称：</span><input type="text" class="project" value="mf"/><br/>
+    <span>上传的类型（server or client）：</span><input type="text" class="type" value="server"/>
+    <div class="btn">上传</div>
+    <script>
+        let file = document.querySelector(".file");
+        let btn = document.querySelector(".btn");
+        let name = document.querySelector(".name");
+        let type = document.querySelector(".type");
+        let project = document.querySelector(".project");
+        let f = null;
+        file.onchange = (e) => {
+            console.log(e);
+            f = e.target.files[0];
+            
+        }
+        btn.onclick = () => {
+            let formData = new FormData();
+            
+            formData.append("name", name.value);
+            formData.append("project", project.value);
+            formData.append("type", type.value);
+            formData.append("file", f);
+            let request = new XMLHttpRequest();
+            request.open("POST", "http://120.78.221.14:2235/api/upload");
+            // request.open("POST", "http://127.0.0.1:2235/api/upload");
+            request.send(formData);
+        }
+        
+    </script>
+</body>
+</html>
