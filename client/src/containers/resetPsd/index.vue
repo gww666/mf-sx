@@ -1,55 +1,48 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-
-import { Input, Button, message } from "ant-design-vue";
+import { Input, Button } from "ant-design-vue";
 Vue.use(Input);
 Vue.use(Button);
-
-import { loginRequest } from "./axios";
-
 @Component
-export default class Login extends Vue {
-    username = "";
+export default class ResetPsd extends Vue {
+    userName = "";
     password = "";
-    async doLogin() {
-        if (!this.username) {
-            message.warning("请输入用户名");
-            return;
-        };
-        try {
-            let res = await loginRequest(this.username, this.password);
-            if (res.data.returnCode === 1) {
-                this.$store.dispatch("qxz/updateUserInfo", res.data.data[0]);
-                localStorage.setItem("sessionId", res.data.data[0].sessionId);
-                message.success("登录成功");
-                this.$router.replace({name: "dishManagement"});
-            } else {
-                message.error("用户名或密码不正确");
-            };
-        } catch (err) {
-            console.log(err, "登录错误");
-        };
+    verifyCode = "";
+    img = require("../../assets/images/bg.png");
+    doLogin() {
+        console.log(this.userName, this.password, this.verifyCode, 'ssssssssss');
+        this.$router.replace({name: "home"});
     }
-    goResetPsd() {
-        this.$router.push({name: "resetPsd"});
+    getVerifyCode() {
+
     }
 	render() {
 		return (
             <div class="login-page">
-                <h1 class="title">后台管理登录</h1>
+                <h1 class="title">重置密码</h1>
                 <div class="login-box">
                     <p class="input-item">
-                        <span>用户名：</span>
-                        <a-input class="inputs" v-model={this.username} placeholder="请输入用户名" />
+                        <span>手机号：</span>
+                        <a-input class="inputs" v-model={this.userName} placeholder="请输入手机号" />
                     </p>
                     <p class="input-item">
-                        <span>密码：</span>
-                        <a-input class="inputs" onPressEnter={this.doLogin} v-model={this.password} type={"password"} placeholder="请输入密码" />
+                        <span>新密码：</span>
+                        <a-input class="inputs" v-model={this.password} type={"password"} placeholder="请输入密码" />
+                    </p>
+                    <p class="input-item">
+                        <span>确认新密码：</span>
+                        <a-input class="inputs" v-model={this.password} type={"password"} placeholder="请输入密码" />
+                    </p>
+                    <p class="input-item">
+                        <span>短信验证码：</span>
+                        <div class="verify-code">
+                            <a-input class="inputs verify-input" v-model={this.verifyCode} type={"password"} placeholder="请输短信验证码" />
+                            <a-button type="primary" class="login-btn" onClick={this.getVerifyCode}>获取验证码</a-button>
+                        </div>
                     </p>
                     <div class="btns-field">
                         <a-button type="primary" class="login-btn" onClick={this.doLogin}>登录</a-button>
-                        <p class="forgot-psd" onClick={this.goResetPsd}>忘记密码？</p>
                     </div>
                 </div>
             </div>
@@ -72,7 +65,7 @@ export default class Login extends Vue {
     }
     .login-box{
         width: 400px;
-        height: 188px;
+        height: 235px;
         background: #FFF;
         padding: 30px;
         margin: 0 auto;

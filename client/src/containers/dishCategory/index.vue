@@ -1,0 +1,243 @@
+<script>
+import Vue from "vue";
+import Component from "vue-class-component";
+import { Tag, Table, Modal, message } from "ant-design-vue";
+import { tableColumns } from "./datas";
+import { getCategoryList, deleteCategory } from "./axios";
+import { operateCategory } from "./operateDish/axios";
+import formateDate from "../../utils/formateDate";
+Vue.use(Tag);
+Vue.use(Table);
+Vue.use(Modal);
+const { Column } = Table;
+
+@Component
+export default class DishCategory extends Vue {
+    time = 0;
+    categoryList = [];
+    get userInfo() {
+        return this.$store.state.qxz.userInfo;
+    };
+    
+    // 获取分类列表
+    async queryCategoryList() {
+        try {
+            let res = await getCategoryList(this.userInfo.id);
+            if (res.data.returnCode === 1) {
+                this.categoryList = res.data.data;
+            } else {
+                this.categoryList = [];
+            };
+        }catch(err) {
+            console.log(err, "获取分类列表err");
+        };
+    };
+    // 跳转新增
+    goCreate() {
+        this.$router.push({name: "operateDish", query: {type: "create"}});
+    };
+    // 跳转编辑
+    goEdit(record, item) {
+        this.$router.push({name: "operateDish", query: {params: JSON.stringify(record), type: "edit"}});
+    };
+    // 删除
+    doDelete(record) {
+        Modal.confirm({
+            title: "提示",
+            content: "确定删除这个分类么？",
+            okText: "确定",
+            okType: "danger",
+            cancelText: "取消",
+            onOk: async () => {
+                try {
+                    let res = await deleteCategory(record.id);
+                    if (res.data.returnCode === 1) {
+                        message.success(res.data.message);
+                        this.queryCategoryList();
+                    } else {
+                        message.error(res.data.message);
+                        this.categoryList = [];
+                    };
+                }catch(err) {
+                    console.log(err, "删除分类err");
+                };
+            },
+            onCancel() {}
+        });
+    };
+    // 修改分类状态
+    async modifyCategoryStatus(record) {
+        
+    }
+    // 启用/停用
+    async handleStatusChange(record) {
+        let currentTime = new Date().getTime();
+        if(currentTime - this.time < 301) {
+            this.time = currentTime;
+            return;
+        };
+        this.time = currentTime;
+        // 修改状态
+        let obj = {
+            categoryId: record.id,
+            name: record.name,
+            sort: record.sort,
+            state: record.state === 1 ? 2 : 1,
+        };
+        try {
+            let res = await operateCategory(obj);
+            if(res.data.returnCode === 1) {
+                for(let i = 0;i < this.categoryList.length;i++) {
+                    if(record.id === this.categoryList[i].id) {
+                        let newRecord = Object.assign(this.categoryList[i], obj);
+                        this.categoryList.splice(i, 1, newRecord);
+                        break;
+                    }
+                }
+            } else {
+                message.error(res.data.message);
+            }
+        } catch (err) {
+            console.log("修改状态err", err);
+        };
+    }
+    // 列表渲染
+    tableRenderFn(text, record, item) {
+        switch (item.key) {
+            case "createDate":
+                text = formateDate(text);
+                break;
+            case "updateDate":
+                text = formateDate(text);
+                break;
+        };
+        let dom = <span>{text}</span>;
+        // 操作按钮
+        if (item.key === "operation") {
+            dom = (
+                <div class="btns-field">
+                    <div class="btns-layout">
+                        <p class="btn edit-btn" onClick={() => this.goEdit(record, item)}>编辑</p>
+                        <p class="btn delete-btn" onClick={() => this.doDelete(record)}>删除</p>
+                    </div>
+                </div>
+            );
+        } else if (item.key === "state") {
+            dom = (
+                <div class="btns-field">
+                    <div class="btns-layout state">
+                        {
+                            record.state === 2 ? <p class="btn edit-btn" onClick={() => this.handleStatusChange(record)}>启用</p> : <span></span>
+                        }
+                        {
+                            record.state === 1 ? <p class="btn delete-btn" onClick={() => this.handleStatusChange(record)}>停用</p> : <span></span>
+                        }
+                    </div>
+                </div>
+            )
+        };
+        return dom;
+    };
+	render() {
+		return (
+            <div class="category-page">
+                <div class="title-bar">
+                    <p>商品分类</p>
+                    <p class="createBtn" onClick={this.goCreate}>添加分类</p>
+                </div>
+                <Table 
+                    rowKey={record => record.id} 
+                    dataSource={this.categoryList}
+                >
+                    {
+                        tableColumns.map(item => {
+                            return (
+                                <Column
+                                    title={item.title}
+                                    dataIndex={item.dataIndex}
+                                    key={item.key}
+                                    align="center"
+                                    customRender={(text, record, index) => this.tableRenderFn(text, record, item)}
+                                    customCell={(record) => {
+                                        return {
+                                            on: { // 事件
+                                                click: () => {console.log(record)}
+                                            }
+                                        }
+                                    }}
+                                />
+                            )
+                        })
+                    }
+                    <Column
+                        title="状态"
+                        key="state"  
+                        align="center"
+                        customRender={(text, record, index) => this.tableRenderFn(text, record, {key: "state"})}
+                    />
+                    <Column
+                        title="操作"
+                        key="operation"  
+                        align="center"
+                        customRender={(text, record, index) => this.tableRenderFn(text, record, {key: "operation"})}
+                    />
+                </Table>
+            </div>
+		);
+    };
+    mounted() {
+        this.queryCategoryList();
+    };
+}
+</script>
+<style lang="less" scoped>
+    .category-page{
+        width: 100%;
+        height: 100%;
+        background: #F5F5F5;
+    }
+    .title-bar{
+        width: 100%;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .btns-field{
+        width: 100%;
+        height: 100%;
+    }
+    .btns-layout{
+        margin: 0 auto;
+        width: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .btn{
+            width: 40px;
+            height: 22px;
+            text-align: center;
+            line-height: 22px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    }
+    .state{
+        justify-content: center;
+    }
+    .createBtn{
+        color: #1890ff;
+        cursor: pointer;
+    }
+    .edit-btn{
+        color: #1890ff;
+        border: 1px solid #1890ff;
+    }
+    .delete-btn{
+        color: #ff4544;
+        border: 1px solid #ff4544;
+    }
+    p{
+        margin: 0;
+    }
+</style>
