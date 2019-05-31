@@ -63,7 +63,7 @@ export default class DishCategory extends Vue {
                         </div>
                         <div class="lines">
                             <p><span class="required-symbol">*</span> 排序：</p>
-                            <a-input v-model={this.categoryInfo.sort} placeholder="请输入1-100的值用以排序" />
+                            <a-input v-model={this.categoryInfo.sort} placeholder="请输入1-100的值用以排序，数字越小代表越靠前" />
                         </div>
                         <div class="btns-box">
                             <a-button type="primary" onClick={this.doSave}>保存</a-button>

@@ -39,6 +39,7 @@ export default class App extends Vue {
                 if (res.data.returnCode === 1) {
                     this.$store.dispatch("qxz/updateUserInfo", res.data.data[0]);
                     localStorage.setItem("sessionId", res.data.data[0].sessionId);
+                    this.$router.replace({name: "dishManagement"});
                 } else {
                     this.$store.dispatch("qxz/updateUserInfo", {});
                     localStorage.setItem("sessionId", "");
