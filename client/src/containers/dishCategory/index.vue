@@ -1,7 +1,7 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Tag, Table, Modal, Select, Input, message } from "ant-design-vue";
+import { Tag, Table, Modal, Select, Input, message, Button } from "ant-design-vue";
 import { tableColumns } from "./datas";
 import { getCategoryList, deleteCategory } from "./axios";
 import { operateCategory } from "./operateDish/axios";
@@ -34,7 +34,15 @@ export default class DishCategory extends Vue {
         try {
             let res = await getCategoryList(this.userInfo.id);
             if (res.data.returnCode === 1) {
-                this.categoryList = res.data.data;
+                this.categoryList = res.data.data.sort((a, b) => {
+                    if (a.sort < b.sort) {
+                        return -1;
+                    }
+                    if (a.sort > b.sort) {
+                        return 1;
+                    }
+                    return 0;
+                });
             } else {
                 this.categoryList = [];
             };
@@ -234,7 +242,10 @@ export default class DishCategory extends Vue {
             <div class="category-page">
                 <div class="title-bar">
                     <p>商品分类</p>
-                    <p class="createBtn" onClick={this.goCreate}>添加分类</p>
+                    <p class="createBtn">
+                        <span onClick={this.goCreate}>添加分类</span>
+                        <a-button style="margin-left: 10px;" size="small" type="primary" onClick={this.queryCategoryList}>刷新</a-button>
+                    </p>
                 </div>
                 <Table 
                     rowKey={record => record.id} 
