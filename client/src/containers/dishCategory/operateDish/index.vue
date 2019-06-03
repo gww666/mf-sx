@@ -8,7 +8,6 @@ Vue.use(Button);
 
 @Component
 export default class DishCategory extends Vue {
-    type = "";
     categoryInfo = {
         name: "",
         sort: ""
@@ -20,26 +19,16 @@ export default class DishCategory extends Vue {
     async doSave() {
         if(this.userInfo.id) {
             let obj = {};
-            if(this.type === "edit") {
-                // 编辑
-                obj = {
-                    categoryId: this.categoryInfo.id,
-                    name: this.categoryInfo.name,
-                    sort: this.categoryInfo.sort,
-                    state: this.categoryInfo.state,
-                };
-            } else {
-                // 新增
-                obj = {
-                    companyId: this.userInfo.id,
-                    name: this.categoryInfo.name,
-                    sort: this.categoryInfo.sort
-                };
+            // 新增
+            obj = {
+                companyId: this.userInfo.id,
+                name: this.categoryInfo.name,
+                sort: this.categoryInfo.sort
             };
             try {
                 let res = await operateCategory(obj);
                 if(res.data.returnCode === 1) {
-                    this.type === "edit" ? message.success("编辑分类成功") : message.success("新增分类成功");
+                    message.success("新增分类成功");
                     this.$router.replace({name: "dishCategory"});
                 };
             }catch(err) {
@@ -55,7 +44,7 @@ export default class DishCategory extends Vue {
 		return (
             <div class="operate-dish">
                 <div class="title-bar">
-                    <p class="title">{this.type === "edit" ? "编辑分类" : "新增分类"}</p>
+                    <p class="title">新增分类</p>
                     <div class="operate-area">
                         <div class="lines">
                             <p><span class="required-symbol">*</span> 分类名称：</p>
@@ -74,14 +63,7 @@ export default class DishCategory extends Vue {
             </div>
 		);
     };
-    mounted() {
-        if(this.$route.query.type === "edit") {
-            this.type = "edit";
-            this.categoryInfo = JSON.parse(this.$route.query.params);
-        }else {
-            this.type = "create";
-        }
-    }
+    mounted() {}
 }
 </script>
 <style lang="less" scoped>
