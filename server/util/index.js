@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const util = require("util");
 const { promisify } = util;
+const resModel_1 = require("./resModel");
 //编写一个中间件，用来获取post参数
 exports.body = () => {
     return (ctx, next) => __awaiter(this, void 0, void 0, function* () {
@@ -47,16 +48,18 @@ exports.validateUser = (ctx, next) => __awaiter(this, void 0, void 0, function* 
     //取得sessionId，判断redis中该key有无过期
     let { sessionid } = ctx.headers;
     if (!sessionid) {
-        ctx.status = 401;
-        ctx.body = "need sign in for todo!";
+        // ctx.status = 401;
+        // ctx.body = "need sign in for todo!";
+        ctx.body = new resModel_1.ErrModel([], "登录信息失效", 401);
         return;
     }
     let redis = ctx.redis;
     let get = promisify(redis.get).bind(redis);
     let userInfo = yield get(sessionid);
     if (!userInfo) {
-        ctx.status = 401;
-        ctx.body = "need sign in for todo!";
+        // ctx.status = 401;
+        // ctx.body = "need sign in for todo!";
+        ctx.body = new resModel_1.ErrModel([], "登录信息失效", 401);
     }
     else {
         yield next();

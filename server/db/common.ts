@@ -2,7 +2,7 @@
 //定义公共遍历方法
 export const each = (array) => {
     let list = [];
-    let trans = (key: string) => {
+    let trans = (key) => {
         // 将下划线改为小驼峰式命名法则
         let temp = key.split("_");
         if (temp.length === 1) return key;

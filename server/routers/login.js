@@ -21,7 +21,7 @@ router.get("/cAutoLogin", (ctx) => __awaiter(this, void 0, void 0, function* () 
     // console.log("headers", ctx.headers);
     let { sessionid } = ctx.headers;
     if (!sessionid) {
-        ctx.body = new resModel_1.ErrModel([], "登录信息失效");
+        ctx.body = new resModel_1.ErrModel([], "登录信息失效", 401);
         return;
     }
     let get = promisify(ctx.redis.get).bind(ctx.redis);
@@ -30,7 +30,7 @@ router.get("/cAutoLogin", (ctx) => __awaiter(this, void 0, void 0, function* () 
         ctx.body = new resModel_1.SucModel([JSON.parse(userInfo)], "success");
     }
     else {
-        ctx.body = new resModel_1.ErrModel([], "登录信息失效");
+        ctx.body = new resModel_1.ErrModel([], "登录信息失效", 401);
     }
 }));
 router.post("/cLogin", (ctx) => __awaiter(this, void 0, void 0, function* () {
@@ -44,7 +44,7 @@ router.post("/cLogin", (ctx) => __awaiter(this, void 0, void 0, function* () {
         let redis = ctx.redis;
         let sessionId = "mfurd" + data[0].id;
         data[0].sessionId = sessionId;
-        redis.set(sessionId, JSON.stringify(data[0]), "EX", 60 * 5);
+        redis.set(sessionId, JSON.stringify(data[0]), "EX", 60 * 60);
         ctx.body = new resModel_1.SucModel(data, "success");
     }
     catch (err) {

@@ -1,5 +1,6 @@
 import util = require("util");
 const {promisify} = util;
+import {ErrModel} from "./resModel";
 //编写一个中间件，用来获取post参数
 export const body = (): Function => {
     return async (ctx, next) => {
@@ -38,16 +39,18 @@ export const validateUser = async (ctx, next) => {
     //取得sessionId，判断redis中该key有无过期
     let {sessionid} = ctx.headers;
     if (!sessionid) {
-        ctx.status = 401;
-        ctx.body = "need sign in for todo!";
+        // ctx.status = 401;
+        // ctx.body = "need sign in for todo!";
+        ctx.body = new ErrModel([], "登录信息失效", 401);
         return;
     }
     let redis = ctx.redis;
     let get = promisify(redis.get).bind(redis);
     let userInfo = await get(sessionid)
     if (!userInfo) {
-        ctx.status = 401;
-        ctx.body = "need sign in for todo!";
+        // ctx.status = 401;
+        // ctx.body = "need sign in for todo!";
+        ctx.body = new ErrModel([], "登录信息失效", 401);
     } else {
         await next();
     }

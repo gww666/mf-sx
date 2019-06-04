@@ -12,7 +12,7 @@ router.get("/cAutoLogin", async ctx => {
     // console.log("headers", ctx.headers);
     let {sessionid} = ctx.headers;
     if (!sessionid) {
-        ctx.body = new ErrModel([], "登录信息失效");
+        ctx.body = new ErrModel([], "登录信息失效", 401);
         return;
     }
     let get = promisify(ctx.redis.get).bind(ctx.redis);
@@ -20,7 +20,7 @@ router.get("/cAutoLogin", async ctx => {
     if (userInfo) {
         ctx.body = new SucModel([JSON.parse(userInfo)], "success");
     } else {
-        ctx.body = new ErrModel([], "登录信息失效");
+        ctx.body = new ErrModel([], "登录信息失效", 401);
     }
 });
 
@@ -35,7 +35,7 @@ router.post("/cLogin", async ctx => {
         let redis = ctx.redis;
         let sessionId = "mfurd" + data[0].id;
         data[0].sessionId = sessionId;
-        redis.set(sessionId, JSON.stringify(data[0]), "EX", 60 * 5);
+        redis.set(sessionId, JSON.stringify(data[0]), "EX", 60 * 60);
         ctx.body = new SucModel(data, "success");
     } catch (err) {
         console.log("err", err);

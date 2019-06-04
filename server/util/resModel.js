@@ -15,10 +15,10 @@ class SucModel extends BaseModel {
 }
 exports.SucModel = SucModel;
 class ErrModel extends BaseModel {
-    constructor(data, message) {
+    constructor(data, message, returnCode) {
         super(data, message);
         this.returnCode = 0;
-        this.returnCode = 0;
+        returnCode && (this.returnCode = returnCode);
     }
 }
 exports.ErrModel = ErrModel;

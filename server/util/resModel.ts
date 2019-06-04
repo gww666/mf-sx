@@ -13,8 +13,8 @@ export class SucModel extends BaseModel {
 
 export class ErrModel extends BaseModel {
     returnCode: number = 0;
-    constructor(data: object[], message: string) {
+    constructor(data: object[], message: string, returnCode?: number) {
         super(data, message);
-        this.returnCode = 0
+        returnCode && (this.returnCode = returnCode);
     }
 }
