@@ -2,7 +2,8 @@ const login = resolve => require(['@/containers/login'], resolve);
 const resetPsd = resolve => require(['@/containers/resetPsd'], resolve);
 const dishManagement = resolve => require(['@/containers/dishManagement'], resolve);
 const dishCategory = resolve => require(['@/containers/dishCategory'], resolve);
-const operateDish = resolve => require(['@/containers/dishCategory/operateDish'], resolve);
+const operateCategory = resolve => require(['@/containers/dishCategory/operateCategory'], resolve);
+const operateDish = resolve => require(['@/containers/dishManagement/operateDish'], resolve);
 
 const router = [
 	{
@@ -24,6 +25,11 @@ const router = [
         path: '/dishCategory',
         name: 'dishCategory',
         component: dishCategory
+    },
+	{
+        path: '/operateCategory',
+        name: 'operateCategory',
+        component: operateCategory
     },
 	{
         path: '/operateDish',

@@ -7,7 +7,7 @@ Vue.use(Input);
 Vue.use(Button);
 
 @Component
-export default class DishCategory extends Vue {
+export default class operateDish extends Vue {
     categoryInfo = {
         name: "",
         sort: ""

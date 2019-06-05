@@ -1,21 +1,31 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Tag, Table, Modal, Select, message } from "ant-design-vue";
+import { Tag, Table, Modal, Select, Input, message, Button } from "ant-design-vue";
 import { tableColumns } from "./datas";
-import { getCategoryList, deleteCategory } from "./axios";
+import { getCategoryList, queryGoodsList, deleteGoods, searchGoods, getGoodsInfoById } from "./axios";
+// import { operateCategory } from "./operateDish/axios";
 import formateDate from "../../utils/formateDate";
 Vue.use(Tag);
 Vue.use(Table);
 Vue.use(Modal);
 Vue.use(Select);
+Vue.use(Input);
 const { Column } = Table;
 
 @Component
-export default class DishManagement extends Vue {
+export default class DishCategory extends Vue {
     time = 0;
-    sortArr = new Array();
+    // 搜索联想列表
+    similarItemList = [];
+    // 搜索条件
+    keyword = "";
+    sortArr = [];
+    // 分类列表列表
     categoryList = [];
+    currentCategory = "";
+    // 列表数据
+    goodsList = [];
     get userInfo() {
         return this.$store.state.qxz.userInfo;
     };
@@ -25,7 +35,26 @@ export default class DishManagement extends Vue {
         try {
             let res = await getCategoryList(this.userInfo.id);
             if (res.data.returnCode === 1) {
-                this.categoryList = res.data.data;
+                if(res.data.data.length > 0) {
+                    this.categoryList = res.data.data.sort((a, b) => {
+                        if (a.sort < b.sort) {
+                            return -1;
+                        }
+                        if (a.sort > b.sort) {
+                            return 1;
+                        }
+                        return 0;
+                    });
+                    this.categoryList.unshift({
+                        name: "全部分类",
+                        id: "all"
+                    });
+                    this.currentCategory = this.categoryList[0].id;
+                    // 获取商品列表
+                    this.queryGoodsList();
+                }else {
+                    this.categoryList = [];
+                };
             } else {
                 this.categoryList = [];
             };
@@ -33,13 +62,85 @@ export default class DishManagement extends Vue {
             console.log(err, "获取分类列表err");
         };
     };
+    // 获取商品列表
+    async queryGoodsList() {
+        try {
+            let res = await queryGoodsList(this.userInfo.id, this.currentCategory);
+            if (res.data.returnCode === 1) {
+                if(res.data.data.length > 0) {
+                    this.goodsList = res.data.data.sort((a, b) => {
+                        if (a.sort < b.sort) {
+                            return -1;
+                        }
+                        if (a.sort > b.sort) {
+                            return 1;
+                        }
+                        return 0;
+                    });
+                } else {
+                    this.goodsList = [];
+                };
+            } else {
+                this.goodsList = [];
+            };
+        }catch(err) {
+            console.log(err, "获取分类列表err");
+        };
+    };
+    // 修改分类搜索条件
+    changeCategory(val) {
+        this.currentCategory = val;
+        this.queryGoodsList();
+    };
+    // 搜索
+    async doSearch() {
+        if (!this.keyword) {
+            message.warning("请输入查询内容");
+            return;
+        };
+        try {
+            let res = await getGoodsInfoById(this.keyword);
+            if (res.data.returnCode === 1) {
+                if(res.data.data.length > 0) {
+                    this.goodsList = res.data.data;
+                } else {
+                    this.goodsList = [];
+                };
+            } else {
+                this.goodsList = [];
+            };
+        }catch(err) {
+            console.log(err, "搜索err");
+        };
+    };
+    // 搜索相似内容
+    async handleSearch (clue) {
+        try {
+            let res = await searchGoods(clue);
+            if (res.data.returnCode === 1) {
+                if(res.data.data.length > 0) {
+                    this.similarItemList = res.data.data;
+                } else {
+                    this.similarItemList = [];
+                };
+            } else {
+                this.similarItemList = [];
+            };
+        }catch(err) {
+            console.log(err, "获取相似内容列表err");
+        };
+    };
+    // 选中相似内容
+    handleChange (clue) {
+        this.keyword = clue;
+    }
     // 跳转新增
     goCreate() {
         this.$router.push({name: "operateDish", query: {type: "create"}});
     };
     // 跳转编辑
-    goEdit(record, item) {
-        this.$router.push({name: "operateDish", query: {params: JSON.stringify(record), type: "edit"}});
+    goEdit(record) {
+        this.$router.push({name: "operateDish", query: {id: record.id, type: "edit"}});
     };
     // 删除
     doDelete(record) {
@@ -51,10 +152,10 @@ export default class DishManagement extends Vue {
             cancelText: "取消",
             onOk: async () => {
                 try {
-                    let res = await deleteCategory(record.id);
+                    let res = await deleteGoods(record.id);
                     if (res.data.returnCode === 1) {
                         message.success(res.data.message);
-                        this.queryCategoryList();
+                        this.queryGoodsList();
                     } else {
                         message.error(res.data.message);
                         this.categoryList = [];
@@ -98,38 +199,12 @@ export default class DishManagement extends Vue {
             console.log("修改状态err", err);
         };
     }
-    // 更改排序
-    async handleSortChange(val, record) {
-        // 修改状态
-        let obj = {
-            categoryId: record.id,
-            name: record.name,
-            sort: val,
-            state: record.state,
-        };
-        try {
-            let res = await operateCategory(obj);
-            if(res.data.returnCode === 1) {
-                for(let i = 0;i < this.categoryList.length;i++) {
-                    if(record.id === this.categoryList[i].id) {
-                        let newRecord = Object.assign(this.categoryList[i], obj);
-                        this.categoryList.splice(i, 1, newRecord);
-                        break;
-                    }
-                }
-            } else {
-                message.error(res.data.message);
-            }
-        } catch (err) {
-            console.log("修改排序err", err);
-        };
-    }
     // 列表渲染
     tableRenderFn(text, record, item) {
         switch (item.key) {
             case "createDate":
                 text = formateDate(text);
-                break;
+                break;z
             case "updateDate":
                 text = formateDate(text);
                 break;
@@ -140,7 +215,7 @@ export default class DishManagement extends Vue {
             dom = (
                 <div class="btns-field">
                     <div class="btns-layout">
-                        <p class="btn edit-btn" onClick={() => this.goEdit(record, item)}>编辑</p>
+                        <p class="btn edit-btn" onClick={() => this.goEdit(record)}>编辑</p>
                         <p class="btn delete-btn" onClick={() => this.doDelete(record)}>删除</p>
                     </div>
                 </div>
@@ -148,29 +223,13 @@ export default class DishManagement extends Vue {
         } else if (item.key === "state") {
             dom = (
                 <div class="btns-field">
-                    <div class="btns-layout state">
-                        {
-                            record.state === 2 ? <p class="btn edit-btn" onClick={() => this.handleStatusChange(record)}>启用</p> : <span></span>
-                        }
-                        {
-                            record.state === 1 ? <p class="btn delete-btn" onClick={() => this.handleStatusChange(record)}>停用</p> : <span></span>
-                        }
-                    </div>
-                </div>
-            )
-        } else if (item.key === "sort") {
-            dom = (
-                <div class="btns-field">
                     <div class="btns-layout">
-                        <a-select onSelect={value => this.handleSortChange(value, record)} defaultValue={text}>
-                            {
-                                this.sortArr.map((ele, index) => {
-                                    return (
-                                        <a-select-option select={this.handleSortChange} value={index + 1}>{index + 1}</a-select-option>
-                                    )
-                                })
-                            }
-                        </a-select>
+                        {
+                            record.state === 2 ? <p class="btn delete-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已下架</p> : <span></span>
+                        }
+                        {
+                            record.state === 1 ? <p class="btn edit-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已上架</p> : <span></span>
+                        }
                     </div>
                 </div>
             )
@@ -181,12 +240,49 @@ export default class DishManagement extends Vue {
 		return (
             <div class="category-page">
                 <div class="title-bar">
-                    <p>商品分类</p>
-                    <p class="createBtn" onClick={this.goCreate}>添加分类</p>
+                    <p>菜品管理</p>
+                    <p class="createBtn">
+                        <p class="addBtn" onClick={this.goCreate}>添加菜品</p>
+                        <a-button size="small" type="primary" onClick={this.queryGoodsList}>刷新</a-button>
+                    </p>
+                </div>
+                <div class="title-bar">
+                    <a-select class="filters" value={this.currentCategory} onChange={val => this.changeCategory(val)}>
+                        {
+                            this.categoryList.map((ele, index) => {
+                                return (
+                                    <a-select-option value={ele.id}>{ele.name}</a-select-option>
+                                )
+                            })
+                        }
+                    </a-select>
+                    <p class="createBtn searcher">
+                        <a-select
+                            size="small"
+                            showSearch
+                            placeholder="请输入关键字查询"
+                            style="width: 150px;"
+                            defaultActiveFirstOption={false}
+                            showArrow={false}
+                            filterOption={false}
+                            onSearch={clue => this.handleSearch(clue)}
+                            onChange={clue => this.handleChange(clue)}
+                            notFoundContent={null}
+                        >
+                            {
+                                this.similarItemList.map(item => {
+                                    return (
+                                        <a-select-option value={item.id}>{item.title}</a-select-option>
+                                    )
+                                })
+                            }
+                        </a-select>
+                        <a-button size="small" type="primary" onClick={this.doSearch}>搜索</a-button>
+                    </p>
                 </div>
                 <Table 
                     rowKey={record => record.id} 
-                    dataSource={this.categoryList}
+                    dataSource={this.goodsList}
                 >
                     {
                         tableColumns.map(item => {
@@ -212,11 +308,13 @@ export default class DishManagement extends Vue {
                         title="状态"
                         key="state"  
                         align="center"
+                        width={100}
                         customRender={(text, record, index) => this.tableRenderFn(text, record, {key: "state"})}
                     />
                     <Column
                         title="操作"
-                        key="operation"  
+                        key="operation"
+                        width={100}
                         align="center"
                         customRender={(text, record, index) => this.tableRenderFn(text, record, {key: "operation"})}
                     />
@@ -254,8 +352,9 @@ export default class DishManagement extends Vue {
         width: 90px;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         .btn{
+            margin: 0 5px;
             width: 40px;
             height: 22px;
             text-align: center;
@@ -267,12 +366,16 @@ export default class DishManagement extends Vue {
             width: 90px;
         }
     }
-    .state{
-        justify-content: center;
-    }
     .createBtn{
+        width: 115px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         color: #1890ff;
         cursor: pointer;
+    }
+    .searcher{
+        width: 205px;
     }
     .edit-btn{
         color: #1890ff;
@@ -282,7 +385,26 @@ export default class DishManagement extends Vue {
         color: #ff4544;
         border: 1px solid #ff4544;
     }
+    .modify-btn{
+        background: #1890ff;
+        color: #FFF;
+        margin-right: 10px;
+    }
+    .name{
+        line-height: 22px;
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space: nowrap;
+    }
     p{
         margin: 0;
+    }
+
+    .filters{
+        width: 100px;
+    }
+    .ant-table-body {
+        overflow: auto;
     }
 </style>

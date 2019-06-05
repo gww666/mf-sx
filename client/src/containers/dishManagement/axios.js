@@ -7,11 +7,35 @@ export const getCategoryList = companyId => {
     };
     return _axios(options);
 };
-// 删除分类
-export const deleteCategory = categoryId => {
+// 获取商品列表
+export const queryGoodsList = (companyId, categoryId) => {
     let options = {
-        url: `/api/delCategory?categoryId=${categoryId}`,
+        url: `/api/goodsList?companyId=${companyId}${categoryId === "all" ? "" : "&categoryId=" + categoryId}`,
         method: "GET"
     };
     return _axios(options);
 };
+// 删除分类
+export const deleteGoods = goodsId => {
+    let options = {
+        url: `/api/delGoods?goodsId=${goodsId}`,
+        method: "GET"
+    };
+    return _axios(options);
+};
+// 从模糊查询商品名
+export const searchGoods = goodsname => {
+    let options = {
+        url: `/api/selectGoodsName?keyword=${goodsname}`,
+        method: "GET"
+    };
+    return _axios(options);
+};
+// 通过id查询商品内容
+export const getGoodsInfoById = goodsId => {
+    let options = {
+        url: `/api/getGoods?goodsId=${goodsId}`,
+        method: "GET"
+    };
+    return _axios(options);
+}

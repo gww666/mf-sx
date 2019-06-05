@@ -4,7 +4,7 @@ import Component from "vue-class-component";
 import { Tag, Table, Modal, Select, Input, message, Button } from "ant-design-vue";
 import { tableColumns } from "./datas";
 import { getCategoryList, deleteCategory } from "./axios";
-import { operateCategory } from "./operateDish/axios";
+import { operateCategory } from "./operateCategory/axios";
 import formateDate from "../../utils/formateDate";
 Vue.use(Tag);
 Vue.use(Table);
@@ -20,7 +20,7 @@ export default class DishCategory extends Vue {
     name = "";
     // 弹出框显示隐藏
     showModal= false;
-    sortArr = new Array();
+    sortArr = [];
     // 列表数据
     categoryList = [];
     // 当前修改项
@@ -52,11 +52,11 @@ export default class DishCategory extends Vue {
     };
     // 跳转新增
     goCreate() {
-        this.$router.push({name: "operateDish", query: {type: "create"}});
+        this.$router.push({name: "operateCategory", query: {type: "create"}});
     };
     // 跳转编辑
     goEdit(record) {
-        this.$router.push({name: "operateDish", query: {params: JSON.stringify(record), type: "edit"}});
+        this.$router.push({name: "operateCategory", query: {params: JSON.stringify(record), type: "edit"}});
     };
     // 删除
     doDelete(record) {
@@ -210,10 +210,10 @@ export default class DishCategory extends Vue {
                 <div class="btns-field">
                     <div class="btns-layout">
                         {
-                            record.state === 2 ? <p class="btn edit-btn" onClick={() => this.handleStatusChange(record)}>启用</p> : <span></span>
+                            record.state === 2 ? <p class="btn delete-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已下架</p> : <span></span>
                         }
                         {
-                            record.state === 1 ? <p class="btn delete-btn" onClick={() => this.handleStatusChange(record)}>停用</p> : <span></span>
+                            record.state === 1 ? <p class="btn edit-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已上架</p> : <span></span>
                         }
                     </div>
                 </div>
@@ -222,7 +222,7 @@ export default class DishCategory extends Vue {
             dom = (
                 <div class="btns-field">
                     <div class="btns-layout">
-                        <a-select onSelect={value => this.handleSortChange(value, record)} defaultValue={text}>
+                        <a-select onChange={value => this.handleSortChange(value, record)} defaultValue={text}>
                             {
                                 this.sortArr.map((ele, index) => {
                                     return (
@@ -288,10 +288,11 @@ export default class DishCategory extends Vue {
                     title="修改分类名"
                     v-model={this.showModal}
                     onOk={this.doModifyName}
+                    width="400px"
                     okText="确认"
                     cancelText="取消"
                 >
-                    <a-input v-model={this.name} placeholder="请输入分类名称" />
+                    <a-input v-model={this.name} style="width: 200px;" placeholder="请输入分类名称" />
                 </a-modal>
             </div>
 		);
