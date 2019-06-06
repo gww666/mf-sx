@@ -2,7 +2,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Input, Button, Select, InputNumber, message } from "ant-design-vue";
-import { operateGood } from "./axios";
+import { operateGoods } from "./axios";
 import { getCategoryList, getGoodsInfoById } from "../axios";
 Vue.use(Input);
 Vue.use(Button);
@@ -57,7 +57,7 @@ export default class DishCategory extends Vue {
         if(this.userInfo.id) {
             let obj = Object.assign({companyId: this.userInfo.id}, this.dishInfo);
             try {
-                let res = await operateGood(obj);
+                let res = await operateGoods(obj);
                 if(res.data.returnCode === 1) {
                     message.success(res.data.message);
                     this.$router.replace({name: "dishManagement"});
@@ -115,7 +115,7 @@ export default class DishCategory extends Vue {
                             <a-input class="inputs" v-model={this.dishInfo.title} maxLength={20} placeholder="请输入菜品标题" />
                         </div>
                         <div class="lines">
-                            <p><span class="required-symbol">*</span> 副标题：</p>
+                            <p> 副标题：</p>
                             <a-input class="inputs" v-model={this.dishInfo.subTitle} maxLength={50} placeholder="请输入菜品副标题" />
                         </div>
                         <div class="lines">
@@ -130,7 +130,7 @@ export default class DishCategory extends Vue {
                             <a-input-number class="inputs" min={0} v-model={this.dishInfo.price} placeholder="请输入菜品价格" />
                         </div>
                         <div class="lines">
-                            <p><span class="required-symbol">*</span> 特价：</p>
+                            <p> 特价：</p>
                             <a-input-number class="inputs" min={0} v-model={this.dishInfo.salePrice} placeholder="请输入菜品特价" />
                         </div>
                         <div class="lines">
@@ -188,7 +188,7 @@ export default class DishCategory extends Vue {
         justify-content: space-between;
         p{
             margin: 0;
-            width: 180px;
+            width: 100px;
             height: 100%;
             line-height: 50px;
             padding-right: 20px;
