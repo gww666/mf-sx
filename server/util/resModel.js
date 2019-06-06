@@ -7,10 +7,14 @@ class BaseModel {
     }
 }
 class SucModel extends BaseModel {
-    constructor(data, message) {
+    constructor(data, message, total) {
         super(data, message);
+        this.total = total;
         this.returnCode = 1;
         this.returnCode = 1;
+        if (total !== undefined) {
+            this.total = total;
+        }
     }
 }
 exports.SucModel = SucModel;

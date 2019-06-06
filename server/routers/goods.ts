@@ -63,7 +63,7 @@ router.get("/delCategory", validateUser, async ctx => {
 router.get("/goodsList", validateUser, async ctx => {
     try {
         let data = await goodsList(ctx);
-        ctx.body = new SucModel(data, "商品列表查询成功");
+        ctx.body = new SucModel(data[0], "商品列表查询成功", data[1]);
     } catch (err) {
         console.log("err", err);
         ctx.body = new ErrModel([], "商品列表查询失败——" + JSON.stringify(err));

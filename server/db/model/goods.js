@@ -54,14 +54,22 @@ exports.deleteCategory = (ctx) => __awaiter(this, void 0, void 0, function* () {
 //查询商品列表
 exports.goodsList = (ctx) => __awaiter(this, void 0, void 0, function* () {
     let mysql = ctx.db;
-    let { companyId, categoryId } = ctx.query;
+    let { companyId, categoryId, pageNum, pageSize } = ctx.query;
     let code = "";
     if (categoryId)
         code = " and category_id = ?";
-    let sql = `select * from goods where company_id = ?${code}`;
+    if (pageNum && pageSize) {
+        let start = (pageNum - 1) * pageSize;
+        code += ` limit ${start}, ${pageSize}`;
+    }
+    let sql = `select SQL_CALC_FOUND_ROWS * from goods where company_id = ?${code}`;
     let params = categoryId ? [companyId, categoryId] : [companyId];
     let [rows] = yield mysql.execute(sql, params);
-    return common_1.each(rows);
+    let sql2 = "SELECT FOUND_ROWS() as total";
+    let [rows2] = yield mysql.execute(sql2);
+    // console.log("打印total", rows2); 
+    // let res = each(rows);
+    return [common_1.each(rows), rows2[0].total];
 });
 //新增一个商品
 exports.insertGoods = (ctx) => __awaiter(this, void 0, void 0, function* () {

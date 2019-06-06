@@ -5,9 +5,12 @@ class BaseModel {
 
 export class SucModel extends BaseModel {
     returnCode: number = 1;
-    constructor(data: object[], message: string) {
+    constructor(data: object[], message: string, public total?: number) {
         super(data, message);
-        this.returnCode = 1
+        this.returnCode = 1;
+        if (total !== undefined) {
+            this.total = total;
+        }
     }
 }
 

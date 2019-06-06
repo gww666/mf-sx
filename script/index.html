@@ -19,10 +19,11 @@
         let type = document.querySelector(".type");
         let project = document.querySelector(".project");
         let f = null;
+        let ext = "";
         file.onchange = (e) => {
             console.log(e);
             f = e.target.files[0];
-            
+            ext = f.type.split("/")[1];
         }
         btn.onclick = () => {
             let formData = new FormData();
@@ -32,8 +33,11 @@
             formData.append("type", type.value);
             formData.append("file", f);
             let request = new XMLHttpRequest();
-            request.open("POST", "http://120.78.221.14:2235/api/upload");
+            // request.open("POST", `http://120.78.221.14:2235/api/upload?type=image&project=mf&mime=${ext}`);
+            request.open("POST", `http://120.78.221.14:2235/api/upload`);
             // request.open("POST", "http://127.0.0.1:2235/api/upload");
+            request.send(f);
+            // request.send({});
             request.send(formData);
         }
         
