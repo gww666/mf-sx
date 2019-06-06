@@ -280,7 +280,7 @@ export default class DishCategory extends Vue {
                                 this.similarItemList.map(item => {
                                     return (
                                         <a-select-option value={item.id}>{item.title}</a-select-option>
-                                    )
+                                    );
                                 })
                             }
                         </a-select>
