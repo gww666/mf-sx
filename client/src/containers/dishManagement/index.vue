@@ -1,7 +1,7 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Tag, Table, Modal, Select, Input, message, Button } from "ant-design-vue";
+import { Tag, Table, Modal, Select, Input, message, Button, Pagination } from "ant-design-vue";
 import { tableColumns } from "./datas";
 import { getCategoryList, queryGoodsList, deleteGoods, searchGoods, getGoodsInfoById } from "./axios";
 import { operateGoods } from "./operateDish/axios";
@@ -11,6 +11,7 @@ Vue.use(Table);
 Vue.use(Modal);
 Vue.use(Select);
 Vue.use(Input);
+Vue.use(Pagination);
 const { Column } = Table;
 
 @Component
@@ -27,6 +28,9 @@ export default class DishCategory extends Vue {
     currentCategory = "";
     // 列表数据
     goodsList = [];
+    pageNum = 1;
+    pageSize = 10;
+    total = 0;
     get userInfo() {
         return this.$store.state.qxz.userInfo;
     };
@@ -66,7 +70,7 @@ export default class DishCategory extends Vue {
     // 获取商品列表
     async queryGoodsList() {
         try {
-            let res = await queryGoodsList(this.userInfo.id, this.currentCategory);
+            let res = await queryGoodsList(this.userInfo.id, this.currentCategory, this.pageNum, this.pageSize);
             if (res.data.returnCode === 1) {
                 if(res.data.data.length > 0) {
                     this.goodsList = res.data.data.sort((a, b) => {
@@ -78,6 +82,7 @@ export default class DishCategory extends Vue {
                         }
                         return 0;
                     });
+                    this.total = res.data.total * this.pageSize;
                 } else {
                     this.goodsList = [];
                 };
@@ -243,6 +248,13 @@ export default class DishCategory extends Vue {
         };
         return dom;
     };
+    // 切换页码
+    handelPageChange(pageNum) {
+        console.log(pageNum);
+        this.pageNum = pageNum;
+        this.queryGoodsList();
+    };
+    // <a-button size="small" type="primary" onClick={this.queryGoodsList}>刷新</a-button>
 	render() {
 		return (
             <div class="category-page">
@@ -250,7 +262,6 @@ export default class DishCategory extends Vue {
                     <p>菜品管理</p>
                     <p class="createBtn">
                         <p class="addBtn" onClick={this.goCreate}>添加菜品</p>
-                        <a-button size="small" type="primary" onClick={this.queryGoodsList}>刷新</a-button>
                     </p>
                 </div>
                 <div class="title-bar">
@@ -290,6 +301,8 @@ export default class DishCategory extends Vue {
                 <Table 
                     rowKey={record => record.id} 
                     dataSource={this.goodsList}
+                    pagination={false}
+                    class="table"
                 >
                     {
                         tableColumns.map(item => {
@@ -326,6 +339,9 @@ export default class DishCategory extends Vue {
                         customRender={(text, record, index) => this.tableRenderFn(text, record, {key: "operation"})}
                     />
                 </Table>
+                <div style="margin:10px auto;">
+                    <a-pagination defaultCurrent={1} total={this.total} onChange={this.handelPageChange} />
+                </div>
             </div>
 		);
     };
@@ -333,7 +349,13 @@ export default class DishCategory extends Vue {
         for(let i = 0;i < 100; i++) {
             this.sortArr.push(i);
         };
-        this.queryCategoryList();
+        if(this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
+        };
+        this.timer = setTimeout(async () => {
+            this.queryCategoryList();
+        }, 300)
     };
 }
 </script>
@@ -341,6 +363,9 @@ export default class DishCategory extends Vue {
     .category-page{
         width: 100%;
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         background: #F5F5F5;
     }
     .title-bar{
@@ -411,7 +436,8 @@ export default class DishCategory extends Vue {
     .filters{
         width: 100px;
     }
-    .ant-table-body {
-        overflow: auto;
+    .table {
+        flex: 1;
+        overflow-y: scroll;
     }
 </style>

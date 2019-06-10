@@ -98,30 +98,15 @@ export default class DishCategory extends Vue {
     doCancel() {
         this.$router.go(-1);
     };
-    dataURItoBlob (base64Data) {
-        var byteString;
-        if(base64Data.split(',')[0].indexOf('base64') >= 0)
-            byteString = atob(base64Data.split(',')[1]);
-        else
-            byteString = unescape(base64Data.split(',')[1]);
-        var mimeString = base64Data.split(',')[0].split(':')[1].split(';')[0];
-        var ia = new Uint8Array(byteString.length);
-        for(var i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ia], {
-            type: mimeString
-        });
-    }
     // 上传图片事件处理
     async handleFileChange(files) {
         console.log(files ,'envjldkfjkld');
         this.imageList = files;
         let formData = new FormData();
         formData.append("type", "image");
-        formData.append("md5", files[0].md5);
+        formData.append("md5", files[files.length - 1].md5);
         formData.append("project", "mf");
-        formData.append("file", files[0]);
+        formData.append("file", files[files.length - 1]);
         try {
             let res = await uploadImg(formData);
             console.log(res, "ressssss")

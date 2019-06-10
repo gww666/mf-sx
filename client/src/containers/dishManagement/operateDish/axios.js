@@ -11,7 +11,7 @@ export const operateGoods = data => {
 // 图片上传
 export const uploadImg = data => {
     let options = {
-        url: "/img/upload",
+        url: "http://120.78.221.14:2235/api/upload",
         method: "POST",
         data: data
     };

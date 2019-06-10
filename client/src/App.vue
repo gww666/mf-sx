@@ -21,14 +21,18 @@ export default class App extends Vue {
                 {
                     this.isLoginPage ? <div></div> : <left-side-list />
                 }
-                <div class="right-side">
+                <div class="right-side" ref="rightSide">
                     {
                         this.isLoginPage ? <div></div> : <common-header />
                     }
-                    <router-view class="router-view"></router-view>
+                    <router-view class="router-view" ref="routerView"></router-view>
                 </div>
             </div>
 		)
+    }
+    setHeight() {
+        let rightSide = this.$refs.rightSide;
+        rightSide.style.height = document.documentElement.offsetHeight + "px";
     }
     async created() {
         // 自动登录
@@ -50,6 +54,9 @@ export default class App extends Vue {
                 console.log("自动登录", err);
             };
         };
+    };
+    mounted() {
+        this.setHeight();
     }
 };
 </script>

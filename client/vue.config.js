@@ -6,14 +6,6 @@ module.exports = {
                 target: 'http://120.78.221.14:2233',
                 ws: true,
                 changeOrigin: true
-            },
-            '/img': {
-                target: 'http://120.78.221.14:2235',
-                ws: true,
-                changeOrigin: true,
-                pathRewrite: {  
-                    '^/img': '/'
-                }
             }
         }
     }
