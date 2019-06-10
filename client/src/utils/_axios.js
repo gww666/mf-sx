@@ -1,5 +1,5 @@
 import axios from 'axios';
-import router from '../router'
+import router from '../router';
 axios.defaults.withCredentials = true;
 
 import { message } from "ant-design-vue";
@@ -22,7 +22,7 @@ axios.interceptors.response.use(
 		if (response.data.returnCode === 401) {
 			message.success("登录信息失效，请重新登录");
 			router.replace({name: "login"});
-		}
+		};
 		return response;
 	},
 	err => {

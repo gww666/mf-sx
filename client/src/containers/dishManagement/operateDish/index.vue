@@ -59,9 +59,10 @@ export default class DishCategory extends Vue {
         };
     };
     // 点击确定
-    async doSave() {
+    async doSave(srcStr) {
         if(this.userInfo.id) {
             let obj = Object.assign({companyId: this.userInfo.id}, this.dishInfo);
+            obj.images = srcStr || "";
             try {
                 let res = await operateGoods(obj);
                 if(res.data.returnCode === 1) {
@@ -102,20 +103,35 @@ export default class DishCategory extends Vue {
     async handleFileChange(files) {
         console.log(files ,'envjldkfjkld');
         this.imageList = files;
-        let formData = new FormData();
-        formData.append("type", "image");
-        formData.append("md5", files[files.length - 1].md5);
-        formData.append("project", "mf");
-        formData.append("file", files[files.length - 1]);
-        try {
-            let res = await uploadImg(formData);
-            console.log(res, "ressssss")
-        }catch (err) {
-            console.log("上传err: ", err);
-        };
     };
     doUpload() {
-        
+        let arr = [];
+        this.imageList.forEach(ele => {
+            arr.push(new Promise((reslove, reject) => {
+                let formData = new FormData();
+                formData.append("type", "image");
+                formData.append("md5", ele.md5);
+                formData.append("project", "mf");
+                formData.append("file", ele);
+                uploadImg(formData).then(res => {
+                    reslove(res);
+                });
+            }));
+        });
+        Promise.all(arr).then(values => {
+            let srcStr = "";
+            values.forEach(item => {
+               srcStr += `${item.data.data[0]},`;
+            });
+            srcStr = srcStr.substr(0, srcStr.length - 1);
+            this.doSave(srcStr);
+        });
+        // try {
+        //     let res = await uploadImg(formData);
+        //     console.log(res, "ressssss")
+        // }catch (err) {
+        //     console.log("上传err: ", err);
+        // };
     }
 	render() {
 		return (
@@ -164,7 +180,7 @@ export default class DishCategory extends Vue {
                             <a-input-number class="inputs" min={0} max={9999} v-model={this.dishInfo.stock} placeholder="请输入菜品库存" />
                         </div>
                         <div class="btns-box">
-                            <a-button type="primary" onClick={this.doSave}>保存</a-button>
+                            <a-button type="primary" onClick={this.doUpload}>保存</a-button>
                             <a-button onClick={this.doCancel}>取消</a-button>
                         </div>
                     </div>
@@ -175,7 +191,7 @@ export default class DishCategory extends Vue {
     mounted() {
         for(let i = 0;i < 100; i++) {
             this.sortArr.push(i);
-        }
+        };
         let query = this.$route.query || {};
         if (query.type === "edit") {
             this.pageType = "edit";
@@ -184,8 +200,8 @@ export default class DishCategory extends Vue {
             this.pageType = "create";
         };
         this.queryCategoryList();
-    }
-}
+    };
+};
 </script>
 <style lang="less" scoped>
     .operate-dish{
