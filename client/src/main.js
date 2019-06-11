@@ -5,7 +5,7 @@ import router from "./router";
 import store from './store';
 import 'ant-design-vue/dist/antd.css';
 Vue.config.productionTip = false;
-
+import domain from "./utils/domain";
 import { autoLogin } from "./utils/autoLogin";
 
 async function createApp () {
@@ -23,7 +23,7 @@ async function createApp () {
             console.log("自动登录", err);
         };
     };
-    
+    domain();
     new Vue({
         router,
         store,

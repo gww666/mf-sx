@@ -4,7 +4,7 @@ import Component from "vue-class-component";
 import { Input, Button, Select, InputNumber, message } from "ant-design-vue";
 import { operateGoods, uploadImg } from "./axios";
 import { getCategoryList, getGoodsInfoById } from "../axios";
-import imageX from "image-sx";
+import imageX, { compress } from "image-sx";
 Vue.use(Input);
 Vue.use(Button);
 Vue.use(Select);
@@ -20,12 +20,16 @@ export default class DishCategory extends Vue {
         categoryId: undefined,
         title: "",
         subTitle: "",
+        images: "",
         state: 1,
         price: 0,
         salePrice: 0,
-        stock: 0
+        stock: 0,
+        thumbnail: ""
     };
     imageList = [];
+    previousImgs = [];
+    goodsIcon = [];
     // 分类列表列表
     categoryList = [];
     sortArr = [];
@@ -59,10 +63,12 @@ export default class DishCategory extends Vue {
         };
     };
     // 点击确定
-    async doSave(srcStr) {
+    async doSave(srcStr, thumbnail) {
         if(this.userInfo.id) {
             let obj = Object.assign({companyId: this.userInfo.id}, this.dishInfo);
-            obj.images = srcStr || "";
+            if (srcStr) {
+                obj.images = srcStr;
+            };
             try {
                 let res = await operateGoods(obj);
                 if(res.data.returnCode === 1) {
@@ -89,6 +95,13 @@ export default class DishCategory extends Vue {
                 for(let key in  this.dishInfo) {
                     this.dishInfo[key] = data[key];
                 };
+                if (data.images.length) {
+                    let imgs = data.images.split(",");
+                    for (let i = 0; i < imgs.length; i++) {
+                        imgs[i] = `${api.base}${imgs[i]}`;
+                    };
+                    this.previousImgs = imgs;
+                };
                 this.dishInfo.goodsId = data.id;
             };
         } catch (err) {
@@ -101,38 +114,88 @@ export default class DishCategory extends Vue {
     };
     // 上传图片事件处理
     async handleFileChange(files) {
-        console.log(files ,'envjldkfjkld');
         this.imageList = files;
     };
-    doUpload() {
-        let arr = [];
-        this.imageList.forEach(ele => {
-            arr.push(new Promise((reslove, reject) => {
+    // 缩略图
+    handleFileChange2(files, fromPic) {
+        this.goodsIcon = files;
+    };
+    createPromise(ele) {
+        return new Promise((reslove, reject) => {
+            let formData = new FormData();
+            formData.append("type", "image");
+            formData.append("md5", ele.md5);
+            formData.append("project", "mf");
+            formData.append("file", ele);
+            uploadImg(formData).then(res => {
+                reslove(res);
+            });
+        });
+    };
+    async compressIcon(image) {
+        if (image.size > 50 * 1024) {
+            let comp = new compress(image, {
+                quality: 0.4,
+                maxWidth: 150,
+                maxHeight: 150
+            });
+            let originBlob = await comp.compress();
+            return new Promise((reslove, reject) => {
                 let formData = new FormData();
                 formData.append("type", "image");
-                formData.append("md5", ele.md5);
+                formData.append("md5", originBlob.md5);
                 formData.append("project", "mf");
-                formData.append("file", ele);
+                formData.append("file", originBlob);
                 uploadImg(formData).then(res => {
                     reslove(res);
                 });
-            }));
-        });
-        Promise.all(arr).then(values => {
-            let srcStr = "";
-            values.forEach(item => {
-               srcStr += `${item.data.data[0]},`;
             });
-            srcStr = srcStr.substr(0, srcStr.length - 1);
-            this.doSave(srcStr);
-        });
-        // try {
-        //     let res = await uploadImg(formData);
-        //     console.log(res, "ressssss")
-        // }catch (err) {
-        //     console.log("上传err: ", err);
-        // };
-    }
+        };
+    };
+    async doUpload() {
+        if (this.imageList.length || this.previousImgs.length) {
+            let arr = [];
+            // 上传了缩略图
+            if (this.goodsIcon.length) {
+                try {
+                    let res = await this.compressIcon(this.goodsIcon[0]);
+                    if (res.data.returnCode === 1) {
+                        this.dishInfo.thumbnail = res.data.data[0];
+                    };
+                } catch (err) {
+                    console.log("缩略图上传err", err);
+                };
+            };
+            // 没有缩略图
+            if (!this.dishInfo.thumbnail) {
+                try {
+                    let res = await this.compressIcon(this.imageList[0]);
+                    if (res.data.returnCode === 1) {
+                        this.dishInfo.thumbnail = res.data.data[0];
+                    };
+                } catch (err) {
+                    console.log("缩略图上传err", err);
+                };
+            };
+            this.imageList.forEach(ele => {
+                arr.push(this.createPromise(ele));
+            });
+            Promise.all(arr).then(values => {
+                let srcStr = "";
+                // 拼接图片字符串
+                this.previousImgs.forEach(item => {
+                    srcStr += `${item.split(api.base)[1]},`;
+                });
+                values.forEach(item => {
+                    srcStr += `${item.data.data[0]},`;
+                });
+                srcStr = srcStr.substr(0, srcStr.length - 1);
+                this.doSave(srcStr);
+            });
+        } else {
+            message.warning("请上传商品图片");
+        };
+    };
 	render() {
 		return (
             <div class="operate-dish">
@@ -146,7 +209,7 @@ export default class DishCategory extends Vue {
                                     this.categoryList.map((ele, index) => {
                                         return (
                                             <a-select-option value={ele.id}>{ele.name}</a-select-option>
-                                        )
+                                        );
                                     })
                                 }
                             </a-select>
@@ -155,7 +218,14 @@ export default class DishCategory extends Vue {
                             <p><span class="required-symbol">*</span> 标题：</p>
                             <a-input class="inputs" v-model={this.dishInfo.title} maxLength={20} placeholder="请输入菜品标题" />
                         </div>
-                        <image-x onFileChange={this.handleFileChange} mode="preview"></image-x>
+                        <div class="lines images">
+                            <p><span class="required-symbol">*</span> 图片：</p>
+                            <image-x onFileChange={this.handleFileChange} imgUrls={this.previousImgs} mode="preview"></image-x>
+                        </div>
+                        <div class="lines images">
+                            <p> 缩略图：</p>
+                            <image-x onFileChange={this.handleFileChange2} maxCount={1} imgUrls={this.dishInfo.thumbnail ? [`${api.base + this.dishInfo.thumbnail}`] : []} mode="preview"></image-x>
+                        </div>
                         <div class="lines">
                             <p> 副标题：</p>
                             <a-input class="inputs" v-model={this.dishInfo.subTitle} maxLength={50} placeholder="请输入菜品副标题" />
@@ -241,6 +311,13 @@ export default class DishCategory extends Vue {
         }
         .inputs{
             flex: 1;
+        }
+    }
+    .images{
+        height: 110px;
+        justify-content: flex-start;
+        p{
+            line-height: 100px;
         }
     }
     .btns-box{

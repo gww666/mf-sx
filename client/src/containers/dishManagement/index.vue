@@ -245,6 +245,10 @@ export default class DishCategory extends Vue {
                     </div>
                 </div>
             );
+        } else if (item.key === "mainImg") {
+            dom = text ?　(
+                <img src={`${api.base}${text}`} style="width: 50px;" />
+            ) : "";
         };
         return dom;
     };
