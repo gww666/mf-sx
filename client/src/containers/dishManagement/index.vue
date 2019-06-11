@@ -148,11 +148,11 @@ export default class DishCategory extends Vue {
     }
     // 跳转新增
     goCreate() {
-        this.$router.push({name: "operateDish", query: {type: "create"}});
+        this.$router.push({name: "operateDish", query: {categoryList: JSON.stringify(this.categoryList), type: "create"}});
     };
     // 跳转编辑
     goEdit(record) {
-        this.$router.push({name: "operateDish", query: {id: record.id, type: "edit"}});
+        this.$router.push({name: "operateDish", query: {params: JSON.stringify(record), categoryList: JSON.stringify(this.categoryList), type: "edit"}});
     };
     // 删除
     doDelete(record) {
@@ -357,9 +357,7 @@ export default class DishCategory extends Vue {
             clearTimeout(this.timer);
             this.timer = null;
         };
-        this.timer = setTimeout(async () => {
-            this.queryCategoryList();
-        }, 300)
+        this.queryCategoryList();
     };
 }
 </script>

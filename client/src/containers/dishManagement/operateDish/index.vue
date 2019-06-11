@@ -39,27 +39,31 @@ export default class DishCategory extends Vue {
     };
     // 获取分类列表
     async queryCategoryList() {
-        try {
-            let res = await getCategoryList(this.userInfo.id);
-            if (res.data.returnCode === 1) {
-                if(res.data.data.length > 0) {
-                    this.categoryList = res.data.data.sort((a, b) => {
-                        if (a.sort < b.sort) {
-                            return -1;
-                        }
-                        if (a.sort > b.sort) {
-                            return 1;
-                        }
-                        return 0;
-                    });
-                }else {
+        if (this.$route.query.categoryList) {
+            this.categoryList = JSON.parse(this.$route.query.categoryList);
+        } else {
+            try {
+                let res = await getCategoryList(this.userInfo.id);
+                if (res.data.returnCode === 1) {
+                    if(res.data.data.length > 0) {
+                        this.categoryList = res.data.data.sort((a, b) => {
+                            if (a.sort < b.sort) {
+                                return -1;
+                            }
+                            if (a.sort > b.sort) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                    }else {
+                        this.categoryList = [];
+                    };
+                } else {
                     this.categoryList = [];
                 };
-            } else {
-                this.categoryList = [];
+            }catch(err) {
+                console.log(err, "获取分类列表err");
             };
-        }catch(err) {
-            console.log(err, "获取分类列表err");
         };
     };
     // 点击确定
@@ -87,26 +91,18 @@ export default class DishCategory extends Vue {
         this.dishInfo.categoryId = val;
     };
     // 编辑回显
-    async queryGoodsInfo (id) {
-        try {
-            let res = await getGoodsInfoById(id);
-            if (res.data.returnCode === 1) {
-                let data = res.data.data[0];
-                for(let key in  this.dishInfo) {
-                    this.dishInfo[key] = data[key];
-                };
-                if (data.images.length) {
-                    let imgs = data.images.split(",");
-                    for (let i = 0; i < imgs.length; i++) {
-                        imgs[i] = `${api.base}${imgs[i]}`;
-                    };
-                    this.previousImgs = imgs;
-                };
-                this.dishInfo.goodsId = data.id;
+    async queryGoodsInfo (data) {
+        for(let key in  this.dishInfo) {
+            this.dishInfo[key] = data[key];
+        };
+        if (data.images.length) {
+            let imgs = data.images.split(",");
+            for (let i = 0; i < imgs.length; i++) {
+                imgs[i] = `${api.base}${imgs[i]}`;
             };
-        } catch (err) {
-            console.log("编辑回显err", err)
-        }
+            this.previousImgs = imgs;
+        };
+        this.dishInfo.goodsId = data.id;
     };
     // 点击取消
     doCancel() {
@@ -193,7 +189,7 @@ export default class DishCategory extends Vue {
                 this.doSave(srcStr);
             });
         } else {
-            message.warning("请上传商品图片");
+            this.doSave();
         };
     };
 	render() {
@@ -219,7 +215,7 @@ export default class DishCategory extends Vue {
                             <a-input class="inputs" v-model={this.dishInfo.title} maxLength={20} placeholder="请输入菜品标题" />
                         </div>
                         <div class="lines images">
-                            <p><span class="required-symbol">*</span> 图片：</p>
+                            <p> 图片：</p>
                             <image-x onFileChange={this.handleFileChange} imgUrls={this.previousImgs} mode="preview"></image-x>
                         </div>
                         <div class="lines images">
@@ -265,7 +261,8 @@ export default class DishCategory extends Vue {
         let query = this.$route.query || {};
         if (query.type === "edit") {
             this.pageType = "edit";
-            this.queryGoodsInfo(query.id);
+            let params = JSON.parse(this.$route.query.params);
+            this.queryGoodsInfo(params);
         } else {
             this.pageType = "create";
         };
