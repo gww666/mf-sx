@@ -13,6 +13,7 @@ const connection_1 = require("./db/connection");
 const util_1 = require("./util");
 const login_1 = require("./routers/login");
 const goods_1 = require("./routers/goods");
+const public_1 = require("./routers/public");
 const app = new koa();
 //全局挂载db
 app.use((ctx, next) => __awaiter(this, void 0, void 0, function* () {
@@ -25,6 +26,7 @@ app.use(util_1.body());
 //挂载路由
 app.use(login_1.default.routes()).use(login_1.default.allowedMethods());
 app.use(goods_1.default.routes()).use(goods_1.default.allowedMethods());
+app.use(public_1.default.routes()).use(public_1.default.allowedMethods());
 let hostname = "172.18.249.80";
 let port = "2233";
 app.listen(port, hostname, () => {
