@@ -11,7 +11,7 @@
     "ant-design-vue": "^1.3.9",
     "axios": "^0.18.0",
     "core-js": "^2.6.5",
-    "image-sx": "^0.1.15",
+    "image-sx": "^0.1.17",
     "js-md5": "^0.7.3",
     "vue": "^2.6.10",
     "vue-class-component": "^7.1.0",
