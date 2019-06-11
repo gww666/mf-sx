@@ -67,8 +67,6 @@ exports.goodsList = (ctx) => __awaiter(this, void 0, void 0, function* () {
     let [rows] = yield mysql.execute(sql, params);
     let sql2 = "SELECT FOUND_ROWS() as total";
     let [rows2] = yield mysql.execute(sql2);
-    // console.log("打印total", rows2); 
-    // let res = each(rows);
     return [common_1.each(rows), rows2[0].total];
 });
 //新增一个商品

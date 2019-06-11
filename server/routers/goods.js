@@ -59,7 +59,6 @@ router.get("/delCategory", util_1.validateUser, (ctx) => __awaiter(this, void 0,
 router.get("/goodsList", util_1.validateUser, (ctx) => __awaiter(this, void 0, void 0, function* () {
     try {
         let data = yield goods_1.goodsList(ctx);
-        // console.log("打印data", data);
         ctx.body = new resModel_1.SucModel(data[0], "商品列表查询成功", data[1]);
     }
     catch (err) {

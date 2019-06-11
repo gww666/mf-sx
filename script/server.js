@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const archiver = require("archiver");
 const {copy, rmdirsSync} = require("./util.js");
+const upload = require("./puppeteer");
 //server目录下需要copy的目录
 let config = {
     include: [
@@ -81,6 +82,13 @@ const deleteTSFile = (startPath = distDir) => {
         //删除temp目录
         rmdirsSync(originDirPath);
         console.log("生成压缩包成功!");
+        //开始上传
+        upload({
+            zipPath: targetZipPath,
+            type: "server",
+            name: "dist",
+            project: "mf"
+        });
     });
     archive.pipe(zipStream);
     //指定压缩的目录，第二个参数是指定解压目录的结构，传false代表采用被压缩文件的目录结构
