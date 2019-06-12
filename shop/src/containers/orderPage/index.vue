@@ -85,14 +85,6 @@ export default class Order extends Vue {
 			'easeInOutCirc'
 		);
 	};
-	// 增加数量
-	addToCart(item) {
-		console.log(item, 'itemmmm')
-	};
-	// 减少数量
-	decrease(item) {
-		console.log(item, 'itemmmm')
-	};
 	render() {
 		return (
 			<div class="order-container">
@@ -128,7 +120,7 @@ export default class Order extends Vue {
 													:
 													<span></span>
 												}
-												<handle goods={item} mStyle="width: 1.6rem;position: absolute;right:0;bottom: -0.14rem;"/>
+												<handle goods={item} mStyle={{width: "1.6rem", position: "absolute", right: 0, bottom: "-0.14rem"}} />
 											</div>
 										</div>
 									</li>
@@ -235,31 +227,5 @@ export default class Order extends Vue {
 		color: rgba(0, 0, 0, 0.65);
 		font-size: .14rem;
 		text-decoration: line-through;
-	}
-	.add-btn{
-		width: 16px;
-		height: 16px;
-		text-align: center;
-		line-height: 14px;
-		font-size: 16px;
-		font-weight: bold;
-		background: #1890ff;
-		color: #FFF;
-		border-radius: 8px;
-		position: absolute;
-		right: 0;
-		bottom: -4px;
-	}
-	.dec-btn{
-		right: 46px;
-		background: #FF4544;
-	}
-	.count{
-		width: 30px;
-		right: 16px;
-		font-size: .14rem;
-		background: transparent;
-		font-weight: normal;
-		color: rgba(0, 0, 0, 0.65);
 	}
 </style>
