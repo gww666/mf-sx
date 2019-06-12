@@ -51,6 +51,7 @@ export default class Order extends Vue {
                 if(res.data.data.length > 0) {
 					let goodsList = res.data.data;
 					let Arr = [];
+					// 排个序
 					this.categoryList.forEach(item => {
 						let arr = [];
 						for (let i = 0;i < goodsList.length;i++) {
@@ -76,14 +77,30 @@ export default class Order extends Vue {
 	};
 	// 切换分类
 	handleCategoryClick(item) {
+		this.currentCategory = item.id;
+		this.$refs.rightList.onscroll = null;
 		let liHeight = document.querySelector(".goods-item").offsetHeight;
 		scrollTo(
 			this.$refs.rightList,
 			'scrollTop',
 			item.startIndex * liHeight, // target scrollY (0 means top of the page)
 			500, // duration in ms
-			'easeInOutCirc'
+			'easeInOutCirc',
+			() => {
+				this.$refs.rightList.onscroll = e => {this.handleUlScroll(e)};
+			}
 		);
+	};
+	handleUlScroll(e) {
+		let length = this.categoryList.length;
+		let liHeight = document.querySelector(".goods-item").offsetHeight;
+		for(let i = length - 1;i >= 0;i--) {
+			console.log(this.categoryList[i].startIndex * liHeight, e.target.scrollTop)
+			if(this.categoryList[i].startIndex * liHeight <= e.target.scrollTop) {
+				this.currentCategory = this.categoryList[i].id;
+				break;
+			};
+		};
 	};
 	render() {
 		return (
@@ -135,6 +152,7 @@ export default class Order extends Vue {
 	};
 	mounted() {
 		this.queryCategoryList();
+		this.$refs.rightList.onscroll = e => {this.handleUlScroll(e)};
 	};
 };
 </script>
@@ -171,7 +189,7 @@ export default class Order extends Vue {
 				box-sizing: border-box;
 			}
 			.choosen-class{
-				background: #FFF;
+				background: #e6e6e6;
 			}
 		}
 	}
