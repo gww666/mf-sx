@@ -222,6 +222,7 @@ export default {
                 align-items: center;
                 box-sizing: border-box;
                 padding: 0.2rem;
+                border-bottom: 1px solid #f2f2f2;
 
                 .title {
                     width: 35%;

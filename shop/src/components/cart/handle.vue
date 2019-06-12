@@ -16,34 +16,33 @@ export default {
             type: Object,
             default: () => ({})
         }
-        // addGoods: {
-        //     type: Function,
-        //     default: () => {}
-        // },
-        // reduceGoods: {
-        //     type: Function,
-        //     default: () => {}
-        // }
     },
     data() {
         return {
-            goodsCount: this.goods.count
+            
         }
     },
     computed: {
-        // goodsCount() {
-
-        // }
+        goodsCount() {
+            if (Object.keys(this.goods).length) {
+                //根据id找到goodsList里对应的count数量
+                let goods = this.$store.state.gw.goodsList.find(item => item.id === this.goods.id);
+                if (goods) {
+                    return goods.count;
+                }
+            }
+            return 0;
+        }
     },
     methods: {
         addGoods() {
             this.$store.commit("gw/addGoods", this.goods);
-            this.goodsCount += 1;
+            // this.goodsCount += 1;
             this.$emit("add");
         },
         reduceGoods() {
             this.$store.commit("gw/reduceGoods", this.goods);
-            this.goodsCount -= 1;
+            // this.goodsCount -= 1;
             this.$emit("reduce");
         }
     }

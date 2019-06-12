@@ -2,28 +2,7 @@ export default {
     namespaced: true,
     state: {
         //维护的菜品数组
-        goodsList: [
-            {
-                id: "232",
-                title: "辣椒炒肉",
-                price: "26.00",
-                salePrice: "24.00",
-                count: 1
-            },
-            {
-                id: "231",
-                title: "小鸡炖蘑菇",
-                price: "56.00",
-                salePrice: "",
-                count: 1
-            },
-            {
-                id: "233",
-                title: "炸花生米",
-                price: "12.00",
-                count: 2
-            },
-        ]
+        goodsList: []
     },
     getters: {
 
