@@ -19,7 +19,7 @@ const router = new KoadRouter({
 });
 
 //根据companyId查询分类
-router.get("/categoryList", validateUser, async ctx => {
+router.get("/categoryList", async ctx => {
     try {
         let data = await getCategoryList(ctx);
         ctx.body = new SucModel(data, "分类列表查询成功");
@@ -60,7 +60,7 @@ router.get("/delCategory", validateUser, async ctx => {
 });
 
 //查询商品列表
-router.get("/goodsList", validateUser, async ctx => {
+router.get("/goodsList", async ctx => {
     try {
         let data = await goodsList(ctx);
         ctx.body = new SucModel(data[0], "商品列表查询成功", data[1]);
