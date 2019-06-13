@@ -4,6 +4,7 @@ import {body} from "./util";
 import login from "./routers/login";
 import goods from "./routers/goods";
 import publicRouter from "./routers/public";
+import settingsRouter from "./routers/settings";
 
 const app = new koa();
 //全局挂载db
@@ -17,6 +18,7 @@ app.use(body());
 //挂载路由
 app.use(login.routes()).use(login.allowedMethods());
 app.use(goods.routes()).use(goods.allowedMethods());
+app.use(settingsRouter.routes()).use(settingsRouter.allowedMethods());
 app.use(publicRouter.routes()).use(publicRouter.allowedMethods());
 let hostname = "172.18.249.80";
 let port = "2233";

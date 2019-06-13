@@ -18,3 +18,18 @@ exports.getCompanyInfo = (ctx) => __awaiter(this, void 0, void 0, function* () {
     let [rows] = yield mysql.execute(sql, [account, password]);
     return common_1.each(rows);
 });
+//查询企业参数配置
+exports.getCompanySettings = (ctx) => __awaiter(this, void 0, void 0, function* () {
+    let mysql = ctx.db;
+    let { companyId } = ctx.query;
+    let sql = `select * from settings where company_id = ?`;
+    let [rows] = yield mysql.execute(sql, [companyId]);
+    return common_1.each(rows);
+});
+//修改企业设定配置
+exports.updateCompanySettings = (ctx) => __awaiter(this, void 0, void 0, function* () {
+    let mysql = ctx.db;
+    let { companyId, noticeType, processType } = ctx.params;
+    let sql = `update settings set process_type = ?, notice_type = ? where company_id = ?`;
+    yield mysql.execute(sql, [companyId, processType, noticeType]);
+});

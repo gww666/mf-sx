@@ -16,7 +16,7 @@ const router = new KoadRouter({
     prefix: "/api"
 });
 //根据companyId查询分类
-router.get("/categoryList", util_1.validateUser, (ctx) => __awaiter(this, void 0, void 0, function* () {
+router.get("/categoryList", (ctx) => __awaiter(this, void 0, void 0, function* () {
     try {
         let data = yield goods_1.getCategoryList(ctx);
         ctx.body = new resModel_1.SucModel(data, "分类列表查询成功");
@@ -56,7 +56,7 @@ router.get("/delCategory", util_1.validateUser, (ctx) => __awaiter(this, void 0,
     }
 }));
 //查询商品列表
-router.get("/goodsList", util_1.validateUser, (ctx) => __awaiter(this, void 0, void 0, function* () {
+router.get("/goodsList", (ctx) => __awaiter(this, void 0, void 0, function* () {
     try {
         let data = yield goods_1.goodsList(ctx);
         ctx.body = new resModel_1.SucModel(data[0], "商品列表查询成功", data[1]);
