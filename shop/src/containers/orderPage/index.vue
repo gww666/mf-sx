@@ -95,7 +95,6 @@ export default class Order extends Vue {
 		let length = this.categoryList.length;
 		let liHeight = document.querySelector(".goods-item").offsetHeight;
 		for(let i = length - 1;i >= 0;i--) {
-			console.log(this.categoryList[i].startIndex * liHeight, e.target.scrollTop)
 			if(this.categoryList[i].startIndex * liHeight <= e.target.scrollTop) {
 				this.currentCategory = this.categoryList[i].id;
 				break;

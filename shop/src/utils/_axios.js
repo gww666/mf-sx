@@ -5,7 +5,7 @@ axios.defaults.withCredentials = true;
 /* 拦截器 */
 axios.interceptors.request.use(
 	config => {
-		config.headers.sessionId = "mfurd1";
+		// config.headers.sessionId = "mfurd1";
 		return config;
 	},
 	err => {

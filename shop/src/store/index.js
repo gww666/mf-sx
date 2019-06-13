@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 Vue.use(Vuex);
 import gw from "./gw";
+import qxz from "./qxz";
  
 export default new Vuex.Store({
 	state: {
@@ -17,6 +18,7 @@ export default new Vuex.Store({
 		
 	},
 	modules: {
-		gw
+		gw,
+		qxz
 	}
 });

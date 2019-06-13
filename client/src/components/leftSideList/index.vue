@@ -19,6 +19,12 @@ export default class LeftSideList extends Vue {
             name: "dishCategory",
             icon: "appstore",
             isActive: false
+        },
+        {
+            title: "系统设置",
+            name: "systemSettings",
+            icon: "setting",
+            isActive: false
         }
     ]
     handleTabClick(item) {
