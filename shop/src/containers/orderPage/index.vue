@@ -2,7 +2,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 
-import { getCategoryList, getGoodsList } from "./axios";
+import { getCategoryList, getGoodsList, getSettings } from "./axios";
 import scrollTo from "scrollto-with-animation";
 import cart from "../../components/cart";
 import handle from "../../components/cart/handle";
@@ -74,6 +74,20 @@ export default class Order extends Vue {
         }catch(err) {
             console.log(err, "获取分类列表err");
         };
+	};
+	// 获取系统设置
+	async querySystemSettings() {
+		try {
+			let res = await getSettings();
+			if(res.data.returnCode === 1) {
+				let data = res.data.data[0];
+				this.$store.commit("qxz/updateTypes", data);
+			} else {
+				console.log("获取系统设置err");
+			};
+		} catch (err) {
+			console.log("获取系统设置err", err);
+		};
 	};
 	// 切换分类
 	handleCategoryClick(item) {
@@ -150,6 +164,7 @@ export default class Order extends Vue {
 		)
 	};
 	mounted() {
+		this.querySystemSettings();
 		this.queryCategoryList();
 		this.$refs.rightList.onscroll = e => {this.handleUlScroll(e)};
 	};

@@ -16,3 +16,11 @@ export const getGoodsList = (companyId, categoryId, pageNum, pageSize) => {
     };
     return _axios(options);
 };
+// 获取设置
+export const getSettings = () => {
+    let options = {
+        url: `/api/getSettings?companyId=${1}`,
+        method: "GET"
+    };
+    return _axios(options);
+}
