@@ -1,4 +1,5 @@
 import _axios from "../../utils/_axios";
+import { getFormateDate } from "../../utils/getFormateDate";
 
 // 获取分类列表
 export const getCategoryList = companyId => {
@@ -20,6 +21,14 @@ export const getGoodsList = (companyId, categoryId, pageNum, pageSize) => {
 export const getSettings = () => {
     let options = {
         url: `/api/getSettings?companyId=${1}`,
+        method: "GET"
+    };
+    return _axios(options);
+}
+// 根据企业号、餐桌号、创建日期查询订单
+export const getOrder = (tableNo = 1) => {
+    let options = {
+        url: `/api/getOrder?companyId=${1}&tableNo=${tableNo}&createDate2=${getFormateDate(new Date())}`,
         method: "GET"
     };
     return _axios(options);
