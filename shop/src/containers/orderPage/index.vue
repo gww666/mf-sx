@@ -75,42 +75,6 @@ export default class Order extends Vue {
             console.log(err, "获取分类列表err");
         };
 	};
-	// 获取系统设置
-	async querySystemSettings() {
-		// try {
-		// 	let res = await getSettings();
-		// 	if(res.data.returnCode === 1) {
-		// 		let data = res.data.data[0];
-		// 		console.log(data, 'data');
-		// 		this.$store.commit("qxz/updateTypes", data);
-		// 		if (data.processType === 1) {
-
-		// 		};
-		// 	} else {
-		// 		console.log("获取系统设置err");
-		// 	};
-		// } catch (err) {
-		// 	console.log("获取系统设置err", err);
-		// };
-		Promise.all([getSettings(), getOrder()]).then(res => {
-			let setting_res = res[0];
-			let order_res = res[1];
-			if (setting_res.data.returnCode === 1 && order_res.data.returnCode === 1) {
-				let setting = setting_res.data.data[0];
-				let order = order_res.data.data[0];
-				// this.$store.commit("qxz/updateTypes", setting);
-				if (setting.processType === 1) {
-					console.log("先付款，有没有未完结的单都继续点");
-				};
-				if (setting.processType === 2 && order) {
-					console.log("后付款，且有未完结订单，调转加菜结账选择页面");
-				};
-			};
-			console.log(res, "resssss");
-		}).catch(err => {
-			console.log("是否有未完结订单err:", err);
-		})
-	};
 	// 切换分类
 	handleCategoryClick(item) {
 		this.currentCategory = item.id;
@@ -157,7 +121,7 @@ export default class Order extends Vue {
 							{
 								this.goodsList.map(item => (
 									<li class="goods-item">
-										<img src={item.mainImg ? `http://120.78.221.14:2233${item.mainImg}` : this.defaultPic} class="main-img" />
+										<img src={item.thumbnail ? `http://120.78.221.14:2233${item.thumbnail}` : this.defaultPic} class="main-img" />
 										<div class="content">
 											<div style="width: 100%;">
 												<p class="title">{item.title}</p>
@@ -186,7 +150,6 @@ export default class Order extends Vue {
 		)
 	};
 	mounted() {
-		this.querySystemSettings();
 		this.queryCategoryList();
 		this.$refs.rightList.onscroll = e => {this.handleUlScroll(e)};
 	};
