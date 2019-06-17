@@ -218,6 +218,7 @@ export default class Order extends Vue {
 	.goods-item{
 		width: 100%;
 		height: 1.8rem;
+		background: #FFF;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;

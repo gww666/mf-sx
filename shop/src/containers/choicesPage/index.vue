@@ -41,6 +41,6 @@ export default class Order extends Vue {
         text-align: center;
         color: #FFF;
         background: #1890ff;
-        margin: .4rem auto;
+        margin: 70% auto;
     }
 </style>
