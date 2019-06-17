@@ -210,10 +210,10 @@ export default class DishCategory extends Vue {
                 <div class="btns-field">
                     <div class="btns-layout">
                         {
-                            record.state === 2 ? <p class="btn delete-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已下架</p> : <span></span>
+                            record.state === 2 ? <p class="btn delete-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已下架</p> : ""
                         }
                         {
-                            record.state === 1 ? <p class="btn edit-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已上架</p> : <span></span>
+                            record.state === 1 ? <p class="btn edit-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已上架</p> : ""
                         }
                     </div>
                 </div>

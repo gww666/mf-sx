@@ -121,7 +121,9 @@ export default class Order extends Vue {
 							{
 								this.goodsList.map(item => (
 									<li class="goods-item">
-										<img src={item.thumbnail ? `http://120.78.221.14:2233${item.thumbnail}` : this.defaultPic} class="main-img" />
+										<div class="icon-can">
+											<img src={item.thumbnail ? `http://120.78.221.14:2233${item.thumbnail}` : this.defaultPic} class="main-img" />
+										</div>
 										<div class="content">
 											<div style="width: 100%;">
 												<p class="title">{item.title}</p>
@@ -193,7 +195,7 @@ export default class Order extends Vue {
 		}
 	}
 	.list-right{
-		width: 75%;
+		width: 74%;
 		height: 100%;
 		overflow-y: auto;
 		transition: all 0.5s;
@@ -201,12 +203,21 @@ export default class Order extends Vue {
 			width: 100%;
 		}
 	}
-	.main-img{
+	.icon-can{
 		width: 24%;
+		height: 100%;
+		margin-left: 1%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.main-img{
+		max-width: 100%;
+		max-height: 1rem;
 	}
 	.goods-item{
 		width: 100%;
-		height: 100px;
+		height: 1.8rem;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;

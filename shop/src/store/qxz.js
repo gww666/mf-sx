@@ -1,10 +1,10 @@
 export default {
     namespaced: true,
     state: {
-        //付款方式
-        processType: "",
+        // 就餐流程
+        processType: 0,
         // 厨房接单方式
-        noticeType: ""
+        noticeType: 0
     },
     getters: {
 

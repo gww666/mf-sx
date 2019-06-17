@@ -23,7 +23,6 @@ export default class Order extends Vue {
 					console.log("后付款，且有未完结订单，调转加菜结账选择页面");
 				};
 			};
-			console.log(res, "resssss");
 		}).catch(err => {
 			console.log("是否有未完结订单err:", err);
 		});
