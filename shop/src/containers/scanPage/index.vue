@@ -9,7 +9,7 @@ export default class Order extends Vue {
 	async querySystemSettings(tableNo) {
 		let hour = new Date().getHours();
 		let requestArr = [];
-		if(0 <= hour && hour <= 17) {
+		if(0 <= hour && hour <= 3) {
 			requestArr = [getSettings(), getOrder(tableNo, new Date()), getOrder(tableNo, new Date().getTime() - 24 * 60 * 60 * 1000)];
 		} else {
 			requestArr = [getSettings(), getOrder(tableNo, new Date())]
