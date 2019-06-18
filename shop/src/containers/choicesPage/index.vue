@@ -6,11 +6,11 @@ import Component from "vue-class-component";
 export default class Order extends Vue {
 	// 回到菜单去加菜
     goOrderPage() {
-        this.$router.push({name: "orderPage", query: {orderNo: this.$route.query.orderNo}});
+        this.$router.push({name: "orderPage"});
 	};
 	// 查看已有订单
     goCheckOrders() {
-		this.$router.push({name: "checkOrderDetail", query: {orderNo: this.$route.query.orderNo, payment: this.$route.query.payment}});
+		this.$router.push({name: "checkOrderDetail"});
     };
 	render() {
 		return (
@@ -21,7 +21,7 @@ export default class Order extends Vue {
 		)
 	};
 	mounted() {
-		console.log(this.$route.query, "route-query")
+		
 	};
 };
 </script>

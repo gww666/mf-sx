@@ -174,13 +174,6 @@ export default class Order extends Vue {
 	mounted() {
 		this.queryCategoryList();
 		this.$refs.rightList.onscroll = e => {this.handleUlScroll(e)};
-
-		let orderNo = this.$route.query.orderNo;
-		if(orderNo) {
-			this.$store.commit("qxz/updateOrderNo", orderNo);
-		}else {
-			this.$store.commit("qxz/updateOrderNo", "");
-		};
 	};
 };
 </script>

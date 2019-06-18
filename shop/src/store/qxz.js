@@ -9,8 +9,8 @@ export default {
         companyId: 0,
         // 桌号
         tableNo: "",
-        // 订单号
-        orderNo: ""
+        // 未完订单信息
+        unfinishedOrder: {}
     },
     getters: {
 
@@ -24,8 +24,8 @@ export default {
             state.companyId = params.companyId;
             state.tableNo = params.tableNo;
         },
-        updateOrderNo(state, orderNo) {
-            state.orderNo = orderNo;
+        updateUnfinishedOrder(state, unfinishedOrder) {
+            state.unfinishedOrder = unfinishedOrder;
         },
     },
     actions: {
