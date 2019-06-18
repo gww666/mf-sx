@@ -12,7 +12,7 @@ export default class Order extends Vue {
 		if(0 <= hour && hour <= 3) {
 			requestArr = [getSettings(), getOrder(tableNo, new Date()), getOrder(tableNo, new Date().getTime() - 24 * 60 * 60 * 1000)];
 		} else {
-			requestArr = [getSettings(), getOrder(tableNo, new Date())]
+			requestArr = [getSettings(), getOrder(tableNo, new Date())];
 		};
 		Promise.all(requestArr).then(res => {
 			this.handleDatas(res, tableNo);
@@ -51,7 +51,7 @@ export default class Order extends Vue {
 				this.$router.push({name: "orderPage"});
 			};
 		};
-	}
+	};
     doScan() {
         this.querySystemSettings(3);
     };

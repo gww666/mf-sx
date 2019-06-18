@@ -2,8 +2,9 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Tag, Table, Modal, Select, Input, message, Button, Pagination } from "ant-design-vue";
-import {  } from "./datas";
-import {  } from "./axios";
+import formateDate from "../../utils/formateDate";
+import { tableColumns } from "./datas";
+import { getOrdersList } from "./axios";
 Vue.use(Tag);
 Vue.use(Table);
 Vue.use(Modal);
@@ -14,21 +15,32 @@ const { Column } = Table;
 
 @Component
 export default class OrdersManagement extends Vue {
+    ordersList = [];
     get userInfo() {
         return this.$store.state.qxz.userInfo;
     };
     // 获取分类列表
     async queryOrdersList() {
-        
+        try {
+            let res = await getOrdersList(this.userInfo.id);
+            if(res.data.returnCode === 1) {
+                this.ordersList = res.data.data;
+                console.log(res, 'ereres');
+            }else {
+                message.warning("获取分类列表失败");
+            };
+        }catch (err) {
+            console.log("获取分类列表err", err);
+        }
     };
     // 列表渲染
     tableRenderFn(text, record, item) {
         switch (item.key) {
-            case "createDate":
-                text = formateDate(text);
+            case "paymentDate":
+                text = text ? formateDate(text) : "";
                 break;
-            case "updateDate":
-                text = formateDate(text);
+            case "status":
+                text = text === 1 ? "待支付" : "已完成";
                 break;
         };
         let dom = <span>{text}</span>;
@@ -38,82 +50,38 @@ export default class OrdersManagement extends Vue {
                 <div class="btns-field">
                     <div class="btns-layout">
                         <p class="btn edit-btn" onClick={() => this.goEdit(record)}>编辑</p>
-                        <p class="btn delete-btn" onClick={() => this.doDelete(record)}>删除</p>
                     </div>
                 </div>
             );
-        } else if (item.key === "state") {
-            dom = (
-                <div class="btns-field">
-                    <div class="btns-layout">
-                        {
-                            record.state === 0 ? <p class="btn delete-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已下架</p> : ""
-                        }
-                        {
-                            record.state === 1 ? <p class="btn edit-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已上架</p> : ""
-                        }
-                    </div>
-                </div>
-            );
-        } else if (item.key === "mainImg") {
-            dom = text ?　(
-                <img src={`${api.base}${text}`} style="width: 50px;" />
-            ) : "";
         };
         return dom;
     };
     // 切换页码
     handelPageChange(pageNum) {
-        console.log(pageNum);
         this.pageNum = pageNum;
         this.queryGoodsList();
     };
+    // <a-select class="filters" value={this.currentCategory} onChange={val => this.changeCategory(val)}>
+    //     {
+    //         this.categoryList.map((ele, index) => {
+    //             return (
+    //                 <a-select-option value={ele.id}>{ele.name}</a-select-option>
+    //             )
+    //         })
+    //     }
+    // </a-select>
 	render() {
 		return (
             <div class="category-page">
                 <div class="title-bar">
-                    <p>菜品管理</p>
-                    <p class="createBtn">
-                        <p class="addBtn" onClick={this.goCreate}>添加菜品</p>
-                    </p>
+                    <p>订单管理</p>
                 </div>
                 <div class="title-bar">
-                    <a-select class="filters" value={this.currentCategory} onChange={val => this.changeCategory(val)}>
-                        {
-                            this.categoryList.map((ele, index) => {
-                                return (
-                                    <a-select-option value={ele.id}>{ele.name}</a-select-option>
-                                )
-                            })
-                        }
-                    </a-select>
-                    <p class="createBtn searcher">
-                        <a-select
-                            size="small"
-                            showSearch
-                            placeholder="请输入关键字查询"
-                            style="width: 150px;"
-                            defaultActiveFirstOption={false}
-                            showArrow={false}
-                            filterOption={false}
-                            onSearch={clue => this.handleSearch(clue)}
-                            onChange={clue => this.handleChange(clue)}
-                            notFoundContent={null}
-                        >
-                            {
-                                this.similarItemList.map(item => {
-                                    return (
-                                        <a-select-option value={item.id}>{item.title}</a-select-option>
-                                    );
-                                })
-                            }
-                        </a-select>
-                        <a-button size="small" type="primary" onClick={this.doSearch}>搜索</a-button>
-                    </p>
+                    
                 </div>
                 <Table 
                     rowKey={record => record.id} 
-                    dataSource={this.goodsList}
+                    dataSource={this.ordersList}
                     pagination={false}
                     class="table"
                 >
@@ -126,24 +94,10 @@ export default class OrdersManagement extends Vue {
                                     key={item.key}
                                     align="center"
                                     customRender={(text, record, index) => this.tableRenderFn(text, record, item)}
-                                    customCell={(record) => {
-                                        return {
-                                            on: { // 事件
-                                                click: () => {console.log(record)}
-                                            }
-                                        }
-                                    }}
                                 />
                             )
                         })
                     }
-                    <Column
-                        title="状态"
-                        key="state"  
-                        align="center"
-                        width={100}
-                        customRender={(text, record, index) => this.tableRenderFn(text, record, {key: "state"})}
-                    />
                     <Column
                         title="操作"
                         key="operation"
@@ -159,14 +113,7 @@ export default class OrdersManagement extends Vue {
 		);
     };
     mounted() {
-        for(let i = 0;i < 100; i++) {
-            this.sortArr.push(i);
-        };
-        if(this.timer) {
-            clearTimeout(this.timer);
-            this.timer = null;
-        };
-        this.queryCategoryList();
+        this.queryOrdersList();
     };
 }
 </script>

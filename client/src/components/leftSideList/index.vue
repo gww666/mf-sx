@@ -25,6 +25,12 @@ export default class LeftSideList extends Vue {
             name: "systemSettings",
             icon: "setting",
             isActive: false
+        },
+        {
+            title: "订单管理",
+            name: "ordersManagement",
+            icon: "ordered-list",
+            isActive: false
         }
     ]
     handleTabClick(item) {

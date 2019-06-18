@@ -5,6 +5,7 @@ const dishCategory = resolve => require(['@/containers/dishCategory'], resolve);
 const operateCategory = resolve => require(['@/containers/dishCategory/operateCategory'], resolve);
 const operateDish = resolve => require(['@/containers/dishManagement/operateDish'], resolve);
 const systemSettings = resolve => require(['@/containers/systemSettings'], resolve);
+const ordersManagement = resolve => require(['@/containers/ordersManagement'], resolve);
 
 const router = [
 	{
@@ -41,6 +42,11 @@ const router = [
         path: '/systemSettings',
         name: 'systemSettings',
         component: systemSettings
+    },
+	{
+        path: '/ordersManagement',
+        name: 'ordersManagement',
+        component: ordersManagement
     },
 ]
 export default router;
