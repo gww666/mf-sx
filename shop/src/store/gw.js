@@ -1,3 +1,14 @@
+import axios from "../utils/_axios";
+
+const handleData = (data) => {
+    if (data.data.returnCode === 1) {
+        return data.data.data;
+    } else {
+        console.log(data.data.message);
+        return;
+    }
+}
+
 export default {
     namespaced: true,
     state: {
@@ -35,6 +46,29 @@ export default {
         }
     },
     actions: {
-
+        //插入订单
+        async addOrder({state}) {
+            let options = {
+                url: "/api/addOrder",
+                method: "post",
+                data: {
+                    companyId: 1,
+                    tableNo: 4,
+                    foodType: 1,
+                    goods: state.goodsList.map(item => {
+                        return {
+                            goodsId: item.id,
+                            title: item.title,
+                            price: item.salePrice || item.price,
+                            count: item.count,
+                            img: item.thumbnail || item.mainImg
+                        }
+                    })
+                }
+            };
+            let data = await axios(options);
+            data = handleData(data);
+            // if (!data) return;
+        }
     }
 }

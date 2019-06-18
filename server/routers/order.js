@@ -25,4 +25,37 @@ router.get("/getOrder", (ctx) => __awaiter(this, void 0, void 0, function* () {
         ctx.body = new resModel_1.ErrModel([], "获取订单信息失败——" + JSON.stringify(err));
     }
 }));
+//插入订单
+router.post("/addOrder", (ctx) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        yield order_1.insertOrder(ctx);
+        ctx.body = new resModel_1.SucModel([], "success");
+    }
+    catch (err) {
+        console.log("err", err);
+        ctx.body = new resModel_1.ErrModel([], "插入订单失败——" + JSON.stringify(err));
+    }
+}));
+//根据企业号(和日期)查找订单列表
+router.get("/getOrderList", (ctx) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        let data = yield order_1.getOrderList(ctx);
+        ctx.body = new resModel_1.SucModel(data, "success");
+    }
+    catch (err) {
+        console.log("err", err);
+        ctx.body = new resModel_1.ErrModel([], "获取订单列表失败——" + JSON.stringify(err));
+    }
+}));
+//查询订单详情
+router.get("/getOrderDetail", (ctx) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        let data = yield order_1.getOrderDetail(ctx);
+        ctx.body = new resModel_1.SucModel(data, "success");
+    }
+    catch (err) {
+        console.log("err", err);
+        ctx.body = new resModel_1.ErrModel([], "获取订单详情失败——" + JSON.stringify(err));
+    }
+}));
 exports.default = router;

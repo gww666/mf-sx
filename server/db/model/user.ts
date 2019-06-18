@@ -24,5 +24,5 @@ export const updateCompanySettings = async (ctx) => {
     let mysql = ctx.db;
     let {companyId, noticeType, processType} = ctx.params;
     let sql = `update settings set process_type = ?, notice_type = ? where company_id = ?`;
-    await mysql.execute(sql, [companyId, processType, noticeType]);
+    await mysql.execute(sql, [processType, noticeType, companyId]);
 }

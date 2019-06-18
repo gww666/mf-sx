@@ -31,5 +31,5 @@ exports.updateCompanySettings = (ctx) => __awaiter(this, void 0, void 0, functio
     let mysql = ctx.db;
     let { companyId, noticeType, processType } = ctx.params;
     let sql = `update settings set process_type = ?, notice_type = ? where company_id = ?`;
-    yield mysql.execute(sql, [companyId, processType, noticeType]);
+    yield mysql.execute(sql, [processType, noticeType, companyId]);
 });

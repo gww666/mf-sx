@@ -76,12 +76,27 @@ export default {
             } else {
                 return "点餐车空空如也";
             }
+        },
+        // 就餐流程
+        // 1先付款，2先就餐
+        processType() {
+            return this.$store.state.qxz.processType;
         }
     },
     methods: {
         //支付按钮（去下单）
-        pay() {
+        async pay() {
             if (!this.cartCount) return;
+            if (this.processType === 1) {
+                //先付款，直接走支付流程
+            } else if (this.processType === 2) {
+                //先就餐，先提交订单
+                await this.$store.dispatch("gw/addOrder");
+            }
+        },
+        //生成订单
+        generateOrder() {
+
         },
         showGoodsList() {
             //点餐车数量为0，不展示点餐车菜品列表
