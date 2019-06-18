@@ -6,15 +6,15 @@ import { getSettings, getOrder } from "./axios";
 @Component
 export default class Order extends Vue {
 	// 获取系统设置
-	async querySystemSettings(tableNum) {
-		Promise.all([getSettings(), getOrder(tableNum)]).then(res => {
+	async querySystemSettings(tableNo) {
+		Promise.all([getSettings(), getOrder(tableNo)]).then(res => {
 			let setting_res = res[0];
 			let order_res = res[1];
 			if (setting_res.data.returnCode === 1 && order_res.data.returnCode === 1) {
 				let setting = setting_res.data.data[0];
 				let order = order_res.data.data;
 				this.$store.commit("qxz/updateTypes", setting);
-				this.$store.commit("qxz/updateIdNo", {companyId: 1, tableNum});
+				this.$store.commit("qxz/updateIdNo", {companyId: 1, tableNo});
 				if (setting.processType === 1) {
                     this.$router.push({name: "orderPage"});
 					console.log("先付款，有没有未完结的单都继续点");
@@ -22,7 +22,7 @@ export default class Order extends Vue {
 				if (setting.processType === 2 && Array.isArray(order)) {
 					for(let i = 0; i < order.length; i++) {
 						if(order[i].status === 1) {
-							this.$router.push({name: "choicesPage", query: {order: JSON.stringify(order[i])}});
+							this.$router.push({name: "choicesPage", query: {orderNo: order[i].orderNo, payment: order[i].payment}});
 							console.log(order[i], "后付款，且有未完结订单，跳转加菜结账选择页面");
 							return;
 						};

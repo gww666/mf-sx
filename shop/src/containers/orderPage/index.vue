@@ -175,9 +175,9 @@ export default class Order extends Vue {
 		this.queryCategoryList();
 		this.$refs.rightList.onscroll = e => {this.handleUlScroll(e)};
 
-		let order = this.$route.query.order ? JSON.parse(this.$route.query.order) : "";
-		if(order) {
-			this.$store.commit("qxz/updateOrderNo", order.orderNo);
+		let orderNo = this.$route.query.orderNo;
+		if(orderNo) {
+			this.$store.commit("qxz/updateOrderNo", orderNo);
 		}else {
 			this.$store.commit("qxz/updateOrderNo", "");
 		};

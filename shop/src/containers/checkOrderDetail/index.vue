@@ -5,7 +5,7 @@ import { getOrderDetail } from "./axios";
 
 @Component
 export default class CheckOrderDetail extends Vue {
-    orderInfo = {};
+    payment = 0;
     goodsList = [];
     defaultPic = require("../../assets/images/noPic.jpg");
 	render() {
@@ -34,36 +34,36 @@ export default class CheckOrderDetail extends Vue {
                     }
                 </ul>
                 <div class="payment-infos">
-                    <span>订单总额：</span><span>￥{this.orderInfo.payment}</span>
+                    <span>订单总额：</span><span>￥{this.payment}</span>
                 </div>
 			</div>
 		)
 	};
 	async mounted() {
-        let order = this.$route.query.order ? JSON.parse(this.$route.query.order) : "";
-        console.log(order, 'order')
-		if(order) {
-            this.orderInfo = order;
+        let orderNo = this.$route.query.orderNo;
+        this.payment = this.$route.query.payment || 0;
+		if(orderNo) {
+            this.orderInfo = orderNo;
             try {
-                let res = await getOrderDetail(order.orderNo);
+                let res = await getOrderDetail(orderNo);
                 if(res.data.returnCode === 1) {
                     this.goodsList = res.data.data;
-                    this.goodsList = [
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                        {"id":17,"orderNo":"201906171818920001","goodsId":18,"goodsTitle":"炒鸡蛋","goodsPrice":"50.00","goodsCount":1,"goodsImg":""},
-                        {"id":18,"orderNo":"201906171818920001","goodsId":11,"goodsTitle":"炒鸡蛋","goodsPrice":"50.00","goodsCount":1,"goodsImg":""}
-                    ];
+                    // this.goodsList = [
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
+                    //     {"id":17,"orderNo":"201906171818920001","goodsId":18,"goodsTitle":"炒鸡蛋","goodsPrice":"50.00","goodsCount":1,"goodsImg":""},
+                    //     {"id":18,"orderNo":"201906171818920001","goodsId":11,"goodsTitle":"炒鸡蛋","goodsPrice":"50.00","goodsCount":1,"goodsImg":""}
+                    // ];
                     console.log(res.data.data, 'ssssssssssssssssssssssssss');
                 }
             } catch(err) {
