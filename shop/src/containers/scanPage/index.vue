@@ -12,15 +12,21 @@ export default class Order extends Vue {
 			let order_res = res[1];
 			if (setting_res.data.returnCode === 1 && order_res.data.returnCode === 1) {
 				let setting = setting_res.data.data[0];
-				let order = order_res.data.data[0];
+				let order = order_res.data.data;
 				this.$store.commit("qxz/updateTypes", setting);
+				this.$store.commit("qxz/updateIdNo", {companyId: 1, tableNum});
 				if (setting.processType === 1) {
                     this.$router.push({name: "orderPage"});
 					console.log("先付款，有没有未完结的单都继续点");
 				};
-				if (setting.processType === 2 && order) {
-                    this.$router.push({name: "choicesPage"});
-					console.log("后付款，且有未完结订单，调转加菜结账选择页面");
+				if (setting.processType === 2 && Array.isArray(order)) {
+					for(let i = 0; i < order.length; i++) {
+						if(order[i].status === 1) {
+							this.$router.push({name: "choicesPage"});
+							break;
+						};
+					};
+					console.log("后付款，且有未完结订单，跳转加菜结账选择页面");
 				};
 			};
 		}).catch(err => {
@@ -28,7 +34,7 @@ export default class Order extends Vue {
 		});
     };
     doScan() {
-        this.querySystemSettings(1);
+        this.querySystemSettings(3);
     };
 	render() {
 		return (
