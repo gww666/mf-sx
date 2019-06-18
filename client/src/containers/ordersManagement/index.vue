@@ -1,0 +1,254 @@
+<script>
+import Vue from "vue";
+import Component from "vue-class-component";
+import { Tag, Table, Modal, Select, Input, message, Button, Pagination } from "ant-design-vue";
+import {  } from "./datas";
+import {  } from "./axios";
+Vue.use(Tag);
+Vue.use(Table);
+Vue.use(Modal);
+Vue.use(Select);
+Vue.use(Input);
+Vue.use(Pagination);
+const { Column } = Table;
+
+@Component
+export default class OrdersManagement extends Vue {
+    get userInfo() {
+        return this.$store.state.qxz.userInfo;
+    };
+    // 获取分类列表
+    async queryOrdersList() {
+        
+    };
+    // 列表渲染
+    tableRenderFn(text, record, item) {
+        switch (item.key) {
+            case "createDate":
+                text = formateDate(text);
+                break;
+            case "updateDate":
+                text = formateDate(text);
+                break;
+        };
+        let dom = <span>{text}</span>;
+        // 操作按钮
+        if (item.key === "operation") {
+            dom = (
+                <div class="btns-field">
+                    <div class="btns-layout">
+                        <p class="btn edit-btn" onClick={() => this.goEdit(record)}>编辑</p>
+                        <p class="btn delete-btn" onClick={() => this.doDelete(record)}>删除</p>
+                    </div>
+                </div>
+            );
+        } else if (item.key === "state") {
+            dom = (
+                <div class="btns-field">
+                    <div class="btns-layout">
+                        {
+                            record.state === 0 ? <p class="btn delete-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已下架</p> : ""
+                        }
+                        {
+                            record.state === 1 ? <p class="btn edit-btn" style="width: 56px;" onClick={() => this.handleStatusChange(record)}>已上架</p> : ""
+                        }
+                    </div>
+                </div>
+            );
+        } else if (item.key === "mainImg") {
+            dom = text ?　(
+                <img src={`${api.base}${text}`} style="width: 50px;" />
+            ) : "";
+        };
+        return dom;
+    };
+    // 切换页码
+    handelPageChange(pageNum) {
+        console.log(pageNum);
+        this.pageNum = pageNum;
+        this.queryGoodsList();
+    };
+	render() {
+		return (
+            <div class="category-page">
+                <div class="title-bar">
+                    <p>菜品管理</p>
+                    <p class="createBtn">
+                        <p class="addBtn" onClick={this.goCreate}>添加菜品</p>
+                    </p>
+                </div>
+                <div class="title-bar">
+                    <a-select class="filters" value={this.currentCategory} onChange={val => this.changeCategory(val)}>
+                        {
+                            this.categoryList.map((ele, index) => {
+                                return (
+                                    <a-select-option value={ele.id}>{ele.name}</a-select-option>
+                                )
+                            })
+                        }
+                    </a-select>
+                    <p class="createBtn searcher">
+                        <a-select
+                            size="small"
+                            showSearch
+                            placeholder="请输入关键字查询"
+                            style="width: 150px;"
+                            defaultActiveFirstOption={false}
+                            showArrow={false}
+                            filterOption={false}
+                            onSearch={clue => this.handleSearch(clue)}
+                            onChange={clue => this.handleChange(clue)}
+                            notFoundContent={null}
+                        >
+                            {
+                                this.similarItemList.map(item => {
+                                    return (
+                                        <a-select-option value={item.id}>{item.title}</a-select-option>
+                                    );
+                                })
+                            }
+                        </a-select>
+                        <a-button size="small" type="primary" onClick={this.doSearch}>搜索</a-button>
+                    </p>
+                </div>
+                <Table 
+                    rowKey={record => record.id} 
+                    dataSource={this.goodsList}
+                    pagination={false}
+                    class="table"
+                >
+                    {
+                        tableColumns.map(item => {
+                            return (
+                                <Column
+                                    title={item.title}
+                                    dataIndex={item.dataIndex}
+                                    key={item.key}
+                                    align="center"
+                                    customRender={(text, record, index) => this.tableRenderFn(text, record, item)}
+                                    customCell={(record) => {
+                                        return {
+                                            on: { // 事件
+                                                click: () => {console.log(record)}
+                                            }
+                                        }
+                                    }}
+                                />
+                            )
+                        })
+                    }
+                    <Column
+                        title="状态"
+                        key="state"  
+                        align="center"
+                        width={100}
+                        customRender={(text, record, index) => this.tableRenderFn(text, record, {key: "state"})}
+                    />
+                    <Column
+                        title="操作"
+                        key="operation"
+                        width={100}
+                        align="center"
+                        customRender={(text, record, index) => this.tableRenderFn(text, record, {key: "operation"})}
+                    />
+                </Table>
+                <div style="margin:10px auto;">
+                    <a-pagination defaultCurrent={1} total={this.total} onChange={this.handelPageChange} />
+                </div>
+            </div>
+		);
+    };
+    mounted() {
+        for(let i = 0;i < 100; i++) {
+            this.sortArr.push(i);
+        };
+        if(this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
+        };
+        this.queryCategoryList();
+    };
+}
+</script>
+<style lang="less" scoped>
+    .category-page{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: #F5F5F5;
+    }
+    .title-bar{
+        width: 100%;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .btns-field{
+        width: 100%;
+        height: 100%;
+    }
+    .btns-layout{
+        margin: 0 auto;
+        width: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .btn{
+            margin: 0 5px;
+            width: 40px;
+            height: 22px;
+            text-align: center;
+            line-height: 22px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .ant-select{
+            width: 90px;
+        }
+    }
+    .createBtn{
+        width: 115px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #1890ff;
+        cursor: pointer;
+    }
+    .searcher{
+        width: 205px;
+    }
+    .edit-btn{
+        color: #1890ff;
+        border: 1px solid #1890ff;
+    }
+    .delete-btn{
+        color: #ff4544;
+        border: 1px solid #ff4544;
+    }
+    .modify-btn{
+        background: #1890ff;
+        color: #FFF;
+        margin-right: 10px;
+    }
+    .name{
+        line-height: 22px;
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space: nowrap;
+    }
+    p{
+        margin: 0;
+    }
+
+    .filters{
+        width: 100px;
+    }
+    .table {
+        flex: 1;
+        overflow-y: scroll;
+    }
+</style>
