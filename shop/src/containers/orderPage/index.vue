@@ -2,7 +2,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 
-import { getCategoryList, getGoodsList, getSettings, getOrder } from "./axios";
+import { getCategoryList, getGoodsList } from "./axios";
 import scrollTo from "scrollto-with-animation";
 import cart from "../../components/cart";
 import handle from "../../components/cart/handle";
@@ -15,7 +15,20 @@ export default class Order extends Vue {
 	categoryList = [];
 	goodsList = [];
 	currentCategory = "";
-	defaultPic = require("../../assets/images/noPic.jpg")
+	defaultPic = require("../../assets/images/noPic.jpg");
+	get selectedGoodsList () {
+		return this.$store.state.gw.goodsList;
+	}
+	// 
+	getCount(item) {
+		let count = 0;
+		this.selectedGoodsList.forEach(ele => {
+			if(ele.categoryId === item.id) {
+				count++;
+			};
+		});
+		return count;
+	};
 	// 获取分类列表
     async queryCategoryList() {
         try {
@@ -111,6 +124,13 @@ export default class Order extends Vue {
 								this.categoryList.map(item => (
 									<li class={this.currentCategory === item.id ? "choosen-class" : ""} onClick={() => this.handleCategoryClick(item)}>
 										{item.name}
+										{
+											this.getCount(item)
+											?
+											<p class="countIcon">{this.getCount(item)}</p>
+											:
+											<span></span>
+										}
 									</li>
 								))
 							}
@@ -127,7 +147,7 @@ export default class Order extends Vue {
 										<div class="content">
 											<div style="width: 100%;">
 												<p class="title">{item.title}</p>
-												<p class="sub-title">{item.subTitle}圣诞节开发了时间浪费</p>
+												<p class="sub-title">{item.subTitle}</p>
 											</div>
 											<div style="position: relative;">
 												<span class={"price"}>￥{item.salePrice ? item.salePrice : item.price}</span>
@@ -154,6 +174,13 @@ export default class Order extends Vue {
 	mounted() {
 		this.queryCategoryList();
 		this.$refs.rightList.onscroll = e => {this.handleUlScroll(e)};
+
+		let order = this.$route.query.order ? JSON.parse(this.$route.query.order) : "";
+		if(order) {
+			this.$store.commit("qxz/updateOrderNo", order.orderNo);
+		}else {
+			this.$store.commit("qxz/updateOrderNo", "");
+		};
 	};
 };
 </script>
@@ -186,13 +213,28 @@ export default class Order extends Vue {
 				width: 100%;
 				height: 1rem;
 				line-height: 1rem;
-				padding: 0 .2rem;
+				padding: 0 .25rem;
 				box-sizing: border-box;
+				position: relative;
 			}
 			.choosen-class{
 				background: #e6e6e6;
 			}
 		}
+	}
+	.countIcon{
+		position: absolute;
+		width: .3rem;
+		height: .3rem;
+		border-radius: .15rem;
+		background: #FF4544;
+		background: linear-gradient(to right, #FF4544, #FE9046);
+		text-align: center;
+		line-height: .3rem;
+		font-size: .1rem;
+		color: #FFF;
+		right: .2rem;
+		top: .2rem;
 	}
 	.list-right{
 		width: 74%;

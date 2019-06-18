@@ -8,7 +8,9 @@ export default {
         // 企业id
         companyId: 0,
         // 桌号
-        tableNum: ""
+        tableNum: "",
+        // 订单号
+        orderNo: ""
     },
     getters: {
 
@@ -21,6 +23,9 @@ export default {
         updateIdNo(state, params) {
             state.companyId = params.companyId;
             state.tableNum = params.tableNum;
+        },
+        updateOrderNo(state, orderNo) {
+            state.orderNo = orderNo;
         },
     },
     actions: {

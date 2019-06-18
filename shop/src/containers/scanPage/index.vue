@@ -22,8 +22,8 @@ export default class Order extends Vue {
 				if (setting.processType === 2 && Array.isArray(order)) {
 					for(let i = 0; i < order.length; i++) {
 						if(order[i].status === 1) {
-							this.$router.push({name: "choicesPage"});
-							console.log("后付款，且有未完结订单，跳转加菜结账选择页面");
+							this.$router.push({name: "choicesPage", query: {order: JSON.stringify(order[i])}});
+							console.log(order[i], "后付款，且有未完结订单，跳转加菜结账选择页面");
 							return;
 						};
 					};

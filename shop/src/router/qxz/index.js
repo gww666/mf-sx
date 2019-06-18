@@ -1,6 +1,7 @@
 const orderPage = resolve => require(['@/containers/orderPage'], resolve);
 const scanPage = resolve => require(['@/containers/scanPage'], resolve);
 const choicesPage = resolve => require(['@/containers/choicesPage'], resolve);
+const checkOrderDetail = resolve => require(['@/containers/checkOrderDetail'], resolve);
 
 const router = [
     {
@@ -17,6 +18,11 @@ const router = [
         path: '/choicesPage',
         name: 'choicesPage',
         component: choicesPage
+    },
+	{
+        path: '/checkOrderDetail',
+        name: 'checkOrderDetail',
+        component: checkOrderDetail
     }
 ]
 export default router;

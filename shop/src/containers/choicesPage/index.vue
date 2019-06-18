@@ -4,22 +4,24 @@ import Component from "vue-class-component";
 
 @Component
 export default class Order extends Vue {
+	// 回到菜单去加菜
     goOrderPage() {
-        this.$router.replace({name: "orderPage"});
-    };
-    goPaymentPage() {
-        console.log("去结账")
+        this.$router.push({name: "orderPage", query: {order: this.$route.query.order}});
+	};
+	// 查看已有订单
+    goCheckOrders() {
+		this.$router.push({name: "checkOrderDetail", query: {order: this.$route.query.order}});
     };
 	render() {
 		return (
 			<div class="choices-container">
 				<div class="choices" onClick={this.goOrderPage}>我要加菜</div>
-				<div class="choices" onClick={this.goPaymentPage}>我要结账</div>
+				<div class="choices" onClick={this.goCheckOrders}>查看已有订单</div>
 			</div>
 		)
 	};
 	mounted() {
-		
+		console.log(this.$route.query, "route-query")
 	};
 };
 </script>
