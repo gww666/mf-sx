@@ -4,7 +4,8 @@ import {
     insertOrder,
     getOrderList,
     getOrderDetail,
-    resetTableNo
+    resetTableNo,
+    addGoodsForOrder
 } from "../db/model/order";
 import {SucModel, ErrModel} from "../util/resModel";
 let router = new KoaRouter({
@@ -21,14 +22,20 @@ router.get("/getOrder", async ctx => {
     }
 });
 
-//插入订单
+//插入订单或加菜
 router.post("/addOrder", async ctx => {
+    let {orderNo} = ctx.params;
+    let tag = orderNo ? "加菜" : "插入订单";
     try {
-        await insertOrder(ctx);
+        if (orderNo) {
+            await addGoodsForOrder(ctx);
+        } else {
+            await insertOrder(ctx);
+        }
         ctx.body = new SucModel([], "success");
     } catch (err) {
         console.log("err", err);
-        ctx.body = new ErrModel([], "插入订单失败——" + JSON.stringify(err));
+        ctx.body = new ErrModel([], `${tag}失败——` + JSON.stringify(err));
     }
 });
 

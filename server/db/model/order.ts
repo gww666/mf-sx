@@ -67,14 +67,22 @@ export const insertOrder = async ctx => {
     let {companyId, tableNo, foodType, goods} = ctx.params;
     let payment = 0;
     let orderNo = await generateOrderNo(ctx, {companyId});
+    let cache = {};
     //生成订单详细记录
     for (let item of goods) {
         const {goodsId, title, price, img, count} = item;
         //叠加订单总价
         payment += Number(price) * count;
+        //往缓存对象中追加一条商品记录，只保留必需的字段
+        cache[goodsId] = {
+            count,
+            price
+        };
         let sql_detail = "insert into order_detail(id, order_no, goods_id, goods_title, goods_price, goods_count, goods_img) values(?, ?, ?, ?, ?, ?, ?)";
         await mysql.execute(sql_detail, [null, orderNo, goodsId, title, price, count, img]);
     }
+    //将当前订单的详细信息放到缓存中，以便后续加菜操作减轻数据库压力
+    ctx.redis.set(orderNo, JSON.stringify(cache));
     //生成订单记录
     let date = Date.now();
     let createDate2 = formatDate(date).split(" ")[0];
@@ -102,11 +110,66 @@ export const getOrderDetail = async ctx => {
     return each(rows);
 }
 
+//加菜操作
+export const addGoodsForOrder = async ctx => {
+    let mysql = ctx.db;
+    let {goods, orderNo} = ctx.params;
+    //从缓存中取得该订单号的商品数组
+    let get = promisify(ctx.redis.get).bind(ctx.redis);
+    let value = await get(orderNo);
+    let cache = null;
+    let payment = 0;
+    //如果有缓存记录，判断哪些是新增，哪些是更新
+    if (value) {
+        cache = JSON.parse(value);//是一个对象，key值为商品ID
+        //原有菜的钱
+        for (let id in cache) {
+            let {price, count} = cache[id];
+            payment += Number(price) * count;
+        }
+        //生成订单详细记录
+        for (let item of goods) {
+            let {goodsId, title, price, img, count} = item;
+            if (cache[goodsId] === undefined) {
+                
+                //新增缓存记录
+                cache[goodsId] = {
+                    count,
+                    price
+                };
+                //新增记录
+                let sql_detail = "insert into order_detail(id, order_no, goods_id, goods_title, goods_price, goods_count, goods_img) values(?, ?, ?, ?, ?, ?, ?)";
+                await mysql.execute(sql_detail, [null, orderNo, goodsId, title, price, count, img]);
+            } else {
+                //更新缓存中的数量和价格
+                cache[goodsId].count += count;
+                cache[goodsId].price = price;
+                //更新数据库
+                let sql_detail = "update order_detail set goods_count = ?, goods_price = ? where order_no = ? and goods_id = ?";
+                await mysql.execute(sql_detail, [cache[goodsId].count, price, orderNo, goodsId]);
+            }
+            //新增菜的钱
+            payment += Number(price) * count;
+        }
+    } else {
+        console.log("缓存中没有该订单");
+        //逻辑待写
+    }
+    //更新缓存
+    if (cache) {
+        ctx.redis.set(orderNo, JSON.stringify(cache));
+    }
+    //生成订单记录
+    let date = Date.now();
+    let sql = `update m_order set update_date = ?, payment = ? where order_no = ?`;
+    await mysql.execute(sql, [date, payment, orderNo]);
+}
+
 //重置订单桌牌号
 export const resetTableNo = async ctx => {
     let mysql = ctx.db;
     let {orderNo, tableNo} = ctx.query;
     let sql = `update m_order set table_no = ? where order_no = ?`;
-    let [rows] = await mysql.execute(sql, [tableNo, orderNo]);
-    return each(rows);
+    let result = await mysql.execute(sql, [tableNo, orderNo]);
+    console.log("调桌", result);
 }

@@ -47,13 +47,13 @@ export default {
     },
     actions: {
         //插入订单
-        async addOrder({state}) {
+        async addOrder({state, rootState}) {
             let options = {
                 url: "/api/addOrder",
                 method: "post",
                 data: {
                     companyId: 1,
-                    tableNo: 4,
+                    tableNo: 3,
                     foodType: 1,
                     goods: state.goodsList.map(item => {
                         return {
@@ -63,12 +63,25 @@ export default {
                             count: item.count,
                             img: item.thumbnail || item.mainImg
                         }
-                    })
+                    }),
+                    orderNo: rootState.qxz.unfinishedOrder.orderNo
                 }
             };
             let data = await axios(options);
             data = handleData(data);
             // if (!data) return;
+        },
+        //测试一下
+        async mt() {
+            let options = {
+                url: "/api/resetTableNo",
+                method: "get",
+                params: {
+                    orderNo: "23ewfdwedgf43",
+                    tableNo: "A-4"
+                }
+            };
+            await axios(options);
         }
     }
 }

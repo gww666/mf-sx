@@ -25,15 +25,22 @@ router.get("/getOrder", (ctx) => __awaiter(this, void 0, void 0, function* () {
         ctx.body = new resModel_1.ErrModel([], "获取订单信息失败——" + JSON.stringify(err));
     }
 }));
-//插入订单
+//插入订单或加菜
 router.post("/addOrder", (ctx) => __awaiter(this, void 0, void 0, function* () {
+    let { orderNo } = ctx.params;
+    let tag = orderNo ? "加菜" : "插入订单";
     try {
-        yield order_1.insertOrder(ctx);
+        if (orderNo) {
+            yield order_1.addGoodsForOrder(ctx);
+        }
+        else {
+            yield order_1.insertOrder(ctx);
+        }
         ctx.body = new resModel_1.SucModel([], "success");
     }
     catch (err) {
         console.log("err", err);
-        ctx.body = new resModel_1.ErrModel([], "插入订单失败——" + JSON.stringify(err));
+        ctx.body = new resModel_1.ErrModel([], `${tag}失败——` + JSON.stringify(err));
     }
 }));
 //根据企业号(和日期)查找订单列表
@@ -56,6 +63,17 @@ router.get("/getOrderDetail", (ctx) => __awaiter(this, void 0, void 0, function*
     catch (err) {
         console.log("err", err);
         ctx.body = new resModel_1.ErrModel([], "获取订单详情失败——" + JSON.stringify(err));
+    }
+}));
+//重置订单桌牌号
+router.get("/resetTableNo", (ctx) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        yield order_1.resetTableNo(ctx);
+        ctx.body = new resModel_1.SucModel([], "success");
+    }
+    catch (err) {
+        console.log("err", err);
+        ctx.body = new resModel_1.ErrModel([], "修改订单桌号失败——" + JSON.stringify(err));
     }
 }));
 exports.default = router;

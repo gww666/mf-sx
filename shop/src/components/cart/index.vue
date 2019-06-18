@@ -90,8 +90,9 @@ export default {
             if (this.processType === 1) {
                 //先付款，直接走支付流程
             } else if (this.processType === 2) {
-                //先就餐，先提交订单
+                //先就餐, 先提交订单，暂不支付
                 await this.$store.dispatch("gw/addOrder");
+                // await this.$store.dispatch("gw/mt");
             }
         },
         //生成订单
