@@ -53,7 +53,7 @@ export default class Order extends Vue {
 	};
     doScan() {
 		this.querySystemSettings(3);
-		this.$router.push({name: "choicesPage", query: {companyId: 1, tableNo: 3}});
+		// this.$router.push({name: "choicesPage", query: {companyId: 1, tableNo: 3}});
     };
 	render() {
 		return (

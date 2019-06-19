@@ -9,7 +9,7 @@ export default class Order extends Vue {
 	};
 	// 回到菜单去加菜
     goOrderPage() {
-        this.$router.push({name: "orderPage", params: {orderNo: this.$route.params.orderNo || this.unfinishOrder.orderNo}});
+        this.$router.push({name: "orderPage"});
 	};
 	// 查看已有订单
     goCheckOrders() {
