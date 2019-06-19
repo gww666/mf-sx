@@ -6,11 +6,11 @@ import Component from "vue-class-component";
 export default class Order extends Vue {
 	// 回到菜单去加菜
     goOrderPage() {
-        this.$router.push({name: "orderPage"});
+        this.$router.push({name: "orderPage", query: {orderNo: this.$route.query.orderNo}});
 	};
 	// 查看已有订单
     goCheckOrders() {
-		this.$router.push({name: "checkOrderDetail"});
+		this.$router.push({name: "checkOrderDetail", query: {orderNo: this.$route.query.orderNo}, params: {payment: this.$route.params.payment}});
     };
 	render() {
 		return (

@@ -13,7 +13,7 @@ export const getSettings = () => {
 export const getOrder = (tableNo = 1, date) => {
     let options = {
         url: `/api/getOrder?companyId=${1}&tableNo=${tableNo}&createDate2=${getFormateDate(date)}`,
-        // url: `/api/getOrder?companyId=${1}&tableNo=${tableNo}&createDate2=2019-06-17`,
+        // url: `/api/getOrder?companyId=${1}&tableNo=${tableNo}&createDate2=2019-06-18`,
         method: "GET"
     };
     return _axios(options);
