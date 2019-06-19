@@ -91,9 +91,15 @@ export default {
                 //先付款，直接走支付流程
             } else if (this.processType === 2) {
                 //先就餐, 先提交订单，暂不支付
-                await this.$store.dispatch("gw/addOrder");
-                // await this.$store.dispatch("gw/mt");
+                let data = await this.$store.dispatch("gw/addOrder");
+                //清除购物车数据
+                this.$store.commit("gw/clearCart");
+                //将订单信息存储到vuex中
+                this.$store.commit("qxz/updateUnfinishedOrder", data[0]);
+                this.$router.push({name: "info"})
             }
+            
+            
         },
         //生成订单
         generateOrder() {

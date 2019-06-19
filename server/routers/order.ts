@@ -27,12 +27,13 @@ router.post("/addOrder", async ctx => {
     let {orderNo} = ctx.params;
     let tag = orderNo ? "加菜" : "插入订单";
     try {
+        let data = null;
         if (orderNo) {
-            await addGoodsForOrder(ctx);
+            data = await addGoodsForOrder(ctx);
         } else {
-            await insertOrder(ctx);
+            data = await insertOrder(ctx);
         }
-        ctx.body = new SucModel([], "success");
+        ctx.body = new SucModel([data], "success");
     } catch (err) {
         console.log("err", err);
         ctx.body = new ErrModel([], `${tag}失败——` + JSON.stringify(err));

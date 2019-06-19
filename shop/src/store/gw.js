@@ -43,6 +43,9 @@ export default {
                 //数量减1
                 state.goodsList[index].count -= 1;
             }
+        },
+        clearCart(state) {
+            state.goodsList = [];
         }
     },
     actions: {
@@ -68,8 +71,7 @@ export default {
                 }
             };
             let data = await axios(options);
-            data = handleData(data);
-            // if (!data) return;
+            return handleData(data);
         },
         //测试一下
         async mt() {

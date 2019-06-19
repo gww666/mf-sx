@@ -88,6 +88,17 @@ export const insertOrder = async ctx => {
     let createDate2 = formatDate(date).split(" ")[0];
     let sql = `insert into m_order(id, order_no, company_id, food_type, payment, table_no, status, create_date, create_date2, update_date, payment_date) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     await mysql.execute(sql, [null, orderNo, companyId, foodType, payment, tableNo, 1, date, createDate2, date, null]);
+    return {
+        orderNo,
+        tableNo,
+        payment,
+        companyId,
+        foodType,
+        createDate2,
+        createDate: date,
+        updateDate: date,
+        paymentDate: null
+    }
 }
 
 //查询订单列表
@@ -163,6 +174,11 @@ export const addGoodsForOrder = async ctx => {
     let date = Date.now();
     let sql = `update m_order set update_date = ?, payment = ? where order_no = ?`;
     await mysql.execute(sql, [date, payment, orderNo]);
+    return {
+        orderNo,
+        payment,
+        updateDate: date
+    }
 }
 
 //重置订单桌牌号

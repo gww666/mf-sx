@@ -30,13 +30,14 @@ router.post("/addOrder", (ctx) => __awaiter(this, void 0, void 0, function* () {
     let { orderNo } = ctx.params;
     let tag = orderNo ? "加菜" : "插入订单";
     try {
+        let data = null;
         if (orderNo) {
-            yield order_1.addGoodsForOrder(ctx);
+            data = yield order_1.addGoodsForOrder(ctx);
         }
         else {
-            yield order_1.insertOrder(ctx);
+            data = yield order_1.insertOrder(ctx);
         }
-        ctx.body = new resModel_1.SucModel([], "success");
+        ctx.body = new resModel_1.SucModel([data], "success");
     }
     catch (err) {
         console.log("err", err);
