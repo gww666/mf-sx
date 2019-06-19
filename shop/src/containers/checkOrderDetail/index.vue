@@ -46,7 +46,7 @@ export default class CheckOrderDetail extends Vue {
 		)
 	};
 	async mounted() {
-        let orderNo = this.$route.query.orderNo;
+        let orderNo = this.$route.params.orderNo;
         this.payment = this.$route.params.payment || 0;
 		if(orderNo) {
             this.orderInfo = orderNo;

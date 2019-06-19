@@ -4,13 +4,16 @@ import Component from "vue-class-component";
 
 @Component
 export default class Order extends Vue {
+	get unfinishOrder() {
+		return this.$store.state.qxz.unfinishedOrder
+	}
 	// 回到菜单去加菜
     goOrderPage() {
-        this.$router.push({name: "orderPage", query: {orderNo: this.$route.query.orderNo}});
+        this.$router.push({name: "orderPage", params: {orderNo: this.$route.params.orderNo || this.unfinishOrder.orderNo}});
 	};
 	// 查看已有订单
     goCheckOrders() {
-		this.$router.push({name: "checkOrderDetail", query: {orderNo: this.$route.query.orderNo}, params: {payment: this.$route.params.payment}});
+		this.$router.push({name: "checkOrderDetail", params: {orderNo: this.$route.params.orderNo || this.unfinishOrder.orderNo, payment: this.$route.params.payment || this.unfinishOrder.payment}});
     };
 	render() {
 		return (

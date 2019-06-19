@@ -40,8 +40,10 @@ export default class Order extends Vue {
 			if (setting.processType === 2 && Array.isArray(order)) {
 				for(let i = 0; i < order.length; i++) {
 					if(order[i].status === 1) {
+						// 把未完结的单存到vuex中
+						this.$store.commit("qxz/updateUnfinishedOrder", order[i]);
 						// 后付款，且有未完结订单，跳转加菜、查看已有订单选择页面
-						this.$router.push({name: "choicesPage", query: {orderNo: order[i].orderNo}, params: {payment: order[i].payment}});
+						this.$router.push({name: "choicesPage", params: {orderNo: order[i].orderNo, payment: order[i].payment}});
 						return;
 					};
 				};
@@ -50,7 +52,8 @@ export default class Order extends Vue {
 		};
 	};
     doScan() {
-        this.querySystemSettings(3);
+		this.querySystemSettings(3);
+		this.$router.push({name: "choicesPage", query: {companyId: 1, tableNo: 3}});
     };
 	render() {
 		return (
