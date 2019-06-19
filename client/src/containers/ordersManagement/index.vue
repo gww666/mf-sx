@@ -1,11 +1,10 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Tag, Table, Modal, Select, Input, message, Button, Pagination } from "ant-design-vue";
+import { Table, Modal, Select, Input, message, Button, Pagination } from "ant-design-vue";
 import formateDate from "../../utils/formateDate";
 import { tableColumns } from "./datas";
-import { getOrdersList } from "./axios";
-Vue.use(Tag);
+import { getOrdersList, modifyTableNo } from "./axios";
 Vue.use(Table);
 Vue.use(Modal);
 Vue.use(Select);
@@ -16,22 +15,56 @@ const { Column } = Table;
 @Component
 export default class OrdersManagement extends Vue {
     ordersList = [];
+    tableNoList = ["1", "2", "3", "4", "5", "6", "7"];
     get userInfo() {
         return this.$store.state.qxz.userInfo;
     };
-    // 获取分类列表
+    // 获取订单列表
     async queryOrdersList() {
         try {
             let res = await getOrdersList(this.userInfo.id);
             if(res.data.returnCode === 1) {
                 this.ordersList = res.data.data;
-                console.log(res, 'ereres');
             }else {
                 message.warning("获取分类列表失败");
             };
         }catch (err) {
             console.log("获取分类列表err", err);
-        }
+        };
+    };
+    // 换桌
+    changeTableNo(record) {
+        Modal.confirm({
+            title: "提示",
+            content: (
+                <a-select class="table-no" defaultValue={record.tableNo} onChange={val => record.tableNo = val}>
+                    {
+                        this.tableNoList.map(item => {
+                            return (
+                                <a-select-option value={item}>{item}</a-select-option>
+                            )
+                        })
+                    }
+                </a-select>
+            ),
+            okText: "确定",
+            okType: "danger",
+            cancelText: "取消",
+            onOk: async () => {
+                try {
+                    let res = await modifyTableNo(record);
+                    if(res.data.returnCode === 1) {
+                        message.success("换桌成功");
+                        this.queryOrdersList();
+                    }else {
+                        message.warning("换桌失败");
+                    }
+                }catch(err) {
+                    console.log(err, "删除分类err");
+                };
+            },
+            onCancel() {}
+        });
     };
     // 列表渲染
     tableRenderFn(text, record, item) {
@@ -49,7 +82,7 @@ export default class OrdersManagement extends Vue {
             dom = (
                 <div class="btns-field">
                     <div class="btns-layout">
-                        <p class="btn edit-btn" onClick={() => this.goEdit(record)}>编辑</p>
+                        <p class="btn edit-btn" onClick={() => this.changeTableNo(Object.assign({}, record))}>换桌</p>
                     </div>
                 </div>
             );
@@ -61,23 +94,11 @@ export default class OrdersManagement extends Vue {
         this.pageNum = pageNum;
         this.queryGoodsList();
     };
-    // <a-select class="filters" value={this.currentCategory} onChange={val => this.changeCategory(val)}>
-    //     {
-    //         this.categoryList.map((ele, index) => {
-    //             return (
-    //                 <a-select-option value={ele.id}>{ele.name}</a-select-option>
-    //             )
-    //         })
-    //     }
-    // </a-select>
 	render() {
 		return (
             <div class="category-page">
                 <div class="title-bar">
                     <p>订单管理</p>
-                </div>
-                <div class="title-bar">
-                    
                 </div>
                 <Table 
                     rowKey={record => record.id} 
@@ -180,22 +201,15 @@ export default class OrdersManagement extends Vue {
         color: #FFF;
         margin-right: 10px;
     }
-    .name{
-        line-height: 22px;
-        max-width: 80px;
-        overflow: hidden;
-        text-overflow:ellipsis;
-        white-space: nowrap;
-    }
     p{
         margin: 0;
-    }
-
-    .filters{
-        width: 100px;
     }
     .table {
         flex: 1;
         overflow-y: scroll;
+    }
+    .table-no{
+        margin: 10px auto;
+        width: 200px;
     }
 </style>
