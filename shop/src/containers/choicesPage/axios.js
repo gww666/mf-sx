@@ -8,7 +8,7 @@ export const getSettings = () => {
         method: "GET"
     };
     return _axios(options);
-}
+};
 // 根据企业号、餐桌号、创建日期查询订单
 export const getOrder = (tableNo = 1, date) => {
     let options = {
@@ -17,4 +17,4 @@ export const getOrder = (tableNo = 1, date) => {
         method: "GET"
     };
     return _axios(options);
-}
+};
