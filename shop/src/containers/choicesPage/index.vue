@@ -17,13 +17,13 @@ export default class Order extends Vue {
 		this.$router.push({name: "checkOrderDetail", params: {orderNo: this.unfinishedOrder.orderNo, payment: this.unfinishedOrder.payment}});
 	};
 	// 获取系统设置
-	async querySystemSettings(tableNo) {
+	async querySystemSettings(companyId, tableNo) {
 		let hour = new Date().getHours();
 		let requestArr = [];
 		if(0 <= hour && hour <= 3) {
-			requestArr = [getSettings(), getOrder(tableNo, new Date()), getOrder(tableNo, new Date().getTime() - 24 * 60 * 60 * 1000)];
+			requestArr = [getSettings(), getOrder(companyId, tableNo, new Date()), getOrder(companyId, tableNo, new Date().getTime() - 24 * 60 * 60 * 1000)];
 		} else {
-			requestArr = [getSettings(), getOrder(tableNo, new Date())];
+			requestArr = [getSettings(), getOrder(companyId, tableNo, new Date())];
 		};
 		Promise.all(requestArr).then(res => {
 			this.handleDatas(res, tableNo);
@@ -61,9 +61,11 @@ export default class Order extends Vue {
 			};
 		};
 	};
+	// <p>您有尚未支付的订单，您可以选择继续点餐</p>
 	render() {
 		return (
 			<div class="choices-container">
+				
 				<div class="choices" onClick={this.goOrderPage}>我要加菜</div>
 				<div class="choices" onClick={this.goCheckOrders}>查看已有订单</div>
 			</div>
@@ -72,7 +74,7 @@ export default class Order extends Vue {
 	created() {
 		let { companyId, tableNo } = this.$route.query;
 		this.$store.commit("qxz/updateIdNo", {companyId, tableNo});
-		this.querySystemSettings(tableNo);
+		this.querySystemSettings(companyId, tableNo);
 	};
 };
 </script>

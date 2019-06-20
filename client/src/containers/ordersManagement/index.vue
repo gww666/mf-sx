@@ -35,7 +35,7 @@ export default class OrdersManagement extends Vue {
     // 换桌
     changeTableNo(record) {
         Modal.confirm({
-            title: "提示",
+            title: "请选择桌号",
             content: (
                 <a-select class="table-no" defaultValue={record.tableNo} onChange={val => record.tableNo = val}>
                     {
@@ -58,7 +58,7 @@ export default class OrdersManagement extends Vue {
                         this.queryOrdersList();
                     }else {
                         message.warning("换桌失败");
-                    }
+                    };
                 }catch(err) {
                     console.log(err, "删除分类err");
                 };

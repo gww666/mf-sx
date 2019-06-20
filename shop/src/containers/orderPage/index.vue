@@ -18,7 +18,11 @@ export default class Order extends Vue {
 	defaultPic = require("../../assets/images/noPic.jpg");
 	get selectedGoodsList () {
 		return this.$store.state.gw.goodsList;
-	}
+	};
+	// 企业id
+	get companyId () {
+		return this.$store.state.qxz.companyId;
+	};
 	// 
 	getCount(item) {
 		let count = 0;
@@ -59,7 +63,7 @@ export default class Order extends Vue {
 	// 获取分类下的商品
 	async queryGoodsList() {
 		try {
-            let res = await getGoodsList(1, "all", 1, 100);
+            let res = await getGoodsList(this.companyId);
             if (res.data.returnCode === 1) {
                 if(res.data.data.length > 0) {
 					let goodsList = res.data.data;
@@ -197,21 +201,23 @@ export default class Order extends Vue {
 		justify-content: space-between;
 	}
 	.list-left{
-		width: 25%;
+		width: 22%;
 		height: 100%;
 		ul{
 			height: 100%;
 			overflow-y: auto;
+			background: #f2f2f2;
 			li{
 				width: 100%;
-				height: 1rem;
-				line-height: 1rem;
-				padding: 0 .25rem;
+				min-height: 1rem;
+				display: flex;
+				align-items: center;
+				padding: 0 .24rem;
 				box-sizing: border-box;
 				position: relative;
 			}
 			.choosen-class{
-				background: #e6e6e6;
+				background: #fff;
 			}
 		}
 	}
@@ -230,7 +236,7 @@ export default class Order extends Vue {
 		top: .2rem;
 	}
 	.list-right{
-		width: 74%;
+		width: 78%;
 		height: 100%;
 		overflow-y: auto;
 		transition: all 0.5s;
@@ -239,9 +245,9 @@ export default class Order extends Vue {
 		}
 	}
 	.icon-can{
-		width: 24%;
+		width: 23%;
 		height: 100%;
-		margin-left: 1%;
+		margin-left: 2%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -269,7 +275,7 @@ export default class Order extends Vue {
 	}
 	.title{
 		width: 100%;
-		font-size: .32rem;
+		font-size: .28rem;
 		overflow: hidden;
 		text-overflow:ellipsis;
 		white-space: nowrap;
@@ -280,16 +286,18 @@ export default class Order extends Vue {
 		text-overflow:ellipsis;
 		white-space: nowrap;
 		margin-top: .1rem;
+		font-size: .2rem;
 		color: rgba(0, 0, 0, 0.65);
 	}
 	.price{
 		display: inline-block;
 		margin-right: .16rem;
+		font-size: .26rem;
 		color: #FF4544;
 	}
 	.sale-price{
 		color: rgba(0, 0, 0, 0.65);
-		font-size: .14rem;
+		font-size: .2rem;
 		text-decoration: line-through;
 	}
 </style>

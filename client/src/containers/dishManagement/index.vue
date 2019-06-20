@@ -82,7 +82,7 @@ export default class DishCategory extends Vue {
                         };
                         return 0;
                     });
-                    this.total = res.data.total * this.pageSize;
+                    this.total = res.data.total;
                 } else {
                     this.goodsList = [];
                 };
@@ -158,7 +158,7 @@ export default class DishCategory extends Vue {
     doDelete(record) {
         Modal.confirm({
             title: "提示",
-            content: "确定删除这个分类么？",
+            content: "确定删除这个菜品么？",
             okText: "确定",
             okType: "danger",
             cancelText: "取消",
@@ -254,7 +254,6 @@ export default class DishCategory extends Vue {
     };
     // 切换页码
     handelPageChange(pageNum) {
-        console.log(pageNum);
         this.pageNum = pageNum;
         this.queryGoodsList();
     };

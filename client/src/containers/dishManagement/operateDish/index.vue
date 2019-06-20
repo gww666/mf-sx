@@ -146,7 +146,7 @@ export default class DishCategory extends Vue {
                     reslove(res);
                 });
             });
-        };
+        }
     };
     async doUpload() {
         if (this.imageList.length || this.previousImgs.length) {
@@ -155,7 +155,12 @@ export default class DishCategory extends Vue {
             if (this.goodsIcon.length) {
                 try {
                     let res = await this.compressIcon(this.goodsIcon[0]);
-                    if (res.data.returnCode === 1) {
+                    if(res) {
+                        if (res.data.returnCode === 1) {
+                            this.dishInfo.thumbnail = res.data.data[0];
+                        };
+                    }else {
+                        let res = await this.createPromise(this.imageList[0]);
                         this.dishInfo.thumbnail = res.data.data[0];
                     };
                 } catch (err) {
@@ -166,7 +171,12 @@ export default class DishCategory extends Vue {
             if (!this.dishInfo.thumbnail) {
                 try {
                     let res = await this.compressIcon(this.imageList[0]);
-                    if (res.data.returnCode === 1) {
+                    if(res) {
+                        if (res.data.returnCode === 1) {
+                            this.dishInfo.thumbnail = res.data.data[0];
+                        };
+                    }else {
+                        let res = await this.createPromise(this.imageList[0]);
                         this.dishInfo.thumbnail = res.data.data[0];
                     };
                 } catch (err) {

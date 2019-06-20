@@ -10,10 +10,10 @@ export const getSettings = () => {
     return _axios(options);
 };
 // 根据企业号、餐桌号、创建日期查询订单
-export const getOrder = (tableNo = 1, date) => {
+export const getOrder = (companyId, tableNo, date) => {
     let options = {
-        url: `/api/getOrder?companyId=${1}&tableNo=${tableNo}&createDate2=${getFormateDate(date)}`,
-        // url: `/api/getOrder?companyId=${1}&tableNo=${tableNo}&createDate2=2019-06-18`,
+        // url: `/api/getOrder?companyId=${companyId}&tableNo=${tableNo}&createDate2=${getFormateDate(date)}`,
+        url: `/api/getOrder?companyId=${companyId}&tableNo=${tableNo}&createDate2=2019-06-19`,
         method: "GET"
     };
     return _axios(options);

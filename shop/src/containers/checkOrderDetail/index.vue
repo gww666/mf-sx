@@ -14,33 +14,28 @@ export default class CheckOrderDetail extends Vue {
 	render() {
 		return (
             <div class="order-container">
-                <div class="go-back" onClick={this.goBack}>
-                    {"‹"}
+                <div class="page-title">
+                    订单详情
+                </div>
+                <div class="ul-title">
+                    已点菜品：
                 </div>
                 <ul class="content-ul">
                     {
                         this.goodsList.map(item => (
                             <li class="goods-item">
-                                <div class="icon-can">
-                                    <img src={item.goodsImg ? `http://120.78.221.14:2233${item.goodsImg}` : this.defaultPic} class="main-img" />
-                                </div>
                                 <div class="content">
-                                    <div style="width: 100%;">
-                                        <p class="title">{item.goodsTitle}</p>
-                                    </div>
-                                    <div>
-                                        <span>数量：</span><span class={"price"}>{item.goodsCount}</span>
-                                    </div>
-                                    <div style="position: relative;">
-                                        <span class={"price"}>￥{item.goodsPrice}</span>
-                                    </div>
+                                    <p class="title">{item.goodsTitle}</p>
+                                    <p class="count"><span>×</span><span>{item.goodsCount}</span></p>
+                                    <p class="price">￥{item.goodsPrice}</p>
                                 </div>
                             </li>
                         ))
                     }
                 </ul>
                 <div class="payment-infos">
-                    <span>订单总额：</span><span>￥{this.payment}</span>
+                    <p style="margin-right: .2rem;"><span>需要支付：</span><span>￥{this.payment}</span></p>
+                    <div class="payment-btn">去结算</div>
                 </div>
 			</div>
 		)
@@ -54,23 +49,6 @@ export default class CheckOrderDetail extends Vue {
                 let res = await getOrderDetail(orderNo);
                 if(res.data.returnCode === 1) {
                     this.goodsList = res.data.data;
-                    // this.goodsList = [
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":16,"orderNo":"201906171818920001","goodsId":6,"goodsTitle":"炒辣条","goodsPrice":"48.80","goodsCount":2,"goodsImg":"/public/upload/b0d439b0f6933d8e0c63a1ccc50ad9b0.jpeg"},
-                    //     {"id":17,"orderNo":"201906171818920001","goodsId":18,"goodsTitle":"炒鸡蛋","goodsPrice":"50.00","goodsCount":1,"goodsImg":""},
-                    //     {"id":18,"orderNo":"201906171818920001","goodsId":11,"goodsTitle":"炒鸡蛋","goodsPrice":"50.00","goodsCount":1,"goodsImg":""}
-                    // ];
-                    // console.log(res.data.data, 'ssssssssssssssssssssssssss');
                 }
             } catch(err) {
                 console.log("获取订单详情err: ", err);
@@ -91,6 +69,23 @@ export default class CheckOrderDetail extends Vue {
         justify-content: space-between;
         position: relative;
     }
+    .page-title{
+        width: 100%;
+        height: .8rem;
+        text-align: center;
+        line-height: .8rem;
+        font-size: .3rem;
+        font-weight: bold;
+        color: #FFF;
+        background: #0af;
+        background: linear-gradient(90deg, #0af, #0085ff);
+    }
+    .ul-title{
+        font-size: .3rem;
+        color: #333;
+        box-sizing: border-box;
+        padding: .2rem 5%;
+    }
     .content-ul{
         flex: 1;
         overflow-y: scroll;
@@ -98,42 +93,29 @@ export default class CheckOrderDetail extends Vue {
         box-sizing: border-box;
         padding: 0 5%;
     }
-    .go-back{
-        width: .4rem;
-        height: .6rem;
-        // border-radius: .2rem;
-        font-size: .8rem;
-        text-align: center;
-        line-height: .4rem;
-        margin-left: .2rem;
-        // position: absolute;
-        // left: .3rem;
-        // top: .3rem;
-    }
     .main-img{
 		max-width: 100%;
 		max-height: 1rem;
 	}
 	.goods-item{
 		width: 100%;
-		height: 1.8rem;
 		background: #FFF;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-	}
+    }
 	.content{
-		width: 76%;
+		width: 100%;
 		height: 100%;
 		box-sizing: border-box;
-		padding: .3rem .2rem;
+		padding: .24rem 0;
 		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
+        justify-content: space-between;
+        color: #333;
 	}
 	.title{
-		width: 100%;
-		font-size: .32rem;
+		flex: 1;
+		font-size: .28rem;
 		overflow: hidden;
 		text-overflow:ellipsis;
 		white-space: nowrap;
@@ -144,26 +126,36 @@ export default class CheckOrderDetail extends Vue {
 		text-overflow:ellipsis;
 		white-space: nowrap;
 		margin-top: .1rem;
+		font-size: .2rem;
 		color: rgba(0, 0, 0, 0.65);
 	}
 	.price{
-		display: inline-block;
-		margin-right: .16rem;
-		color: #FF4544;
-	}
-	.sale-price{
-		color: rgba(0, 0, 0, 0.65);
-		font-size: .14rem;
-		text-decoration: line-through;
+        width: 1.8rem;
+        text-align: right;
+		font-size: .26rem;
+    }
+    .count{
+        width: .8rem;
+        text-align: right;
     }
     .payment-infos{
-        box-sizing: border-box;
-        padding: 0 5%;
         width: 100%;
         height: .8rem;
         line-height: .8rem;
         text-align: right;
         font-size: .3rem;
-        background: #FFF;
+        color: #FFF;
+        background: rgba(61,61,63,.9);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+    .payment-btn{
+        width: 2.6rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #38ca73;
     }
 </style>
