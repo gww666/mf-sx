@@ -7,7 +7,9 @@ import { getOrderDetail } from "./axios";
 export default class CheckOrderDetail extends Vue {
     goodsList = [];
     payment = 0;
-    defaultPic = require("../../assets/images/noPic.jpg");
+    get unfinishedOrder () {
+        return this.$store.state.qxz.unfinishedOrder;
+    };
     goBack() {
         this.$router.go(-1);
     };
