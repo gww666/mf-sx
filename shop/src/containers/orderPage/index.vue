@@ -108,6 +108,10 @@ export default class Order extends Vue {
 			}
 		);
 	};
+	// 跳转详情
+	goDetail(item) {
+		this.$router.push({name: "detail", params: {info: item}});
+	};
 	handleUlScroll(e) {
 		let length = this.categoryList.length;
 		let liHeight = document.querySelector(".goods-item").offsetHeight;
@@ -145,11 +149,11 @@ export default class Order extends Vue {
 							{
 								this.goodsList.map(item => (
 									<li class="goods-item">
-										<div class="icon-can">
+										<div class="icon-can" onClick={() => this.goDetail(item)}>
 											<img src={item.thumbnail ? `http://120.78.221.14:2233${item.thumbnail}` : this.defaultPic} class="main-img" />
 										</div>
 										<div class="content">
-											<div style="width: 100%;">
+											<div style="width: 100%;" onClick={() => this.goDetail(item)}>
 												<p class="title">{item.title}</p>
 												<p class="sub-title">{item.subTitle}</p>
 											</div>

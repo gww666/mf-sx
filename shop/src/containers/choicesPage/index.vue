@@ -5,6 +5,7 @@ import { getSettings, getOrder } from "./axios";
 
 @Component
 export default class Order extends Vue {
+	showPage = false;
 	get unfinishedOrder() {
 		return this.$store.state.qxz.unfinishedOrder;
 	};
@@ -52,6 +53,7 @@ export default class Order extends Vue {
 					if(order[i].status === 1) {
 						// 把未完结的单存到vuex中
 						this.$store.commit("qxz/updateUnfinishedOrder", order[i]);
+						this.showPage = true;
 						// 后付款，且有未完结订单，跳转加菜、查看已有订单选择页面
 						// this.$router.push({name: "choicesPage", params: {orderNo: order[i].orderNo, payment: order[i].payment}});
 						return;
@@ -64,11 +66,14 @@ export default class Order extends Vue {
 	// <p>您有尚未支付的订单，您可以选择继续点餐</p>
 	render() {
 		return (
+			this.showPage
+			?
 			<div class="choices-container">
-				
 				<div class="choices" onClick={this.goOrderPage}>我要加菜</div>
 				<div class="choices" onClick={this.goCheckOrders}>查看已有订单</div>
 			</div>
+			:
+			<div></div>
 		)
 	};
 	created() {
@@ -92,7 +97,8 @@ export default class Order extends Vue {
         width: 2rem;
         height: .6rem;
         border-radius: .3rem;
-        line-height: .6rem;
+		line-height: .6rem;
+		font-size: .24rem;
         text-align: center;
         color: #FFF;
         background: #1890ff;
