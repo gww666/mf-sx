@@ -2,6 +2,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { getOrderDetail } from "./axios";
+import { formatDateTime } from "../../utils/getFormateDate";
 
 @Component
 export default class CheckOrderDetail extends Vue {
@@ -10,8 +11,8 @@ export default class CheckOrderDetail extends Vue {
     get unfinishedOrder () {
         return this.$store.state.qxz.unfinishedOrder;
     };
-    goBack() {
-        this.$router.go(-1);
+    goPayment() {
+        console.log("去支付")
     };
 	render() {
 		return (
@@ -35,9 +36,14 @@ export default class CheckOrderDetail extends Vue {
                         ))
                     }
                 </ul>
+                <div class="order-infos">
+                    <p class="info-title">订单信息：</p>
+                    <p><span>订单号：</span><span>{this.unfinishedOrder.orderNo}</span></p>
+                    <p><span>下单时间：</span><span>{this.unfinishedOrder.createDate ? formatDateTime(Number(this.unfinishedOrder.createDate)) : ""}</span></p>
+                </div>
                 <div class="payment-infos">
                     <p style="margin-right: .2rem;"><span>需要支付：</span><span>￥{this.payment}</span></p>
-                    <div class="payment-btn">去结算</div>
+                    <div class="payment-btn" onClick={this.goPayment}>去结算</div>
                 </div>
 			</div>
 		)
@@ -139,6 +145,23 @@ export default class CheckOrderDetail extends Vue {
     .count{
         width: .8rem;
         text-align: right;
+    }
+    .order-infos{
+        width: 100%;
+        height: 2rem;
+        box-sizing: border-box;
+        padding: .2rem 5%;
+        color: #6e6e6e;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        .info-title{
+            font-size: .3rem;
+            color: #333;
+        }
+        p{
+            font-size: .28rem;
+        }
     }
     .payment-infos{
         width: 100%;
