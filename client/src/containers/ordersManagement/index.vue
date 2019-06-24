@@ -5,6 +5,7 @@ import { Table, Modal, Select, Input, message, Button, Pagination } from "ant-de
 import formateDate from "../../utils/formateDate";
 import { tableColumns } from "./datas";
 import { getOrdersList, modifyTableNo } from "./axios";
+// import io from "socket.io-client";
 Vue.use(Table);
 Vue.use(Modal);
 Vue.use(Select);
@@ -135,6 +136,13 @@ export default class OrdersManagement extends Vue {
     };
     mounted() {
         this.queryOrdersList();
+        socket.on("connect", () => {
+            console.log("connect");
+            if (info) {
+                $(".id").innerHTML = info.nickname;
+                socket.emit("create id", info);
+            };
+        });
     };
 }
 </script>
