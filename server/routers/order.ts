@@ -22,6 +22,12 @@ router.get("/getOrder", async ctx => {
     }
 });
 
+//获取实时订单列表
+router.get("/getRTOrder", async ctx => {
+    // const sockets = ctx.sockets;
+
+});
+
 //插入订单或加菜
 router.post("/addOrder", async ctx => {
     let {orderNo} = ctx.params;
@@ -33,6 +39,8 @@ router.post("/addOrder", async ctx => {
         } else {
             data = await insertOrder(ctx);
         }
+        //向客户端发送socket事件
+        ctx.sockets.to(ctx.sockets.id).emit("orderChange", "订单改变");
         ctx.body = new SucModel([data], "success");
     } catch (err) {
         console.log("err", err);
