@@ -7,14 +7,14 @@ export const getFormateDate = val => {
 
         if(M < 10) {
             M = '0' + M;
-        };
+        }
         if(D < 10) {
             D = '0' + D;
-        };
+        }
         return Y + '-' + M + '-' + D ;
     } else {
         return '';
-    };
+    }
 }
 
 export const formatDateTime = inputTime => {

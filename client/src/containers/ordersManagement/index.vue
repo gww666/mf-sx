@@ -1,21 +1,29 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Table, Modal, Select, Input, message, Button, Pagination } from "ant-design-vue";
+import { Tabs, Table, Modal, Select, Input, message, Button, Pagination } from "ant-design-vue";
 import formateDate from "../../utils/formateDate";
-import { tableColumns } from "./datas";
+import { tableColumns, detailTableColumn } from "./datas";
 import { getOrdersList, modifyTableNo } from "./axios";
+Vue.use(Tabs);
 Vue.use(Table);
 Vue.use(Modal);
 Vue.use(Select);
 Vue.use(Input);
 Vue.use(Pagination);
 const { Column } = Table;
+const { TabPane } = Tabs;
 
 @Component
 export default class OrdersManagement extends Vue {
-    ordersList = [];
+    visible = false;
     tableNoList = ["1", "2", "3", "4", "5", "6", "7"];
+    // 订单列表
+    ordersList = [];
+    // 实时订单列表
+    rtOrder = [];
+    // 详情列表
+    detailList = [];
     get userInfo() {
         return this.$store.state.qxz.userInfo;
     };
@@ -66,6 +74,30 @@ export default class OrdersManagement extends Vue {
             onCancel() {}
         });
     };
+    // 实时列表渲染
+    rtTableRenderFn(text, record, item) {
+        switch (item.key) {
+            case "paymentDate":
+                text = text ? formateDate(text) : "";
+                break;
+            case "status":
+                text = text === 1 ? "待支付" : "已完成";
+                break;
+        };
+        let dom = <span>{text}</span>;
+        // 操作按钮
+        if (item.key === "operation") {
+            dom = (
+                <div class="btns-field">
+                    <div class="btns-layout">
+                        <p class="btn edit-btn" onClick={() => this.changeTableNo(Object.assign({}, record))}>换桌</p>
+                        <p class="btn edit-btn" onClick={() => this.showOrderDetail(Object.assign({}, record))}>详情</p>
+                    </div>
+                </div>
+            );
+        };
+        return dom;
+    };
     // 列表渲染
     tableRenderFn(text, record, item) {
         switch (item.key) {
@@ -89,62 +121,187 @@ export default class OrdersManagement extends Vue {
         };
         return dom;
     };
+    // 展示详情
+    showOrderDetail(record) {
+        console.log(record, 'record');
+        this.detailList = record.orderList || [];
+        this.visible = true;
+    };
     // 切换页码
     handelPageChange(pageNum) {
         this.pageNum = pageNum;
         this.queryGoodsList();
     };
+    // 切换tab
+    handleTabChange(index) {
+        if(index == 2) {
+            this.queryOrdersList();
+        }
+    };
+    // 获取实时订单
+    getRTOrder() {
+        this.rtOrder = [{
+            orderNo: "121315467843526",
+            payment: 15.60,
+            tableNo: 2,
+            createDate: "2019-06-22 17:53:50",
+            updateDate: "2019-06-22 17:53:50",
+            orderList: [
+                {
+                    createDate: "2019-06-22 18:20:08",
+                    updateDate: "2019-06-22 18:20:08",
+                    goods: [
+                        {count: 1, price: 15.00, title: "炒鸡蛋"},
+                        {count: 1, price: 15.00, title: "炒鸭蛋"},
+                        {count: 1, price: 15.00, title: "炒鹅蛋"},
+                    ]
+                },
+                {
+                    createDate: "2019-06-22 18:20:08",
+                    updateDate: "2019-06-22 18:20:08",
+                    goods: [
+                        {count: 1, price: 15.00, title: "炒鸡蛋"},
+                        {count: 1, price: 15.00, title: "炒鸭蛋"},
+                        {count: 1, price: 15.00, title: "炒鹅蛋"},
+                    ]
+                },
+                {
+                    createDate: "2019-06-22 18:20:08",
+                    updateDate: "2019-06-22 18:20:08",
+                    goods: [
+                        {count: 1, price: 15.00, title: "炒鸡蛋"},
+                        {count: 1, price: 15.00, title: "炒鸭蛋"},
+                        {count: 1, price: 15.00, title: "炒鹅蛋"},
+                    ]
+                }
+            ]
+        }];
+    };
+    // 弹窗确定按钮
+    handleOk() {
+
+    };
 	render() {
 		return (
             <div class="category-page">
-                <div class="title-bar">
-                    <p>订单管理</p>
-                </div>
-                <Table 
-                    rowKey={record => record.id} 
-                    dataSource={this.ordersList}
-                    pagination={false}
-                    class="table"
+                <a-tabs defaultActiveKey="1" onChange={this.handleTabChange} class="tabs-container">
+                    <TabPane tab="实时订单" key="1" style="height: 100%;">
+                        <Table
+                            rowKey={record => record.id} 
+                            dataSource={this.rtOrder}
+                            pagination={false}
+                            style="flex: 1;overflow-y:auto;"
+                        >
+                            {
+                                tableColumns.map(item => {
+                                    return (
+                                        <Column
+                                            title={item.title}
+                                            dataIndex={item.dataIndex}
+                                            key={item.key}
+                                            align="center"
+                                            customRender={(text, record, index) => this.rtTableRenderFn(text, record, item)}
+                                        />
+                                    )
+                                })
+                            }
+                            <Column
+                                title="操作"
+                                key="operation"
+                                width={150}
+                                align="center"
+                                customRender={(text, record, index) => this.rtTableRenderFn(text, record, {key: "operation"})}
+                            />
+                        </Table>
+                        <div class="pagination-box">
+                            <a-pagination defaultCurrent={1} total={this.total} onChange={this.handelPageChange} />
+                        </div>
+                    </TabPane>
+                    <TabPane tab="订单管理" key="2" style="height: 100%;" forceRender>
+                        <Table
+                            rowKey={record => record.id} 
+                            dataSource={this.ordersList}
+                            pagination={false}
+                            style="flex: 1;overflow-y:auto;"
+                        >
+                            {
+                                tableColumns.map(item => {
+                                    return (
+                                        <Column
+                                            title={item.title}
+                                            dataIndex={item.dataIndex}
+                                            key={item.key}
+                                            align="center"
+                                            customRender={(text, record, index) => this.tableRenderFn(text, record, item)}
+                                        />
+                                    )
+                                })
+                            }
+                            
+                            <Column
+                                title="操作"
+                                key="operation"
+                                width={100}
+                                align="center"
+                                customRender={(text, record, index) => this.tableRenderFn(text, record, {key: "operation"})}
+                            />
+                        </Table>
+                        <div class="pagination-box">
+                            <a-pagination defaultCurrent={1} total={this.total} onChange={this.handelPageChange} />
+                        </div>
+                    </TabPane>
+                </a-tabs>
+                <a-modal
+                    title="订单详情"
+                    v-model={this.visible}
+                    onOk={this.handleOk}
+                    width="80%"
+                    style="height: 80%;"
                 >
-                    {
-                        tableColumns.map(item => {
-                            return (
-                                <Column
-                                    title={item.title}
-                                    dataIndex={item.dataIndex}
-                                    key={item.key}
-                                    align="center"
-                                    customRender={(text, record, index) => this.tableRenderFn(text, record, item)}
-                                />
-                            )
-                        })
-                    }
-                    <Column
-                        title="操作"
-                        key="operation"
-                        width={100}
-                        align="center"
-                        customRender={(text, record, index) => this.tableRenderFn(text, record, {key: "operation"})}
-                    />
-                </Table>
-                <div style="margin:10px auto;">
-                    <a-pagination defaultCurrent={1} total={this.total} onChange={this.handelPageChange} />
-                </div>
+                        {
+                            this.detailList.map((ele, index) => {
+                                return (
+                                    <div>
+                                        {
+                                            index === 0 ? <p class="table-title"></p> : <p class="table-title">第{index}次加菜</p>
+                                        }
+                                        <Table
+                                            rowKey={record => record.id} 
+                                            dataSource={ele.goods}
+                                            pagination={false}
+                                            style="flex: 1;overflow-y:auto;"
+                                        >
+                                            {
+                                                detailTableColumn.map(item => {
+                                                    return (
+                                                        <Column
+                                                            title={item.title}
+                                                            dataIndex={item.dataIndex}
+                                                            key={item.key}
+                                                            align="center"
+                                                            customRender={(text, record, index) => this.rtTableRenderFn(text, record, item)}
+                                                        />
+                                                    )
+                                                })
+                                            }
+                                        </Table>
+                                    </div>
+                                )
+                            })
+                        }
+                </a-modal>
             </div>
 		);
     };
     mounted() {
-        this.queryOrdersList();
+        this.getRTOrder();
     };
 }
 </script>
 <style lang="less" scoped>
     .category-page{
         width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        flex: 1;
         background: #F5F5F5;
     }
     .title-bar{
@@ -204,12 +361,16 @@ export default class OrdersManagement extends Vue {
     p{
         margin: 0;
     }
-    .table {
-        flex: 1;
-        overflow-y: scroll;
-    }
     .table-no{
         margin: 10px auto;
         width: 200px;
+    }
+    .tabs-container{
+        height: 100%;
+        overflow-y: auto;
+    }
+    .pagination-box{
+        margin:10px auto;
+        text-align: center;
     }
 </style>

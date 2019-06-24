@@ -39,5 +39,5 @@ export const tableColumns = [
         title: "更新日期",
         dataIndex: "updateDate",
         key: "updateDate"
-    }   
+    }
 ];

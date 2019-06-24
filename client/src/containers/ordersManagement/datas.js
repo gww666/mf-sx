@@ -26,3 +26,26 @@ export const tableColumns = [
         key: "paymentDate"
     }
 ];
+
+export const detailTableColumn = [
+    {
+        title: "商品",
+        dataIndex: "title",
+        key: "title"
+    },
+    {
+        title: "数量",
+        dataIndex: "count",
+        key: "count"
+    },
+    {
+        title: "价格",
+        dataIndex: "price",
+        key: "price"
+    },
+    {
+        title: "特价",
+        dataIndex: "salePrice",
+        key: "salePrice"
+    }
+]
