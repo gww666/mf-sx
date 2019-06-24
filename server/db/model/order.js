@@ -12,6 +12,7 @@ const common_1 = require("../common");
 const util_1 = require("../../util");
 const util = require("util");
 const { promisify } = util;
+const md5 = require("js-md5");
 //根据企业号、桌号(和日期)查找订单
 exports.getOrder = (ctx) => __awaiter(this, void 0, void 0, function* () {
     let mysql = ctx.db;
@@ -39,15 +40,102 @@ let setNo = (ctx, { key, no }) => {
     // }
     ctx.redis.set(key, no, "PX", restTime);
 };
+const getOrderListKey = companyId => {
+    return "orderList-" + companyId;
+};
+/**
+ * 订单数据结构
+ * {
+ *     orderNo: {
+ *         baseInfo: {payment, createDate, updateDate, tableNo},
+ *         goodsArray: [
+ *             {
+ *                 baseInfo: {createDate, tableNo},
+ *                 goods: {
+ *                     goodsId: {count, price, goodsTitle}
+ *                 }
+ *             }
+ *         ]
+ *     }
+ * }
+ * @param ctx
+ * @param param1
+ */
+//将订单数据放到redis中
+const insertOrderToRedis = (ctx, { order, companyId }) => __awaiter(this, void 0, void 0, function* () {
+    let key = getOrderListKey(companyId);
+    let get = promisify(ctx.redis.get).bind(ctx.redis);
+    let orderList = yield get(key);
+    if (orderList) {
+        orderList = JSON.parse(orderList); //一个对象
+        if (orderList[order.orderNo]) {
+            let _order = orderList[order.orderNo];
+            _order.baseInfo = Object.assign({}, _order.baseInfo, { payment: order.payment, updateDate: order.updateDate });
+            _order.goodsArray.push({
+                baseInfo: {
+                    createDate: order.updateDate,
+                    tableNo: order.tableNo
+                },
+                goods: Object.assign({}, order.goods)
+            });
+        }
+        else {
+            orderList[order.orderNo] = {
+                baseInfo: {
+                    payment: order.payment,
+                    createDate: order.createDate,
+                    updateDate: order.updateDate,
+                    tableNo: order.tableNo
+                },
+                goodsArray: [
+                    {
+                        baseInfo: {
+                            createDate: order.updateDate,
+                            tableNo: order.tableNo
+                        },
+                        goods: Object.assign({}, order.goods)
+                    }
+                ]
+            };
+        }
+    }
+    else {
+        orderList = {
+            [order.orderNo]: {
+                baseInfo: {
+                    payment: order.payment,
+                    createDate: order.createDate,
+                    updateDate: order.updateDate,
+                    tableNo: order.tableNo
+                },
+                goodsArray: [
+                    {
+                        baseInfo: {
+                            createDate: order.updateDate,
+                            tableNo: order.tableNo
+                        },
+                        goods: Object.assign({}, order.goods)
+                    }
+                ]
+            }
+        };
+    }
+    ctx.redis.set(key, JSON.stringify(orderList));
+});
+const getOrderFromRedis = (ctx, { companyId }) => __awaiter(this, void 0, void 0, function* () {
+    let get = promisify(ctx.redis.get).bind(ctx.redis);
+    let key = getOrderListKey(companyId);
+    let orderList = yield get(key);
+    return orderList;
+});
 //生成订单号
 const generateOrderNo = (ctx, { companyId }) => __awaiter(this, void 0, void 0, function* () {
-    //拿到年月日时分秒，例如：20191023123234
+    //拿到年月日时分，例如：201910231232
     let time = util_1.formatDate(Date.now());
     let arr = time.split(" ");
     time = arr[0].split("-").join("") + arr[1].split(":").join("");
-    //两位随机码
-    let code = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D"];
-    let id = code[parseInt(Math.random() * code.length + "")] + code[parseInt(Math.random() * code.length + "")];
+    //去掉前两位，拿到一个10位数的时间值
+    time = time.slice(2);
     //拿到当天流水号
     //获取当前企业id在缓存中的当天流水号
     let get = promisify(ctx.redis.get).bind(ctx.redis);
@@ -64,6 +152,8 @@ const generateOrderNo = (ctx, { companyId }) => __awaiter(this, void 0, void 0, 
     for (let i = 0; i < length; i++) {
         no = "0" + no;
     }
+    //中间6位随机数随机码
+    let id = md5(time + no + companyId).slice(0, 6);
     setNo(ctx, { key, no });
     let orderNo = time + id + no;
     return orderNo;
@@ -74,25 +164,38 @@ exports.insertOrder = (ctx) => __awaiter(this, void 0, void 0, function* () {
     let { companyId, tableNo, foodType, goods } = ctx.params;
     let payment = 0;
     let orderNo = yield generateOrderNo(ctx, { companyId });
-    let cache = {};
+    //要插入redis中的订单对象所包含的数据
+    let order = {
+        orderNo,
+        goods: {},
+        createDate: 0,
+        payment: 0,
+        updateDate: 0,
+        tableNo
+    };
     //生成订单详细记录
     for (let item of goods) {
         const { goodsId, title, price, img, count } = item;
         //叠加订单总价
         payment += Number(price) * count;
         //往缓存对象中追加一条商品记录，只保留必需的字段
-        cache[goodsId] = {
+        order.goods[goodsId] = {
             count,
-            price
+            price,
+            title
         };
         let sql_detail = "insert into order_detail(id, order_no, goods_id, goods_title, goods_price, goods_count, goods_img) values(?, ?, ?, ?, ?, ?, ?)";
         yield mysql.execute(sql_detail, [null, orderNo, goodsId, title, price, count, img]);
     }
-    //将当前订单的详细信息放到缓存中，以便后续加菜操作减轻数据库压力
-    ctx.redis.set(orderNo, JSON.stringify(cache));
     //生成订单记录
     let date = Date.now();
     let createDate2 = util_1.formatDate(date).split(" ")[0];
+    //补充order对象
+    order.createDate = date;
+    order.updateDate = date;
+    order.payment = payment;
+    //存入redis中
+    insertOrderToRedis(ctx, { companyId, order });
     let sql = `insert into m_order(id, order_no, company_id, food_type, payment, table_no, status, create_date, create_date2, update_date, payment_date) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     yield mysql.execute(sql, [null, orderNo, companyId, foodType, payment, tableNo, 1, date, createDate2, date, null]);
     return {
@@ -128,40 +231,58 @@ exports.getOrderDetail = (ctx) => __awaiter(this, void 0, void 0, function* () {
 //加菜操作
 exports.addGoodsForOrder = (ctx) => __awaiter(this, void 0, void 0, function* () {
     let mysql = ctx.db;
-    let { goods, orderNo } = ctx.params;
+    let { goods, orderNo, companyId } = ctx.params;
     //从缓存中取得该订单号的商品数组
     let get = promisify(ctx.redis.get).bind(ctx.redis);
-    let value = yield get(orderNo);
+    let orderListKey = getOrderListKey(companyId);
+    let value = yield get(orderListKey);
     let cache = null;
     let payment = 0;
+    //需要往redis中追加的菜品对象
+    let goodsForRedis = {};
+    let tableNo = "";
     //如果有缓存记录，判断哪些是新增，哪些是更新
     if (value) {
-        cache = JSON.parse(value); //是一个对象，key值为商品ID
+        cache = (JSON.parse(value))[orderNo]; //是一个对象
+        tableNo = cache.baseInfo.tableNo;
+        //设置一个记录缓存原有的菜品的数量
+        let countInfo = {};
         //原有菜的钱
-        for (let id in cache) {
-            let { price, count } = cache[id];
-            payment += Number(price) * count;
-        }
+        cache.goodsArray.forEach(item => {
+            for (let id in item.goods) {
+                let { price, count } = item.goods[id];
+                // console.log("原有菜", count);
+                countInfo[id] = countInfo[id] ? countInfo[id] + count : count;
+                payment += Number(price) * count;
+            }
+        });
         //生成订单详细记录
         for (let item of goods) {
             let { goodsId, title, price, img, count } = item;
-            if (cache[goodsId] === undefined) {
-                //新增缓存记录
-                cache[goodsId] = {
-                    count,
-                    price
-                };
+            goodsForRedis[goodsId] = {
+                title,
+                price,
+                count
+            };
+            //判断该订单下有没有该商品
+            let exist = false;
+            for (let oldItem of cache.goodsArray) {
+                for (let id in oldItem.goods) {
+                    if (id == goodsId) {
+                        exist = true;
+                        break;
+                    }
+                }
+            }
+            if (!exist) {
                 //新增记录
                 let sql_detail = "insert into order_detail(id, order_no, goods_id, goods_title, goods_price, goods_count, goods_img) values(?, ?, ?, ?, ?, ?, ?)";
                 yield mysql.execute(sql_detail, [null, orderNo, goodsId, title, price, count, img]);
             }
             else {
-                //更新缓存中的数量和价格
-                cache[goodsId].count += count;
-                cache[goodsId].price = price;
                 //更新数据库
                 let sql_detail = "update order_detail set goods_count = ?, goods_price = ? where order_no = ? and goods_id = ?";
-                yield mysql.execute(sql_detail, [cache[goodsId].count, price, orderNo, goodsId]);
+                yield mysql.execute(sql_detail, [countInfo[goodsId] + count, price, orderNo, goodsId]);
             }
             //新增菜的钱
             payment += Number(price) * count;
@@ -171,12 +292,20 @@ exports.addGoodsForOrder = (ctx) => __awaiter(this, void 0, void 0, function* ()
         console.log("缓存中没有该订单");
         //逻辑待写
     }
-    //更新缓存
-    if (cache) {
-        ctx.redis.set(orderNo, JSON.stringify(cache));
-    }
     //生成订单记录
     let date = Date.now();
+    //更新缓存
+    if (cache) {
+        let order = {
+            orderNo,
+            payment,
+            updateDate: date,
+            goods: goodsForRedis,
+            tableNo
+        };
+        insertOrderToRedis(ctx, { order, companyId });
+        // ctx.redis.set(orderNo, JSON.stringify(cache));
+    }
     let sql = `update m_order set update_date = ?, payment = ? where order_no = ?`;
     yield mysql.execute(sql, [date, payment, orderNo]);
     return {

@@ -5,7 +5,11 @@ import { Tabs, Table, Modal, Select, Input, message, Button, Pagination } from "
 import formateDate from "../../utils/formateDate";
 import { tableColumns, detailTableColumn } from "./datas";
 import { getOrdersList, modifyTableNo } from "./axios";
+<<<<<<< HEAD
 Vue.use(Tabs);
+=======
+// import io from "socket.io-client";
+>>>>>>> ffbd3c66004757d059b6ca568daef94b66d072bd
 Vue.use(Table);
 Vue.use(Modal);
 Vue.use(Select);
@@ -295,6 +299,13 @@ export default class OrdersManagement extends Vue {
     };
     mounted() {
         this.getRTOrder();
+        // socket.on("connect", () => {
+        //     console.log("connect");
+        //     if (info) {
+        //         $(".id").innerHTML = info.nickname;
+        //         socket.emit("create id", info);
+        //     };
+        // });
     };
 }
 </script>
