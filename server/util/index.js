@@ -65,7 +65,7 @@ exports.validateUser = (ctx, next) => __awaiter(this, void 0, void 0, function* 
         yield next();
     }
 });
-//时间戳格式化为yy-mm-dd hh-mm-ss格式
+//时间戳格式化为yy-mm-dd hh-mm格式
 exports.formatDate = (time) => {
     if (typeof time === "string")
         time = Number(time);

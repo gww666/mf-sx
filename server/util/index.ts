@@ -56,7 +56,7 @@ export const validateUser = async (ctx, next) => {
     }
 }
 
-//时间戳格式化为yy-mm-dd hh-mm-ss格式
+//时间戳格式化为yy-mm-dd hh-mm格式
 export const formatDate = (time: number | string): string => {
     if (typeof time === "string") time = Number(time);
     let date = new Date(time);
