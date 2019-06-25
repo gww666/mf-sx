@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const http = require("http");
 const koa = require("koa");
 const connection_1 = require("./db/connection");
 const util_1 = require("./util");
@@ -16,7 +17,10 @@ const goods_1 = require("./routers/goods");
 const public_1 = require("./routers/public");
 const settings_1 = require("./routers/settings");
 const order_1 = require("./routers/order");
+// import socketIo from "socket.io";
+const socketIo = require("socket.io");
 const app = new koa();
+const server = http.createServer(app.callback());
 //全局挂载db
 app.use((ctx, next) => __awaiter(this, void 0, void 0, function* () {
     ctx.db = yield connection_1.getDB();
@@ -33,6 +37,35 @@ app.use(public_1.default.routes()).use(public_1.default.allowedMethods());
 app.use(order_1.default.routes()).use(order_1.default.allowedMethods());
 let hostname = "172.18.249.80";
 let port = "2233";
-app.listen(port, hostname, () => {
+// console.log("socketIo", socketIo);
+// console.log("socketIo.listen", socketIo.listen);
+// console.log("server", server);
+// console.log("server.listen", server.listen);
+const io = socketIo.listen(server);
+const shopIds = {};
+// const getClientIdBySocketId = (SocketId) => {
+//     for (let key in shopIds) {
+//         if (shopIds[key].id === clientId) {
+//             return key;
+//         }
+//     }
+// }
+io.on("connection", sockets => {
+    sockets.on("disconnect", (reason) => {
+        console.log("离开房间", sockets.id, reason);
+        sockets.leave(`room-${shopIds[sockets.id]}`);
+    });
+    console.log("socket.io is connected");
+    sockets.on("join", id => {
+        shopIds[sockets.id] = id;
+        //该商户加入自己的room，方便后续给其发送事件
+        sockets.join(`room-${id}`);
+    });
+});
+global["mIo"] = io;
+server.listen(port, hostname, () => {
     console.log("mf server is running!");
 });
+// app.listen(port, hostname, () => {
+//     console.log("mf server is running!");
+// });
