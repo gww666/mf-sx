@@ -31,21 +31,56 @@ export const detailTableColumn = [
     {
         title: "商品",
         dataIndex: "title",
-        key: "title"
+        key: "title",
+        width: "120px"
     },
     {
         title: "数量",
         dataIndex: "count",
-        key: "count"
+        key: "count",
+        width: "120px"
     },
     {
         title: "价格",
         dataIndex: "price",
-        key: "price"
-    },
-    {
-        title: "特价",
-        dataIndex: "salePrice",
-        key: "salePrice"
+        key: "price",
+        width: "120px"
     }
 ]
+
+// this.rtOrder = [{
+//     orderNo: "121315467843526",
+//     payment: 15.60,
+//     tableNo: 2,
+//     createDate: "2019-06-22 17:53:50",
+//     updateDate: "2019-06-22 17:53:50",
+//     orderList: [
+//         {
+//             createDate: "2019-06-22 18:20:08",
+//             updateDate: "2019-06-22 18:20:08",
+//             goods: [
+//                 {count: 1, price: 15.00, title: "炒鸡蛋"},
+//                 {count: 1, price: 15.00, title: "炒鸭蛋"},
+//                 {count: 1, price: 15.00, title: "炒鹅蛋"},
+//             ]
+//         },
+//         {
+//             createDate: "2019-06-22 18:20:08",
+//             updateDate: "2019-06-22 18:20:08",
+//             goods: [
+//                 {count: 1, price: 15.00, title: "炒鸡蛋"},
+//                 {count: 1, price: 15.00, title: "炒鸭蛋"},
+//                 {count: 1, price: 15.00, title: "炒鹅蛋"},
+//             ]
+//         },
+//         {
+//             createDate: "2019-06-22 18:20:08",
+//             updateDate: "2019-06-22 18:20:08",
+//             goods: [
+//                 {count: 1, price: 15.00, title: "炒鸡蛋"},
+//                 {count: 1, price: 15.00, title: "炒鸭蛋"},
+//                 {count: 1, price: 15.00, title: "炒鹅蛋"},
+//             ]
+//         }
+//     ]
+// }];
