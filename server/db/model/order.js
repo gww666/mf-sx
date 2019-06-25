@@ -46,7 +46,7 @@ const getOrderListKey = companyId => {
 /**
  * 订单数据结构
  * {
- *     orderNo: {
+ *     [orderNo]: {
  *         baseInfo: {payment, createDate, updateDate, tableNo},
  *         goodsArray: [
  *             {
@@ -122,11 +122,14 @@ const insertOrderToRedis = (ctx, { order, companyId }) => __awaiter(this, void 0
     }
     ctx.redis.set(key, JSON.stringify(orderList));
 });
-const getOrderFromRedis = (ctx, { companyId }) => __awaiter(this, void 0, void 0, function* () {
+const getOrderFromRedis = (ctx, params) => __awaiter(this, void 0, void 0, function* () {
+    let { companyId, orderNo } = params;
     let get = promisify(ctx.redis.get).bind(ctx.redis);
     let key = getOrderListKey(companyId);
     let orderList = yield get(key);
-    return orderList;
+    return util_1.isNotUndefined(orderNo) ? JSON.parse(orderList)[orderNo] : JSON.parse(orderList);
+});
+const updateOrderFromRedis = (ctx) => __awaiter(this, void 0, void 0, function* () {
 });
 //生成订单号
 const generateOrderNo = (ctx, { companyId }) => __awaiter(this, void 0, void 0, function* () {
@@ -321,4 +324,80 @@ exports.resetTableNo = (ctx) => __awaiter(this, void 0, void 0, function* () {
     let sql = `update m_order set table_no = ? where order_no = ?`;
     let result = yield mysql.execute(sql, [tableNo, orderNo]);
     console.log("调桌", result);
+});
+//更新订单信息
+exports.updateOrder = (ctx) => __awaiter(this, void 0, void 0, function* () {
+    let mysql = ctx.db;
+    let { orderNo, tableNo, payment, goods, companyId } = ctx.params;
+    let orderList = yield getOrderFromRedis(ctx, { companyId });
+    let orderData = orderList[orderNo];
+    if (!orderData)
+        throw new Error("查无此订单");
+    let date = Date.now();
+    //根据传的参数进行不同处理
+    if (util_1.isNotUndefined(payment)) {
+        //修改订单金额
+        //更新redis里的数据
+        let value = orderData.baseInfo.payment = (payment - 0).toFixed(2);
+        //更新数据库数据
+        let sql = `update m_order set payment = ?, update_date = ? where order_no = ?`;
+        yield mysql.execute(sql, [value, date, orderNo]);
+    }
+    else if (util_1.isNotUndefined(tableNo)) {
+        //修改桌号
+        //更新redis里的数据
+        orderData.baseInfo.tableNo = tableNo;
+        orderData.goodsArray.forEach(item => {
+            item.baseInfo.tableNo = tableNo;
+        });
+        //更新数据库数据
+        let sql = `update m_order set table_no = ?, update_date = ? where order_no = ?`;
+        yield mysql.execute(sql, [tableNo, date, orderNo]);
+    }
+    else if (util_1.isNotUndefined(goods)) {
+        //修改菜品数据
+        //更新redis里的数据
+        //type代表操作类型，reduce，replace
+        const { index, count, type, goodsId, title, price, img, newGoodsId } = goods;
+        //先判断缓存中有无该次加菜
+        if (orderData.goodsArray[index]) {
+            let goodsObject = orderData.goodsArray[index].goods;
+            let goodsItem = goodsObject[goodsId];
+            if (type === "reduce") {
+                //减菜
+                if (goodsItem.count === 1) {
+                    //删除该商品
+                    delete goodsObject[goodsId];
+                    let sql = "delete from order_detail where order_no = ? and goods_id = ?";
+                    yield mysql.execute(sql, [orderNo, goodsId]);
+                }
+                else {
+                    goodsItem.count -= 1;
+                    let sql = "update order_detail set count = ? where order_no = ? and goods_id = ?";
+                    yield mysql.execute(sql, [goodsItem.count, orderNo, goodsId]);
+                }
+            }
+            else if (type === "replace") {
+                //先删除要替换的菜品
+                delete goodsObject[goodsId];
+                goodsObject[newGoodsId] = {
+                    count,
+                    title,
+                    price
+                };
+                let deltetSql = "delete from order_detail where order_no = ? and goods_id = ?";
+                yield mysql.execute(deltetSql, [orderNo, goodsId]);
+                let insertSql = "insert into order_detail(id, order_no, goods_id, goods_title, goods_count, goods_price, goods_img) values(?, ?, ?, ?, ?, ?, ?)";
+                yield mysql.execute(insertSql, [null, orderNo, newGoodsId, title, count, price, img || null]);
+            }
+        }
+    }
+    //更新修改日期
+    orderData.baseInfo.updateDate = date;
+    //更新缓存
+    let orderListKey = getOrderListKey(companyId);
+    ctx.redis.set(orderListKey, JSON.stringify(orderList));
+    //通知客户端更新订单数据
+    let _io = global["mIo"];
+    _io.in(`room-${companyId}`).emit("orderChange", JSON.stringify(orderList));
 });

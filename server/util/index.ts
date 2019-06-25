@@ -66,5 +66,9 @@ export const formatDate = (time: number | string): string => {
     let hour = date.getHours() > 9 ? date.getHours() : "0" + date.getHours();
     let minutes = date.getMinutes() > 9 ? date.getMinutes() : "0" + date.getMinutes();
     return `${year}-${month}-${day} ${hour}:${minutes}`;
-  }
+}
+
+export const isNotUndefined = (data: any): boolean => {
+    return data !== undefined;
+}
 

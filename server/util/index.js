@@ -77,3 +77,6 @@ exports.formatDate = (time) => {
     let minutes = date.getMinutes() > 9 ? date.getMinutes() : "0" + date.getMinutes();
     return `${year}-${month}-${day} ${hour}:${minutes}`;
 };
+exports.isNotUndefined = (data) => {
+    return data !== undefined;
+};
