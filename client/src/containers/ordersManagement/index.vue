@@ -438,8 +438,7 @@ export default class OrdersManagement extends Vue {
                 </a-tabs>
                 <a-modal
                     title="订单详情"
-                    okText="确定"
-                    cancelText="取消"
+                    okText="关闭"
                     centered={true}
                     v-model={this.visible}
                     width="80%"
@@ -483,6 +482,7 @@ export default class OrdersManagement extends Vue {
                             )
                         })
                     }
+                    <div slot="footer" style="text-align:center;"><button type="button" class="ant-btn ant-btn-default" onClick={() => this.visible = false}><span>关 闭</span></button></div>
                     <a-modal
                         title="更换菜品"
                         okText="确定"
@@ -490,36 +490,33 @@ export default class OrdersManagement extends Vue {
                         mask={false}
                         centered={true}
                         v-model={this.changeModel}
+                        destroyOnClose={true}
                         width="40%"
                         bodyStyle={{height: "180px"}}
                         onOk={this.doChangeGoods}
                     >
-                        {
-                            this.changeModel ? 
-                            <div style="width: 250px;margin:20px auto;">
-                                <a-select
-                                    showSearch
-                                    placeholder="请输入关键字查询菜品"
-                                    style="width: 250px;"
-                                    defaultActiveFirstOption={false}
-                                    showArrow={false}
-                                    filterOption={false}
-                                    onSearch={clue => this.handleSearch(clue)}
-                                    onChange={clue => this.handleChange(clue)}
-                                    notFoundContent="未搜索到类似商品"
-                                >
-                                    {
-                                        this.similarItemList.map(item => {
-                                            return (
-                                                <a-select-option value={item.id}>{item.title}</a-select-option>
-                                            )
-                                        })
-                                    }
-                                </a-select>
-                                <InputNumber min={1} placeholder="请输入更换菜品的数量" v-model={this.changeGoodsCount} style="width: 250px;margin-top: 20px;" />
-                            </div>
-                            : <div></div>
-                        }
+                        <div style="width: 250px;margin:20px auto;">
+                            <a-select
+                                showSearch
+                                placeholder="请输入关键字查询菜品"
+                                style="width: 250px;"
+                                defaultActiveFirstOption={false}
+                                showArrow={false}
+                                filterOption={false}
+                                onSearch={clue => this.handleSearch(clue)}
+                                onChange={clue => this.handleChange(clue)}
+                                notFoundContent="未搜索到类似商品"
+                            >
+                                {
+                                    this.similarItemList.map(item => {
+                                        return (
+                                            <a-select-option value={item.id}>{item.title}</a-select-option>
+                                        )
+                                    })
+                                }
+                            </a-select>
+                            <InputNumber min={1} placeholder="请输入更换菜品的数量" v-model={this.changeGoodsCount} style="width: 250px;margin-top: 20px;" />
+                        </div>
                     </a-modal>
                 </a-modal>
                 {
