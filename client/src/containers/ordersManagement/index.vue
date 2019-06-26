@@ -1,11 +1,12 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Tabs, Table, Modal, Select, InputNumber, message, Button, Pagination } from "ant-design-vue";
+import { Tabs, Table, Modal, Select, InputNumber, message, Button, Pagination, Spin } from "ant-design-vue";
 import formateDate from "../../utils/formateDate";
-import { tableColumns, detailTableColumn } from "./datas";
-import { getOrdersList, modifyTableNo, getRtOrdersList, modifyOrder } from "./axios";
+import { tableColumns, rtTableColumns, detailTableColumn } from "./datas";
+import { getOrdersList, modifyTableNo, getRtOrdersList, modifyOrder, searchGoods, getGoodsInfoById } from "./axios";
 Vue.use(Tabs);
+Vue.use(Spin);
 Vue.use(Table);
 Vue.use(Modal);
 Vue.use(Select);
@@ -16,7 +17,9 @@ const { TabPane } = Tabs;
 
 @Component
 export default class OrdersManagement extends Vue {
+    loading = false;
     visible = false;
+    changeModel = false;
     tableNoList = ["1", "2", "3", "4", "5", "6", "7"];
     // 修改的订单金额
     newSum = 0;
@@ -27,6 +30,16 @@ export default class OrdersManagement extends Vue {
     rtOrder = [];
     // 详情列表
     detailIndex = 0;
+    // 搜索联想列表
+    similarItemList = [];
+    // 被更换菜品
+    replacedRecord = {};
+    // 被更换菜品的子订单下标
+    replacedIndex = "";
+    // 更换的菜品
+    newGoods = {};
+    // 更换菜品的数量
+    changeGoodsCount = "";
     get userInfo() {
         return this.$store.state.qxz.userInfo;
     };
@@ -88,13 +101,9 @@ export default class OrdersManagement extends Vue {
     };
     // 实时列表渲染
     rtTableRenderFn(text, record, item, index) {
-        // console.log(text, record, item, "tjiejljsdklfsd")
         switch (item.key) {
-            case "paymentDate":
+            case "createDate":
                 text = text ? formateDate(text) : "";
-                break;
-            case "status":
-                text = text === 1 ? "待支付" : "已完成";
                 break;
         };
         let dom = <span>{text}</span>;
@@ -201,10 +210,6 @@ export default class OrdersManagement extends Vue {
         this.detailIndex = index;
         this.visible = true;
     };
-    // 换菜
-    changeGoods(record, index) {
-        
-    }
     // 换桌
     changeTableNo(record) {
         this.modifingOrder = record;
@@ -270,6 +275,7 @@ export default class OrdersManagement extends Vue {
     }
     // 修改实时订单
     async doModifyOrder(record, index, type) {
+        this.loading = true;
         let param = {
             companyId: this.userInfo.id,
             orderNo: this.modifingOrder.orderNo,
@@ -279,8 +285,7 @@ export default class OrdersManagement extends Vue {
                 param.goods = {
                     goodsId: record.id,
                     type: "reduce",
-                    index: index,
-                    count: record.count > 0 ? record.count - 1 : 0
+                    index: index
                 };
                 break;
             case "tableNo":
@@ -289,14 +294,84 @@ export default class OrdersManagement extends Vue {
             case "payment":
                 param.payment = record.payment;
                 break;
+            case "replace":
+                param.goods = {
+                    goodsId: record.id,
+                    newGoodsId: this.newGoods.id,
+                    title: this.newGoods.title,
+                    price: this.newGoods.price,
+                    type: "replace",
+                    index: index,
+                    count: this.changeGoodsCount
+                };
+                break;
         };
         let res = await modifyOrder(param);
+        this.loading = false;
         if(res.data.returnCode === 1) {
             message.success("操作成功！");
         } else {
             message.error(res.data.message);
         };
     };
+    // 搜索相似内容
+    handleSearch (clue) {
+        if(this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
+        };
+        this.timer = setTimeout(async () => {
+            try {
+                let res = await searchGoods(clue);
+                if (res.data.returnCode === 1) {
+                    if(res.data.data.length > 0) {
+                        this.similarItemList = res.data.data;
+                    } else {
+                        this.similarItemList = [];
+                    };
+                } else {
+                    this.similarItemList = [];
+                };
+            }catch(err) {
+                console.log(err, "获取相似内容列表err");
+            };
+        }, 300);
+    };
+    // 打开换菜弹窗
+    changeGoods(record, index) {
+        this.newGoods = {};
+        this.changeGoodsCount = "";
+        this.changeModel = true;
+        this.replacedRecord = record;
+        this.replacedIndex = index;
+    };
+    doChangeGoods() {
+        if(!this.newGoods.id) {
+            message.warning("请选择更换的菜品");
+            return;
+        }
+        if(!this.changeGoodsCount) {
+            message.warning("请输入更换菜品的数量");
+            return;
+        }
+        this.changeModel = false;
+        this.doModifyOrder(this.replacedRecord, this.replacedIndex, "replace");
+    };
+    // 选中相似内容
+    async handleChange (clue) {
+        // this.loading = true;
+        let res = await getGoodsInfoById(clue);
+        if (res.data.returnCode === 1) {
+            if(res.data.data.length > 0) {
+                this.newGoods = res.data.data[0];
+            } else {
+                this.newGoods = {};
+            };
+        } else {
+            this.newGoods = {};
+        };
+        // this.loading = false;
+    }
 	render() {
 		return (
             <div class="category-page">
@@ -309,7 +384,7 @@ export default class OrdersManagement extends Vue {
                             style="flex: 1;overflow-y:auto;"
                         >
                             {
-                                tableColumns.map((item, index) => {
+                                rtTableColumns.map((item, index) => {
                                     return (
                                         <Column
                                             title={item.title}
@@ -363,49 +438,97 @@ export default class OrdersManagement extends Vue {
                 </a-tabs>
                 <a-modal
                     title="订单详情"
+                    okText="确定"
+                    cancelText="取消"
+                    centered={true}
                     v-model={this.visible}
                     width="80%"
                     bodyStyle={{height: "500px", overflowY: "scroll"}}
                 >
-                        {
-                            this.rtOrder.length && this.rtOrder[this.detailIndex].orderList.map((ele, index) => {
-                                return (
-                                    <div>
+                    {
+                        this.rtOrder.length && this.rtOrder[this.detailIndex].orderList.map((ele, index) => {
+                            return (
+                                <div>
+                                    {
+                                        index === 0 ? <p></p> : <p class="table-title">第{index}次加菜</p>
+                                    }
+                                    <Table
+                                        rowKey={record => record.id} 
+                                        dataSource={ele.goods}
+                                        pagination={false}
+                                        style="flex: 1;overflow-y:auto;"
+                                    >
                                         {
-                                            index === 0 ? <p></p> : <p class="table-title">第{index}次加菜</p>
+                                            detailTableColumn.map((item, ind) => {
+                                                return (
+                                                    <Column
+                                                        title={item.title}
+                                                        dataIndex={item.dataIndex}
+                                                        align="center"
+                                                        width={item.width}
+                                                        customRender={(text, record) => this.rtTableDetailRenderFn(text, record, item, index)}
+                                                    />
+                                                )
+                                            })
                                         }
-                                        <Table
-                                            rowKey={record => record.id} 
-                                            dataSource={ele.goods}
-                                            pagination={false}
-                                            style="flex: 1;overflow-y:auto;"
-                                        >
-                                            {
-                                                detailTableColumn.map((item, ind) => {
-                                                    return (
-                                                        <Column
-                                                            title={item.title}
-                                                            dataIndex={item.dataIndex}
-                                                            align="center"
-                                                            width={item.width}
-                                                            customRender={(text, record) => this.rtTableDetailRenderFn(text, record, item, index)}
-                                                        />
-                                                    )
-                                                })
-                                            }
-                                            <Column
-                                                title="操作"
-                                                key="operation"
-                                                width={100}
-                                                align="center"
-                                                customRender={(text, record, index) => this.rtTableDetailRenderFn(text, record, {key: "operation"})}
-                                            />
-                                        </Table>
-                                    </div>
-                                )
-                            })
+                                        <Column
+                                            title="操作"
+                                            key="operation"
+                                            width={100}
+                                            align="center"
+                                            customRender={(text, record) => this.rtTableDetailRenderFn(text, record, {key: "operation"}, index)}
+                                        />
+                                    </Table>
+                                </div>
+                            )
+                        })
+                    }
+                    <a-modal
+                        title="更换菜品"
+                        okText="确定"
+                        cancelText="取消"
+                        mask={false}
+                        centered={true}
+                        v-model={this.changeModel}
+                        width="40%"
+                        bodyStyle={{height: "180px"}}
+                        onOk={this.doChangeGoods}
+                    >
+                        {
+                            this.changeModel ? 
+                            <div style="width: 250px;margin:20px auto;">
+                                <a-select
+                                    showSearch
+                                    placeholder="请输入关键字查询菜品"
+                                    style="width: 250px;"
+                                    defaultActiveFirstOption={false}
+                                    showArrow={false}
+                                    filterOption={false}
+                                    onSearch={clue => this.handleSearch(clue)}
+                                    onChange={clue => this.handleChange(clue)}
+                                    notFoundContent="未搜索到类似商品"
+                                >
+                                    {
+                                        this.similarItemList.map(item => {
+                                            return (
+                                                <a-select-option value={item.id}>{item.title}</a-select-option>
+                                            )
+                                        })
+                                    }
+                                </a-select>
+                                <InputNumber min={1} placeholder="请输入更换菜品的数量" v-model={this.changeGoodsCount} style="width: 250px;margin-top: 20px;" />
+                            </div>
+                            : <div></div>
                         }
+                    </a-modal>
                 </a-modal>
+                {
+                    this.loading ?
+                    <div class="ant-modal-mask">
+                        <a-spin />
+                    </div>
+                    : <span />
+                }
             </div>
 		);
     };
@@ -416,6 +539,11 @@ export default class OrdersManagement extends Vue {
 }
 </script>
 <style lang="less" scoped>
+    .ant-modal-mask{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
     .category-page{
         width: 100%;
         flex: 1;

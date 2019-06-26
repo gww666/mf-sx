@@ -26,6 +26,23 @@ export const tableColumns = [
         key: "paymentDate"
     }
 ];
+export const rtTableColumns = [
+    {
+        title: "订单号",
+        dataIndex: "orderNo",
+        key: "orderNo"
+    },
+    {
+        title: "餐桌号",
+        dataIndex: "tableNo",
+        key: "tableNo"
+    },
+    {
+        title: "下单时间",
+        dataIndex: "createDate",
+        key: "createDate"
+    }
+];
 
 export const detailTableColumn = [
     {
