@@ -1,18 +1,39 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { getOrderDetail } from "./axios";
+import { getOrderDetail, doPay } from "./axios";
 import { formatDateTime } from "../../utils/getFormateDate";
 
 @Component
 export default class CheckOrderDetail extends Vue {
     goodsList = [];
     payment = 0;
+    // 企业id
+	get companyId () {
+		return this.$store.state.qxz.companyId;
+	};
+    // 未完结订单
     get unfinishedOrder () {
         return this.$store.state.qxz.unfinishedOrder;
     };
-    goPayment() {
-        console.log("去支付")
+    // 支付
+    async goPayment() {
+        let param = {
+            companyId: this.companyId,
+            orderNo: this.unfinishedOrder.orderNo
+        };
+        try {
+            let res = await doPay(param);
+            if(res.data.returnCode === 1) {
+                console.log("支付成功")
+            } else {
+                console.log("支付失败")
+            }
+            console.log(res, 'resssss')
+        }catch (err) {
+            console.log("支付接口err：", err);
+        }
+        console.log(this.unfinishedOrder.orderNo, "去支付")
     };
 	render() {
 		return (

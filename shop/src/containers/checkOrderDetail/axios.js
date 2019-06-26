@@ -8,3 +8,12 @@ export const getOrderDetail = orderNo => {
     };
     return _axios(options);
 };
+// 支付
+export const doPay = data => {
+    let options = {
+        url: `/api/pay`,
+        method: "POST",
+        data: JSON.stringify(data)
+    };
+    return _axios(options);
+}
