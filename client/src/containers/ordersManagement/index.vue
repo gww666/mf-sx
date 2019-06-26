@@ -306,13 +306,18 @@ export default class OrdersManagement extends Vue {
                 };
                 break;
         };
-        let res = await modifyOrder(param);
-        this.loading = false;
-        if(res.data.returnCode === 1) {
-            message.success("操作成功！");
-        } else {
-            message.error(res.data.message);
-        };
+        try {
+            let res = await modifyOrder(param);
+            this.loading = false;
+            if(res.data.returnCode === 1) {
+                message.success("操作成功！");
+            } else {
+                message.error(res.data.message);
+            };
+        }catch (err) {
+            console.log("修改实时订单err:", err);
+            this.loading = false;
+        }
     };
     // 搜索相似内容
     handleSearch (clue) {
@@ -345,6 +350,7 @@ export default class OrdersManagement extends Vue {
         this.replacedRecord = record;
         this.replacedIndex = index;
     };
+    // 更换菜品
     doChangeGoods() {
         if(!this.newGoods.id) {
             message.warning("请选择更换的菜品");
@@ -360,18 +366,23 @@ export default class OrdersManagement extends Vue {
     // 选中相似内容
     async handleChange (clue) {
         // this.loading = true;
-        let res = await getGoodsInfoById(clue);
-        if (res.data.returnCode === 1) {
-            if(res.data.data.length > 0) {
-                this.newGoods = res.data.data[0];
+        try {
+            let res = await getGoodsInfoById(clue);
+            // this.loading = false;
+            if (res.data.returnCode === 1) {
+                if(res.data.data.length > 0) {
+                    this.newGoods = res.data.data[0];
+                } else {
+                    this.newGoods = {};
+                };
             } else {
                 this.newGoods = {};
             };
-        } else {
-            this.newGoods = {};
+        }catch (err) {
+            console.log("选中商品获取商品详细信息err:", err);
+            // this.loading = false;
         };
-        // this.loading = false;
-    }
+    };
 	render() {
 		return (
             <div class="category-page">
@@ -521,11 +532,11 @@ export default class OrdersManagement extends Vue {
                 </a-modal>
                 {
                     this.loading ?
-                    <div class="ant-modal-mask">
-                        <a-spin />
-                    </div>
-                    : <span />
+                    <div class="ant-modal-mask" style="z-index:1001;">
+                        <Spin tip="修改中..." />
+                    </div> : <div />
                 }
+                
             </div>
 		);
     };
