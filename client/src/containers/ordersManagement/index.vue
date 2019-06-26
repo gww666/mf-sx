@@ -1,25 +1,36 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Tabs, Table, Modal, Select, InputNumber, message, Button, Pagination, Spin } from "ant-design-vue";
-import formateDate from "../../utils/formateDate";
-import { tableColumns, rtTableColumns, detailTableColumn } from "./datas";
-import { getOrdersList, modifyTableNo, getRtOrdersList, modifyOrder, searchGoods, getGoodsInfoById } from "./axios";
+import { Tabs, Table, Modal, Select, DatePicker, InputNumber, message, Button, Pagination, Spin } from "ant-design-vue";
+import { formateDate, getFormateDate } from "../../utils/formateDate";
+import { tableColumns, rtTableColumns, detailTableColumn, staticDetailTableColumn } from "./datas";
+import { getOrdersList, modifyTableNo, getRtOrdersList, modifyOrder, searchGoods, getGoodsInfoById, getOrderDetail } from "./axios";
 Vue.use(Tabs);
 Vue.use(Spin);
 Vue.use(Table);
 Vue.use(Modal);
 Vue.use(Select);
+Vue.use(Button);
+Vue.use(DatePicker);
 Vue.use(InputNumber);
 Vue.use(Pagination);
 const { Column } = Table;
 const { TabPane } = Tabs;
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+moment.locale('zh-cn');
+const dateString = getFormateDate(new Date())
 
 @Component
 export default class OrdersManagement extends Vue {
     loading = false;
+    // 实时订单的详情弹窗
     visible = false;
+    // 订单管理的详情弹窗
+    detailModel = false;
+    // 实时订单换菜的弹窗
     changeModel = false;
+    // 桌号列表
     tableNoList = ["1", "2", "3", "4", "5", "6", "7"];
     // 修改的订单金额
     newSum = 0;
@@ -32,6 +43,8 @@ export default class OrdersManagement extends Vue {
     detailIndex = 0;
     // 搜索联想列表
     similarItemList = [];
+    // 订单管理详情列表数据
+    detailGoodsList= [];
     // 被更换菜品
     replacedRecord = {};
     // 被更换菜品的子订单下标
@@ -40,23 +53,33 @@ export default class OrdersManagement extends Vue {
     newGoods = {};
     // 更换菜品的数量
     changeGoodsCount = "";
+    // 订单列表筛选日期
+    choosenDate = moment(dateString, 'YYYY-MM-DD');
     get userInfo() {
         return this.$store.state.qxz.userInfo;
     };
+    // 切换tab
+    handleTabChange(index) {
+        if(index == 2) {
+            this.queryOrdersList();
+        }
+    };
     // 获取订单列表
     async queryOrdersList() {
-        if(!this.ordersList.length) {
+        // if(!this.ordersList.length) {
             try {
-                let res = await getOrdersList(this.userInfo.id);
+                let res = await getOrdersList(this.userInfo.id, this.choosenDate ? getFormateDate(this.choosenDate._d) : "");
                 if(res.data.returnCode === 1) {
-                    this.ordersList = res.data.data;
+                    this.ordersList = res.data.data.sort((a, b) => {
+                        return b.createDate - a.createDate;
+                    }) || [];
                 }else {
                     message.warning("获取分类列表失败");
                 };
             }catch (err) {
                 console.log("获取分类列表err", err);
             };
-        };
+        // };
     };
     // 获取实时订单列表
     async queryRtOrdersList() {
@@ -82,6 +105,9 @@ export default class OrdersManagement extends Vue {
             case "paymentDate":
                 text = text ? formateDate(text) : "";
                 break;
+            case "updateDate":
+                text = text ? formateDate(text) : "";
+                break;
             case "status":
                 text = text === 1 ? "待支付" : "已完成";
                 break;
@@ -92,12 +118,26 @@ export default class OrdersManagement extends Vue {
             dom = (
                 <div class="btns-field">
                     <div class="btns-layout">
-                        <p class="btn edit-btn" onClick={() => this.changeTableNo(Object.assign({}, record))}>换桌</p>
+                        <p class="btn edit-btn" onClick={() => this.seeOrderDetail(record)}>详情</p>
                     </div>
                 </div>
             );
         };
         return dom;
+    };
+    // 查看订单管理的详情
+    async seeOrderDetail(record) {
+        this.detailModel = true;
+        try {
+            let res = await getOrderDetail(record.orderNo);
+            if(res.data.returnCode === 1) {
+                this.detailGoodsList = res.data.data || [];
+            } else {
+                this.detailGoodsList = [];
+            }
+        }catch (err) {
+            console.log("获取订单详情err: ", err)
+        };
     };
     // 实时列表渲染
     rtTableRenderFn(text, record, item, index) {
@@ -152,12 +192,6 @@ export default class OrdersManagement extends Vue {
         this.pageNum = pageNum;
         this.queryGoodsList();
     };
-    // 切换tab
-    handleTabChange(index) {
-        if(index == 2) {
-            this.queryOrdersList();
-        }
-    };
     // 获取实时订单
     getRTOrder() {
         let socket = io("http://120.78.221.14:2233");
@@ -201,10 +235,12 @@ export default class OrdersManagement extends Vue {
                 });
                 Arr.push(obj);
             };
-            this.rtOrder = Arr;
+            this.rtOrder = Arr.sort((a, b) => {
+                return b.createDate - a.createDate;
+            });
         }
     };
-    // 展示详情
+    // 展示时时订单详情
     showOrderDetail(record, index) {
         this.modifingOrder = record;
         this.detailIndex = index;
@@ -230,7 +266,6 @@ export default class OrdersManagement extends Vue {
             okType: "danger",
             cancelText: "取消",
             onOk: async () => {
-                console.log(record, "record")
                 this.doModifyOrder(record, null, "tableNo")
             },
             onCancel() {}
@@ -238,7 +273,6 @@ export default class OrdersManagement extends Vue {
     };
     // 修改订单金额
     changePayment(record) {
-        console.log(record)
         this.modifingOrder = record;
         let oldSum = record.payment;
         Modal.confirm({
@@ -383,6 +417,10 @@ export default class OrdersManagement extends Vue {
             // this.loading = false;
         };
     };
+    // 订单管理搜索日期变化
+    handleDateChange(date) {
+        this.choosenDate = date;
+    };
 	render() {
 		return (
             <div class="category-page">
@@ -392,6 +430,7 @@ export default class OrdersManagement extends Vue {
                             rowKey={record => record.orderNo} 
                             dataSource={this.rtOrder}
                             pagination={false}
+                            locale={{emptyText: '暂无数据'}}
                             style="flex: 1;overflow-y:auto;"
                         >
                             {
@@ -416,10 +455,18 @@ export default class OrdersManagement extends Vue {
                         </Table>
                     </TabPane>
                     <TabPane tab="订单管理" key="2" style="height: 100%;" forceRender>
+                        <div class="search-bar">
+                            <div>
+                                <DatePicker size="small" showToday={false} placeholder="请选择日期" onChange={this.handleDateChange} defaultValue={this.choosenDate} />
+                                <a-button size="small" type="primary" style="margin-left:10px;" onClick={() => this.queryOrdersList()}>搜索</a-button>
+                            </div>
+                            <a-button size="small" type="primary" onClick={() => this.queryOrdersList()}>刷新</a-button>
+                        </div>
                         <Table
                             rowKey={record => record.id} 
                             dataSource={this.ordersList}
                             pagination={false}
+                            locale={{emptyText: '暂无数据'}}
                             style="flex: 1;overflow-y:auto;"
                         >
                             {
@@ -437,11 +484,41 @@ export default class OrdersManagement extends Vue {
                             <Column
                                 title="操作"
                                 key="operation"
-                                width={100}
+                                width={150}
                                 align="center"
-                                customRender={(text, record, index) => this.tableRenderFn(text, record, {key: "operation"})}
+                                customRender={(text, record) => this.tableRenderFn(text, record, {key: "operation"})}
                             />
                         </Table>
+                        <a-modal
+                            title="订单详情"
+                            okText="关闭"
+                            centered={true}
+                            v-model={this.detailModel}
+                            width="70%"
+                            bodyStyle={{height: "400px", overflowY: "scroll"}}
+                        >
+                            <Table
+                                rowKey={record => record.id} 
+                                dataSource={this.detailGoodsList}
+                                pagination={false}
+                                locale={{emptyText: '暂无数据'}}
+                                style="flex: 1;overflow-y:auto;"
+                            >
+                                {
+                                    staticDetailTableColumn.map(item => {
+                                        return (
+                                            <Column
+                                                title={item.title}
+                                                dataIndex={item.dataIndex}
+                                                align="center"
+                                                customRender={(text, record, index) => this.tableRenderFn(text, record, item)}
+                                            />
+                                        )
+                                    })
+                                }
+                            </Table>
+                            <div slot="footer" style="text-align:center;"><button type="button" class="ant-btn ant-btn-default" onClick={() => {this.detailModel = false;this.detailGoodsList = [];}}><span>关 闭</span></button></div>
+                        </a-modal>
                         <div class="pagination-box">
                             <a-pagination defaultCurrent={1} total={this.total} onChange={this.handelPageChange} />
                         </div>
@@ -466,6 +543,7 @@ export default class OrdersManagement extends Vue {
                                         rowKey={record => record.id} 
                                         dataSource={ele.goods}
                                         pagination={false}
+                                        locale={{emptyText: '暂无数据'}}
                                         style="flex: 1;overflow-y:auto;"
                                     >
                                         {
@@ -556,6 +634,11 @@ export default class OrdersManagement extends Vue {
         width: 100%;
         flex: 1;
         background: #F5F5F5;
+    }
+    .search-bar{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
     .btns-field{
         width: 100%;

@@ -95,13 +95,14 @@ export default class Order extends Vue {
 	}
     .choices{
         width: 2rem;
-        height: .6rem;
-        border-radius: .3rem;
-		line-height: .6rem;
+        height: .68rem;
+        border-radius: .34rem;
+		line-height: .71rem;
 		font-size: .24rem;
+		font-weight: bold;
         text-align: center;
         color: #FFF;
         background: #1890ff;
-        margin: 70% auto;
+        margin: 5rem auto;
     }
 </style>

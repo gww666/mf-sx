@@ -21,6 +21,16 @@ export const tableColumns = [
         key: "status"
     },
     {
+        title: "创建时间",
+        dataIndex: "createDate2",
+        key: "createDate2"
+    },
+    {
+        title: "修改时间",
+        dataIndex: "updateDate",
+        key: "updateDate"
+    },
+    {
         title: "支付时间",
         dataIndex: "paymentDate",
         key: "paymentDate"
@@ -61,6 +71,26 @@ export const detailTableColumn = [
         title: "价格",
         dataIndex: "price",
         key: "price",
+        width: "120px"
+    }
+]
+export const staticDetailTableColumn = [
+    {
+        title: "商品",
+        dataIndex: "goodsTitle",
+        key: "goodsTitle",
+        width: "120px"
+    },
+    {
+        title: "数量",
+        dataIndex: "goodsCount",
+        key: "goodsCount",
+        width: "120px"
+    },
+    {
+        title: "价格",
+        dataIndex: "goodsPrice",
+        key: "goodsPrice",
         width: "120px"
     }
 ]

@@ -146,10 +146,12 @@ export default class DishCategory extends Vue {
                     reslove(res);
                 });
             });
+        } else {
+            console.log("----------------------------------------")
         }
     };
     async doUpload() {
-        if (this.imageList.length || this.previousImgs.length) {
+        if (this.imageList.length || this.previousImgs.length || this.goodsIcon.length) {
             let arr = [];
             // 上传了缩略图
             if (this.goodsIcon.length) {
@@ -160,7 +162,7 @@ export default class DishCategory extends Vue {
                             this.dishInfo.thumbnail = res.data.data[0];
                         };
                     }else {
-                        let res = await this.createPromise(this.imageList[0]);
+                        let res = await this.createPromise(this.goodsIcon[0]);
                         this.dishInfo.thumbnail = res.data.data[0];
                     };
                 } catch (err) {

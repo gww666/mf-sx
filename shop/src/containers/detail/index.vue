@@ -94,8 +94,8 @@ export default class CheckOrderDetail extends Vue {
         height: .4rem;
         border-radius: .2rem;
         text-align: center;
-        line-height: .36rem;
-        font-size: .35rem;
+        line-height: .41rem;
+        font-size: .32rem;
         color: #FFF;
         background-color: rgba(0,0,0,.2);
         position: absolute;

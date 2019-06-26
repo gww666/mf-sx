@@ -5,7 +5,7 @@ import { Tag, Table, Modal, Select, Input, message, Button, Pagination } from "a
 import { tableColumns } from "./datas";
 import { getCategoryList, queryGoodsList, deleteGoods, searchGoods, getGoodsInfoById } from "./axios";
 import { operateGoods } from "./operateDish/axios";
-import formateDate from "../../utils/formateDate";
+import { formateDate } from "../../utils/formateDate";
 Vue.use(Tag);
 Vue.use(Table);
 Vue.use(Modal);
@@ -305,6 +305,7 @@ export default class DishCategory extends Vue {
                     rowKey={record => record.id} 
                     dataSource={this.goodsList}
                     pagination={false}
+                    locale={{emptyText: '暂无数据'}}
                     class="table"
                 >
                     {

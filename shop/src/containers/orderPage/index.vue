@@ -23,7 +23,7 @@ export default class Order extends Vue {
 	get companyId () {
 		return this.$store.state.qxz.companyId;
 	};
-	// 
+	// 加入菜品数
 	getCount(item) {
 		let count = 0;
 		this.selectedGoodsList.forEach(ele => {
@@ -40,13 +40,7 @@ export default class Order extends Vue {
             if (res.data.returnCode === 1) {
 				if (res.data.data.length > 0) {
 					this.categoryList = res.data.data.sort((a, b) => {
-						if (a.sort < b.sort) {
-							return -1;
-						}
-						if (a.sort > b.sort) {
-							return 1;
-						}
-						return 0;
+						return a.sort - b.sort;
 					});
 					this.currentCategory = this.categoryList[0].id;
 					this.queryGoodsList();
@@ -68,9 +62,13 @@ export default class Order extends Vue {
                 if(res.data.data.length > 0) {
 					let goodsList = res.data.data;
 					let Arr = [];
-					// 排个序
+					// 分类的index
+					let cateIndex = 0;
+					// 排序
 					this.categoryList.forEach(item => {
-						let arr = [];
+						item.isCategory = true;
+						item.cateIndex = cateIndex;
+						let arr = [item];
 						for (let i = 0;i < goodsList.length;i++) {
 							if(goodsList[i].categoryId === item.id) {
 								arr.push(goodsList[i]);
@@ -78,8 +76,9 @@ export default class Order extends Vue {
 								i--;
 							};
 						};
-						item.startIndex = Arr.length;
+						item.startIndex = Arr.length - cateIndex;
 						Arr = Arr.concat(arr);
+						cateIndex++;
 					});
 					this.goodsList = Arr;
                 } else {
@@ -97,10 +96,11 @@ export default class Order extends Vue {
 		this.currentCategory = item.id;
 		this.$refs.rightList.onscroll = null;
 		let liHeight = document.querySelector(".goods-item").offsetHeight;
+		let catLiHeight = document.querySelector(".category-name").offsetHeight;
 		scrollTo(
 			this.$refs.rightList,
 			'scrollTop',
-			item.startIndex * liHeight, // target scrollY (0 means top of the page)
+			item.startIndex * liHeight + item.cateIndex * catLiHeight, // target scrollY (0 means top of the page)
 			500, // duration in ms
 			'easeInOutCirc',
 			() => {
@@ -114,10 +114,12 @@ export default class Order extends Vue {
 	};
 	handleUlScroll(e) {
 		let length = this.categoryList.length;
+		let catLiHeight = document.querySelector(".category-name").offsetHeight;
 		let liHeight = document.querySelector(".goods-item").offsetHeight;
 		for(let i = length - 1;i >= 0;i--) {
-			if(this.categoryList[i].startIndex * liHeight <= e.target.scrollTop) {
-				this.currentCategory = this.categoryList[i].id;
+			let temp = this.categoryList[i];
+			if(temp.startIndex * liHeight + temp.cateIndex * catLiHeight <= e.target.scrollTop) {
+				this.currentCategory = temp.id;
 				break;
 			};
 		};
@@ -148,6 +150,12 @@ export default class Order extends Vue {
 						<ul>
 							{
 								this.goodsList.map(item => (
+									item.isCategory
+									?
+									<li class="category-name">
+										{item.name}
+									</li>
+									:
 									<li class="goods-item">
 										<div class="icon-can" onClick={() => this.goDetail(item)}>
 											<img src={item.thumbnail ? `http://120.78.221.14:2233${item.thumbnail}` : this.defaultPic} class="main-img" />
@@ -258,7 +266,20 @@ export default class Order extends Vue {
 	}
 	.main-img{
 		max-width: 100%;
-		max-height: 1rem;
+		max-height: 1.4rem;
+	}
+	.category-name{
+		width: 100%;
+		height: .7rem;
+		line-height: .7rem;
+		box-sizing: border-box;
+		font-size: .26rem;
+		font-weight: bold;
+		padding: 0 2%;
+		background: #FFF;
+		box-sizing: border-box;
+		// border-top: 1px solid #f2f2f2;
+		// border-bottom: 1px solid #f2f2f2;
 	}
 	.goods-item{
 		width: 100%;

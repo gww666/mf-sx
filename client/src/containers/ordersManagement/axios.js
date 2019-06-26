@@ -8,9 +8,9 @@ export const getRtOrdersList = companyId => {
     return _axios(options);
 }
 // 获取订单列表
-export const getOrdersList = companyId => {
+export const getOrdersList = (companyId, createDate2) => {
     let options = {
-        url: `/api/getOrderList?companyId=${companyId}`,
+        url: `/api/getOrderList?companyId=${companyId}${createDate2 ? '&createDate2=' + createDate2 : ''}`,
         method: "GET"
     };
     return _axios(options);
@@ -44,6 +44,14 @@ export const searchGoods = goodsname => {
 export const getGoodsInfoById = goodsId => {
     let options = {
         url: `/api/getGoods?goodsId=${goodsId}`,
+        method: "GET"
+    };
+    return _axios(options);
+}
+// 获取订单详情
+export const getOrderDetail = orderNo => {
+    let options = {
+        url: `/api/getOrderDetail?orderNo=${orderNo}`,
         method: "GET"
     };
     return _axios(options);

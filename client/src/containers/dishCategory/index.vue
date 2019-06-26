@@ -5,7 +5,7 @@ import { Tag, Table, Modal, Select, Input, message, Button } from "ant-design-vu
 import { tableColumns } from "./datas";
 import { getCategoryList, deleteCategory } from "./axios";
 import { operateCategory } from "./operateCategory/axios";
-import formateDate from "../../utils/formateDate";
+import { formateDate } from "../../utils/formateDate";
 Vue.use(Tag);
 Vue.use(Table);
 Vue.use(Modal);
@@ -250,6 +250,7 @@ export default class DishCategory extends Vue {
                 <Table 
                     rowKey={record => record.id} 
                     dataSource={this.categoryList}
+                    locale={{emptyText: '暂无数据'}}
                 >
                     {
                         tableColumns.map(item => {

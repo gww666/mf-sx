@@ -39,6 +39,7 @@ export default class CheckOrderDetail extends Vue {
 		return (
             <div class="order-container">
                 <div class="page-title">
+                    
                     订单详情
                 </div>
                 <div class="ul-title">
@@ -198,6 +199,8 @@ export default class CheckOrderDetail extends Vue {
         display: flex;
         align-items: center;
         justify-content: flex-end;
+        box-sizing: border-box;
+        border-top: 1px solid #e6e6e6;
     }
     .payment-btn{
         color: #FFF;
