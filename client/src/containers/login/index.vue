@@ -68,6 +68,8 @@ export default class Login extends Vue {
         height: 260px;
         line-height: 450px;
         color: #f5f5f5;
+        font-size: 20px;
+        font-weight: bold;
         text-align: center;
     }
     .login-box{

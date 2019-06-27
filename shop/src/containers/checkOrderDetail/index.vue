@@ -35,11 +35,15 @@ export default class CheckOrderDetail extends Vue {
         }
         console.log(this.unfinishedOrder.orderNo, "去支付")
     };
+    // 返回
+    goBack() {
+        this.$router.go(-1);
+    };
 	render() {
 		return (
             <div class="order-container">
                 <div class="page-title">
-                    
+                    <div class="go-back" onClick={this.goBack}>{'‹'}</div>
                     订单详情
                 </div>
                 <div class="ul-title">
@@ -109,7 +113,17 @@ export default class CheckOrderDetail extends Vue {
         color: #666;
         background: #FFF;
         border-bottom: 1px solid #e6e6e6;
+        position: relative;
         // background: linear-gradient(90deg, #0af, #0085ff);
+    }
+    .go-back{
+        height: 100%;
+        width: 1rem;
+        font-size: .8rem;
+        line-height: .7rem;
+        position: absolute;
+        left: 0;
+        top: 0;
     }
     .ul-title{
         font-size: .3rem;

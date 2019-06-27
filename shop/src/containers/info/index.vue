@@ -40,7 +40,7 @@ export default {
 <style lang="scss" scoped>
 .info-box {
     width: 100%;
-
+    background: #FFF;
     .header {
         font-size: 0.4rem;
         color: #666;

@@ -244,8 +244,8 @@ export default class Order extends Vue {
 		line-height: .3rem;
 		font-size: .1rem;
 		color: #FFF;
-		right: .2rem;
-		top: .2rem;
+		right: .16rem;
+		top: .16rem;
 	}
 	.list-right{
 		width: 78%;

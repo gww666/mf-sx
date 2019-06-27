@@ -24,7 +24,7 @@ export default class App extends Vue {
                     {
                         this.isLoginPage ? <div></div> : <common-header />
                     }
-                    <div ref="routerView">
+                    <div ref="routerView" style="flex:1">
                         <router-view class="router-view"></router-view>
                     </div>
                 </div>
@@ -35,7 +35,7 @@ export default class App extends Vue {
         let rightSide = this.$refs.rightSide;
         rightSide.style.height = document.documentElement.offsetHeight + "px";
         rightSide.style.width = document.documentElement.offsetWidth - 120 + "px";
-        this.$refs.routerView.style.height = document.documentElement.clientHeight - 50 + "px";
+        // this.$refs.routerView.style.height = document.documentElement.clientHeight - 0 + "px";
     };
     mounted() {
         this.setHeight();
