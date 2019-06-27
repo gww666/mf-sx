@@ -7,6 +7,7 @@ import goods from "./routers/goods";
 import publicRouter from "./routers/public";
 import settingsRouter from "./routers/settings";
 import orderRouter from "./routers/order";
+import payRouter from "./routers/pay";
 // import socketIo from "socket.io";
 import socketIo = require("socket.io");
 
@@ -26,6 +27,7 @@ app.use(goods.routes()).use(goods.allowedMethods());
 app.use(settingsRouter.routes()).use(settingsRouter.allowedMethods());
 app.use(publicRouter.routes()).use(publicRouter.allowedMethods());
 app.use(orderRouter.routes()).use(orderRouter.allowedMethods());
+app.use(payRouter.routes()).use(payRouter.allowedMethods());
 let hostname = "172.18.249.80";
 let port = "2233";
 // console.log("socketIo", socketIo);

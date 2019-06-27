@@ -125,7 +125,7 @@ interface handleRedisOrderParams {
     companyId: string,
     orderNo?: string
 }
-const getOrderFromRedis = async (ctx, params: handleRedisOrderParams) => {
+export const getOrderFromRedis = async (ctx, params: handleRedisOrderParams) => {
     let {companyId, orderNo} = params;
     let get = promisify(ctx.redis.get).bind(ctx.redis);
     let key = getOrderListKey(companyId);
@@ -305,11 +305,12 @@ export const addGoodsForOrder = async ctx => {
     }
     //生成订单记录
     let date = Date.now();
+    let paymentValue = payment.toFixed(2);
      //更新缓存
     if (cache) {
         let order = {
             orderNo,
-            payment,
+            payment: paymentValue,
             updateDate: date,
             goods: goodsForRedis,
             tableNo
@@ -318,10 +319,10 @@ export const addGoodsForOrder = async ctx => {
         // ctx.redis.set(orderNo, JSON.stringify(cache));
     }
     let sql = `update m_order set update_date = ?, payment = ? where order_no = ?`;
-    await mysql.execute(sql, [date, payment, orderNo]);
+    await mysql.execute(sql, [date, paymentValue, orderNo]);
     return {
         orderNo,
-        payment,
+        payment: paymentValue,
         updateDate: date
     }
 }
@@ -370,35 +371,115 @@ export const updateOrder = async ctx => {
         if (orderData.goodsArray[index]) {
             let goodsObject = orderData.goodsArray[index].goods;
             let goodsItem = goodsObject[goodsId];
+
             if (type === "reduce") {
                 //减菜
                 if (goodsItem.count === 1) {
                     //删除该商品
                     delete goodsObject[goodsId];
-                    let sql = "delete from order_detail where order_no = ? and goods_id = ?";
-                    await mysql.execute(sql, [orderNo, goodsId]);
+                    if (!Object.keys(goodsObject).length) {
+                        //该加菜组别中已经没有菜了，需要删除该次加菜记录
+                        orderData.goodsArray.splice(index, 1);
+                    }
+                    let restCount = 0;
+                    //这里需要判断数据库订单详情表中该订单下其他组别是否还有该商品
+                    for (let oldItem of orderData.goodsArray) {
+                        for (let id in oldItem.goods) {
+                            if (id == goodsId) {
+                                restCount += oldItem.goods[id].count;
+                            }
+                        }
+                    }
+                    if (restCount) {
+                        //更新数据库
+                        let sql_detail = "update order_detail set goods_count = ? where order_no = ? and goods_id = ?";
+                        await mysql.execute(sql_detail, [restCount, orderNo, goodsId]);
+                    } else {
+                        //删除记录
+                        let deltetSql = "delete from order_detail where order_no = ? and goods_id = ?";
+                        await mysql.execute(deltetSql, [orderNo, goodsId]);
+                    }
+                    // let sql = "delete from order_detail where order_no = ? and goods_id = ?";
+                    // await mysql.execute(sql, [orderNo, goodsId]);
                 } else {
                     goodsItem.count -= 1;
-                    let sql = "update order_detail set count = ? where order_no = ? and goods_id = ?";
+                    let sql = "update order_detail set goods_count = ? where order_no = ? and goods_id = ?";
                     await mysql.execute(sql, [goodsItem.count, orderNo, goodsId]);
                 }
             } else if (type === "replace") {
+                console.log("换菜");
                 //先删除要替换的菜品
+                //更新要存入缓存的数据
                 delete goodsObject[goodsId];
-                goodsObject[newGoodsId] = {
-                    count,
-                    title,
-                    price
+                if (goodsObject[newGoodsId]) {
+                    goodsObject[newGoodsId].count += count;
+                    goodsObject[newGoodsId].price = price;
+                } else {
+                    goodsObject[newGoodsId] = {
+                        count,
+                        title,
+                        price
+                    }
                 }
-                let deltetSql = "delete from order_detail where order_no = ? and goods_id = ?";
-                await mysql.execute(deltetSql, [orderNo, goodsId]);
-                let insertSql = "insert into order_detail(id, order_no, goods_id, goods_title, goods_count, goods_price, goods_img) values(?, ?, ?, ?, ?, ?, ?)";
-                await mysql.execute(insertSql, [null, orderNo, newGoodsId, title, count, price, img || null]);
+                //这里需要判断数据库订单详情表中该订单下其他组别是否还有该商品
+                let restCount = 0;//被替换的菜的剩余数量
+                let totalCount = 0;//替换后的菜的数量
+                for (let oldItem of orderData.goodsArray) {
+                    for (let id in oldItem.goods) {
+                        if (id == goodsId) {
+                            restCount += oldItem.goods[id].count;
+                        } else if (id == newGoodsId) {
+                            //已经有该新增的菜了
+                            totalCount += oldItem.goods[id].count;
+                        }
+                    }
+                }
+                console.log("restCount", restCount);
+                console.log("totalCount", totalCount);
+                
+                //处理数据库中被替换的菜
+                if (restCount) {
+                    console.log("处理数据库中被替换的菜--更新数据库");
+                    //更新数据库
+                    let sql_detail = "update order_detail set goods_count = ? where order_no = ? and goods_id = ?";
+                    await mysql.execute(sql_detail, [restCount, orderNo, goodsId]);
+                } else {
+                    //删除记录
+                    console.log("处理数据库中被替换的菜--删除记录");
+                    let deltetSql = "delete from order_detail where order_no = ? and goods_id = ?";
+                    await mysql.execute(deltetSql, [orderNo, goodsId]);
+                }
+                //处理数据库中替换后的菜
+                if (totalCount === count) {
+                    console.log("处理数据库中替换后的菜--新增记录");
+                    //数量没变化，说明是新增
+                    let insertSql = "insert into order_detail(id, order_no, goods_id, goods_title, goods_count, goods_price, goods_img) values(?, ?, ?, ?, ?, ?, ?)";
+                    await mysql.execute(insertSql, [null, orderNo, newGoodsId, title, count, price, img || null]);
+                } else {
+                    console.log("处理数据库中替换后的菜--更新记录");
+                    //数量变化了（增多了），代表是更新
+                    let sql_detail = "update order_detail set goods_count = ?, goods_price = ? where order_no = ? and goods_id = ?";
+                    await mysql.execute(sql_detail, [totalCount, price, orderNo, goodsId]);
+                }
             }
+            //重新计算订单金额
+            payment = 0;
+            orderData.goodsArray.forEach(obj => {
+                for (let key in obj.goods) {
+                    payment += obj.goods[key].price * obj.goods[key].count
+                }
+            });
+            payment = payment.toFixed(2)
+            //更新缓存数据
+            orderData.baseInfo.payment = payment;
+            //更新数据库数据
+            let sql = `update m_order set payment = ?, update_date = ? where order_no = ?`;
+            await mysql.execute(sql, [payment, date, orderNo]);
         }
     }
     //更新修改日期
     orderData.baseInfo.updateDate = date;
+
     //更新缓存
     let orderListKey = getOrderListKey(companyId);
     ctx.redis.set(orderListKey, JSON.stringify(orderList));
