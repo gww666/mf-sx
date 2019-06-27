@@ -4,7 +4,10 @@ export const operateGoods = data => {
     let options = {
         url: "/api/wGoods",
         method: "POST",
-        data: JSON.stringify(data)
+        data: JSON.stringify(data),
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
@@ -13,7 +16,10 @@ export const uploadImg = data => {
     let options = {
         url: "http://120.78.221.14:2235/api/upload",
         method: "POST",
-        data: data
+        data: data,
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 }

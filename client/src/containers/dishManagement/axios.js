@@ -3,7 +3,10 @@ import _axios from "../../utils/_axios";
 export const getCategoryList = companyId => {
     let options = {
         url: `/api/categoryList?companyId=${companyId}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
@@ -11,7 +14,10 @@ export const getCategoryList = companyId => {
 export const queryGoodsList = (companyId, categoryId, pageNum, pageSize) => {
     let options = {
         url: `/api/goodsList?companyId=${companyId}${categoryId === "all" ? "" : "&categoryId=" + categoryId}&pageNum=${pageNum}&pageSize=${pageSize}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
@@ -19,7 +25,10 @@ export const queryGoodsList = (companyId, categoryId, pageNum, pageSize) => {
 export const deleteGoods = goodsId => {
     let options = {
         url: `/api/delGoods?goodsId=${goodsId}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
@@ -27,7 +36,10 @@ export const deleteGoods = goodsId => {
 export const searchGoods = goodsname => {
     let options = {
         url: `/api/selectGoodsName?keyword=${goodsname}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
@@ -35,7 +47,10 @@ export const searchGoods = goodsname => {
 export const getGoodsInfoById = goodsId => {
     let options = {
         url: `/api/getGoods?goodsId=${goodsId}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 }

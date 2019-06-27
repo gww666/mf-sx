@@ -48,6 +48,11 @@ export const rtTableColumns = [
         key: "tableNo"
     },
     {
+        title: "订单金额",
+        dataIndex: "payment",
+        key: "payment"
+    },
+    {
         title: "下单时间",
         dataIndex: "createDate",
         key: "createDate"

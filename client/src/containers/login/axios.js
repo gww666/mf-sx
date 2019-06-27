@@ -8,7 +8,10 @@ export const loginRequest = (username, password) => {
         data: JSON.stringify({
             account: username,
             password: md5(password)
-        })
+        }),
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };

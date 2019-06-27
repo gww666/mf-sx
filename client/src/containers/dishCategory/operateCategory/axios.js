@@ -4,7 +4,10 @@ export const operateCategory = data => {
     let options = {
         url: "/api/wCategory",
         method: "POST",
-        data: JSON.stringify(data)
+        data: JSON.stringify(data),
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };

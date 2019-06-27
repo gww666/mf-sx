@@ -3,7 +3,10 @@ import _axios from "../../utils/_axios";
 export const getRtOrdersList = companyId => {
     let options = {
         url: `/api/getRTOrder?companyId=${companyId}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 }
@@ -11,7 +14,10 @@ export const getRtOrdersList = companyId => {
 export const getOrdersList = (companyId, createDate2) => {
     let options = {
         url: `/api/getOrderList?companyId=${companyId}${createDate2 ? '&createDate2=' + createDate2 : ''}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
@@ -19,7 +25,10 @@ export const getOrdersList = (companyId, createDate2) => {
 export const modifyTableNo = param => {
     let options = {
         url: `/api/resetTableNo?orderNo=${param.orderNo}&tableNo=${param.tableNo}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
@@ -28,7 +37,10 @@ export const modifyOrder = data => {
     let options = {
         url: `/api/updateOrder`,
         method: "POST",
-        data: JSON.stringify(data)
+        data: JSON.stringify(data),
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 }
@@ -36,7 +48,10 @@ export const modifyOrder = data => {
 export const searchGoods = goodsname => {
     let options = {
         url: `/api/selectGoodsName?keyword=${goodsname}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
@@ -44,7 +59,10 @@ export const searchGoods = goodsname => {
 export const getGoodsInfoById = goodsId => {
     let options = {
         url: `/api/getGoods?goodsId=${goodsId}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 }
@@ -52,7 +70,10 @@ export const getGoodsInfoById = goodsId => {
 export const getOrderDetail = orderNo => {
     let options = {
         url: `/api/getOrderDetail?orderNo=${orderNo}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 }

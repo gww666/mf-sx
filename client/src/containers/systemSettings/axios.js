@@ -4,7 +4,10 @@ import _axios from "../../utils/_axios";
 export const getSettings = companyId => {
     let options = {
         url: `/api/getSettings?companyId=${companyId}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 }
@@ -13,7 +16,10 @@ export const saveSettings = data => {
     let options = {
         url: "/api/updateSettings",
         method: "POST",
-        data: JSON.stringify(data)
+        data: JSON.stringify(data),
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };

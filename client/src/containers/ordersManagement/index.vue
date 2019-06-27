@@ -147,14 +147,33 @@ export default class OrdersManagement extends Vue {
                 break;
         };
         let dom = <span>{text}</span>;
+        if(item.key === "tableNo") {
+            dom = (
+                <div class="btns-field">
+                    <div class="btns-layout" style="width: 100px;justify-content: flex-start;">
+                        <p class="btn modify-btn" onClick={() => this.changeTableNo(Object.assign({}, record))}>换桌</p>
+                        <p class="name" title={text}>{text}</p>
+                    </div>
+                </div>
+            );
+        }
+        if(item.key === "payment") {
+            dom = (
+                <div class="btns-field">
+                    <div class="btns-layout" style="width: 120px;justify-content: flex-start;">
+                        <p class="btn modify-btn" onClick={() => this.changePayment(Object.assign({}, record))}>改价</p>
+                        <p class="name" title={text}>{text}</p>
+                    </div>
+                </div>
+            );
+        }
         // 操作按钮
         if (item.key === "operation") {
             dom = (
                 <div class="btns-field">
                     <div class="btns-layout" style="width: 130px;">
-                        <p class="btn edit-btn" onClick={() => this.changeTableNo(Object.assign({}, record))}>换桌</p>
-                        <p class="btn edit-btn" onClick={() => this.changePayment(Object.assign({}, record))}>改价</p>
                         <p class="btn edit-btn" onClick={() => this.showOrderDetail(record, index)}>详情</p>
+                        <p class="btn edit-btn" onClick={() => this.showOrderDetail(record, index)}>换菜</p>
                     </div>
                 </div>
             );
@@ -666,6 +685,11 @@ export default class OrdersManagement extends Vue {
     .edit-btn{
         color: #1890ff;
         border: 1px solid #1890ff;
+    }
+    .modify-btn{
+        background: #1890ff;
+        color: #FFF;
+        margin-right: 10px;
     }
     p{
         margin: 0;

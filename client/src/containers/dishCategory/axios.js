@@ -3,7 +3,10 @@ import _axios from "../../utils/_axios";
 export const getCategoryList = companyId => {
     let options = {
         url: `/api/categoryList?companyId=${companyId}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
@@ -11,7 +14,10 @@ export const getCategoryList = companyId => {
 export const deleteCategory = categoryId => {
     let options = {
         url: `/api/delCategory?categoryId=${categoryId}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
