@@ -68,6 +68,18 @@ export default class SystemSettings extends Vue {
                 <div class="lines">
                     <a-button style="margin:20px auto;" type="primary" onClick={this.doSave}>保存</a-button>
                 </div>
+
+                <div class="lines">
+                    <p class="label">厨师账号：</p>
+                    <a-input class="filters" />
+                </div>
+                <div class="lines">
+                    <p class="label">密码：</p>
+                    <a-input class="filters" />
+                </div>
+                <div class="lines">
+                    <a-button style="margin:20px auto;" type="primary">保存</a-button>
+                </div>
             </div>
 		);
     };
