@@ -47,6 +47,13 @@ export default {
                         {title: "凉拌黄瓜", count: 1, note: "免香菜"}
                     ]
                 },
+                {
+                    baseInfo: {orderNo: 1, tableNo: 3, note: "免香菜"},
+                    goodsArray: [
+                        {title: "辣椒炒肉", count: 1, note: "免姜"},
+                        {title: "凉拌黄瓜", count: 1, note: "免香菜"}
+                    ]
+                },
             ]
         }
     },

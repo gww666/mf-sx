@@ -5,6 +5,7 @@ import router from "./router";
 import store from './store';
 import "./assets/css/reset.css";
 import 'ant-design-vue/dist/antd.css';
+import 'echarts/map/js/china.js';
 Vue.config.productionTip = false;
 import domain from "./utils/domain";
 import { autoLogin } from "./utils/autoLogin";
