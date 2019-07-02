@@ -1,100 +1,114 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Tag, Table, Modal, Select, Input, message, Button, Pagination } from "ant-design-vue";
-import echarts from 'echarts'
-Vue.use(Tag);
-Vue.use(Table);
+import { Modal } from "ant-design-vue";
+import echarts from 'echarts';
 Vue.use(Modal);
-Vue.use(Select);
-Vue.use(Input);
-Vue.use(Pagination);
-const { Column } = Table;
 
 @Component
 export default class DishCategory extends Vue {
     chart1Option = {
-        backgroundColor: '#2c343c',
-
+        color: ['#3398DB'],
         title: {
-            text: '热门菜品销量对比（月）',
-            left: 'center',
-            top: 20,
-            textStyle: {
-                color: '#ccc'
+            text: "营业额曲线"
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data:['最高营业额','最低营业额']
+        },
+        toolbox: {
+            show: true,
+            feature: {  
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                dataView: {readOnly: true},
+                magicType: {type: ['line', 'bar']},
+                restore: {},
+                saveAsImage: {}
             }
         },
-
-        tooltip : {
-            trigger: 'item',
-            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        xAxis: {
+            type: 'category',
+            data: ['7-01', '7-02', '7-03', '7-04', '7-05', '7-06', '7-07']
         },
-
-        visualMap: {
-            show: false,
-            min: 80,
-            max: 600,
-            inRange: {
-                colorLightness: [0, 1]
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: '￥{value}'
+            }
+        },
+        series: [
+            {
+                data: [820, 932, 901, 934, 1290, 1330, 1320],
+                type: 'line',
+                markPoint: {
+                    data: [
+                        {type: 'max', name: '最大值'},
+                        {type: 'min', name: '最小值'}
+                    ]
+                }
+            }
+        ]
+    };
+    chart2Option = {
+        color: ['#3398DB'],
+        title: {
+            text: "菜品销量对比"
+        },
+        tooltip : {
+            trigger: 'axis',
+            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        toolbox: {
+            show: true,
+            feature: {  
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                dataView: {readOnly: true},
+                magicType: {type: ['line', 'bar']},
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        xAxis : [
+            {
+                type : 'category',
+                data : ['炒鸡蛋', '炒番茄', '水煮肉片', '水煮鱼', '柴火鸡', '大龙虾', '小龙虾', '鸡腿', '鸭腿', '猪脚饭'],
+                axisTick: {
+                    alignWithLabel: true
+                }
+            }
+        ],
+        yAxis : {
+            type : 'value',
+            axisLabel: {
+                formatter: '{value} 份'
             }
         },
         series : [
             {
-                name:'访问来源',
-                type:'pie',
-                radius : '55%',
-                center: ['50%', '50%'],
-                data:[
-                    {value:335, name:'水煮肉片'},
-                    {value:310, name:'辣椒炒肉'},
-                    {value:274, name:'火腿炒蛋'},
-                    {value:235, name:'饭炒饭'},
-                    {value:400, name:'炒辣条'},
-                    {value:182, name:'炒花生'},
-                    {value:302, name:'水煮鱼'},
-                ].sort(function (a, b) { return a.value - b.value; }),
-                roseType: 'radius',
-                label: {
-                    normal: {
-                        textStyle: {
-                            color: 'rgba(255, 255, 255, 0.3)'
-                        }
-                    }
-                },
-                labelLine: {
-                    normal: {
-                        lineStyle: {
-                            color: 'rgba(255, 255, 255, 0.3)'
-                        },
-                        smooth: 0.2,
-                        length: 10,
-                        length2: 20
-                    }
-                },
-                itemStyle: {
-                    normal: {
-                        color: '#c23531',
-                        shadowBlur: 200,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                },
-
-                animationType: 'scale',
-                animationEasing: 'elasticOut',
-                animationDelay: function (idx) {
-                    return Math.random() * 200;
-                }
+                name: '销售份数',
+                type: 'bar',
+                barWidth: '60%',
+                data: [34, 52, 200, 334, 390, 330, 220, 45, 78, 36]
             }
         ]
-    }
+    };
     drawCharts() {
         let myChart1 = echarts.init(this.$refs.myChart1);
-        // let myChart2 = echarts.init(this.$refs.myChart2);
+        let myChart2 = echarts.init(this.$refs.myChart2);
         window.addEventListener("resize", () => {
             myChart1.resize();
-            // myChart2.resize();
+            myChart2.resize();
         });
         myChart1.setOption(this.chart1Option);
+        myChart2.setOption(this.chart2Option);
     }
 	render() {
 		return (
@@ -105,7 +119,8 @@ export default class DishCategory extends Vue {
                         <p class="addBtn"></p>
                     </p>
                 </div>
-                <div ref="myChart1" style="width: 350px;height: 350px;"></div>
+                <div ref="myChart1" style="width: 100%;height: 390px;"></div>
+                <div ref="myChart2" style="width: 100%;height: 390px;"></div>
             </div>
 		);
     };
