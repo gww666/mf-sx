@@ -6,7 +6,7 @@
         </div>
         <div class="content-box">
             <order-item 
-                v-for="(item, index) in orderList" 
+                v-for="(item, index) in orderList2" 
                 :key="'order-item-' + index"
                 :order="item">
             </order-item>
@@ -15,6 +15,7 @@
 </template>
 <script>
 import OrderItem from "./item";
+import {formatDate} from "../../util";
 export default {
     data() {
         return {
@@ -56,6 +57,29 @@ export default {
                 },
             ]
         }
+    },
+    computed: {
+        orderList2() {
+            console.log("list", this.$store.getters.getOrderList);
+            
+            return this.$store.getters.getOrderList.map(item => {
+                return {
+                    baseInfo: {
+                        ...item.baseInfo,
+                        time: formatDate(item.baseInfo.createDate)
+                    },
+                    goodsArray: item.goodsArray
+                }
+            });
+        }
+    },
+    methods: {
+        getOrderList() {
+            this.$store.dispatch("getOrderList", {companyId: 1});
+        }
+    },
+    mounted() {
+        this.getOrderList();
     },
     components: {
         OrderItem
