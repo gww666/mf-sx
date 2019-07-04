@@ -6,6 +6,7 @@ import { getCategoryList, getGoodsList } from "./axios";
 import scrollTo from "scrollto-with-animation";
 import cart from "../../components/cart";
 import handle from "../../components/cart/handle";
+import { Toast } from "../../utils/toast";
 
 @Component({
 	cart,
@@ -110,6 +111,12 @@ export default class Order extends Vue {
 	};
 	// 跳转详情
 	goDetail(item) {
+		Toast({
+			message: "你是真的操作成功了啊，小伙子！",
+			type: "normal",
+			duration: 1500
+		})
+		return
 		this.$router.push({name: "detail", params: {info: item}});
 	};
 	handleUlScroll(e) {
