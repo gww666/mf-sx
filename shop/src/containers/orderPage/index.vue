@@ -111,12 +111,12 @@ export default class Order extends Vue {
 	};
 	// 跳转详情
 	goDetail(item) {
-		Toast({
-			message: "你是真的操作成功了啊，小伙子！",
-			type: "normal",
-			duration: 1500
-		})
-		return
+		// Toast({
+		// 	message: "你是真的操作成功了啊，小伙子！",
+		// 	type: "normal",
+		// 	duration: 1500
+		// })
+		// return
 		this.$router.push({name: "detail", params: {info: item}});
 	};
 	handleUlScroll(e) {
