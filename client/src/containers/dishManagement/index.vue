@@ -263,9 +263,6 @@ export default class DishCategory extends Vue {
             <div class="category-page">
                 <div class="title-bar">
                     <p>菜品管理</p>
-                    <p class="createBtn">
-                        <p class="addBtn" onClick={this.goCreate}>添加菜品</p>
-                    </p>
                 </div>
                 <div class="title-bar">
                     <a-select class="filters" value={this.currentCategory} onChange={val => this.changeCategory(val)}>
@@ -299,6 +296,7 @@ export default class DishCategory extends Vue {
                             }
                         </a-select>
                         <a-button size="small" type="primary" onClick={this.doSearch}>搜索</a-button>
+                        <p class="addBtn" onClick={this.goCreate}>添加菜品</p>
                     </p>
                 </div>
                 <Table 
@@ -409,7 +407,7 @@ export default class DishCategory extends Vue {
         cursor: pointer;
     }
     .searcher{
-        width: 205px;
+        width: 280px;
     }
     .edit-btn{
         color: #1890ff;
@@ -419,10 +417,8 @@ export default class DishCategory extends Vue {
         color: #ff4544;
         border: 1px solid #ff4544;
     }
-    .modify-btn{
-        background: #1890ff;
-        color: #FFF;
-        margin-right: 10px;
+    .addBtn{
+        width: 60px;
     }
     .name{
         line-height: 22px;
