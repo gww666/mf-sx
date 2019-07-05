@@ -7,15 +7,20 @@ export const Toast = (options) => {
 		clearTimeout(timer);
 		timer = null;
     };
-    
+
 	let _options = {
 		duration: 2000,
 		message: "处理成功",
 		type: "normal"
     }
+    // 只传一个字符串，默认2s，type normal
+    if(typeof options === "string") {
+        _options.message = options;
+    }
+
     let config = Object.assign({}, _options);
 
-	if (options) {
+	if (Object.prototype.toString.call(options) === "[object, Object]") {
 		config = Object.assign({}, config, options);
     }
     toastDiv = document.createElement("div");
