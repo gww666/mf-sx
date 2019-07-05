@@ -20,7 +20,9 @@
                 <span class="count">
                     {{item.count}}
                 </span>
+                
             </div>
+            <span class="iconfont icon-xiala" v-if="hasMore"></span>
         </div>
     </div>
 </template>
@@ -31,23 +33,38 @@ export default {
         order: {
             type: Object,
             default: () => ({})
+        },
+        itemStyle: {
+            type: Object,
+            default: () => ({
+                width: "",
+                height: ""
+            })
+        },
+        horizontal: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
         return {
-            itemStyle: {
-                width: "",
-                height: ""
-            },
-            horizontal: false
+            
         }
     },
     computed: {
         baseInfo() {
             return this.order.baseInfo || {};
         },
-        goodsList() {
+        originGoodsArray() {
             return this.order.goodsArray || [];
+        },
+        goodsList() {
+            // return this.order.goodsArray || [];
+            return this.order.showArray || [];
+        },
+        //是否展示下拉按钮
+        hasMore() {
+            return this.originGoodsArray.length > this.goodsList.length;
         },
         settings() {
             return this.$store.state.settings;
@@ -62,7 +79,7 @@ export default {
             let width = document.documentElement.offsetWidth;
             // console.log("width", width);
             if (width >= 640) {
-                
+                // console.log("width", width);
                 //只有大于这个临界值，才会认为是横屏模式
                 this.horizontal = true;
                 const {itemCount} = this.settings;
@@ -86,11 +103,12 @@ export default {
                 // console.log("dishBox", dishBox);
                 
                 let dishBoxHeight = window.getComputedStyle(dishBox, null).height.slice(0, -2);
-                // console.log("dishBoxHeight", dishBoxHeight);
+                console.log("dishBoxHeight", dishBoxHeight);
                 //获取一道菜的高度
                 let dishItem = document.querySelector(".dish-item");
                 // console.log("dishItem", dishItem);
                 let dishItemHeight = window.getComputedStyle(dishItem, null).height.slice(0, -2);
+                console.log("dishItemHeight", dishItemHeight);
                 let count = Math.ceil(dishBoxHeight / dishItemHeight);
                 let marginBottom = rem2px(0.2);
                 let realHeight = count * dishItemHeight + (count - 1) * marginBottom;
@@ -122,9 +140,9 @@ export default {
         
     },
     mounted() {
-        this.addListener();
+        // this.addListener();
         //设置样式
-        this.resetStyle();
+        // this.resetStyle();
     }
 }
 </script>
@@ -169,18 +187,21 @@ export default {
         
     }
     .dish-box {
-        padding: 0 0.2rem;
+        // padding: 0 0.2rem;
+        padding: 0.2rem;
         flex: 1;
         display: flex;
         flex-flow: column nowrap;
-        justify-content: center;
+        // justify-content: center;
         // display: flex
+        position: relative;
 
         .dish-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 0.2rem;
+            
 
             .title {
                 border: 1px solid #e0e0e0;
@@ -195,10 +216,22 @@ export default {
             .count {
                 font-weight: bold;
             }
+            
         }
+        
 
         .dish-item:last-of-type {
             margin-bottom: 0;
+        }
+
+        .icon-xiala {
+            // display: block;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+
         }
 
     }
