@@ -19,8 +19,8 @@ export const Toast = (options) => {
     }
 
     let config = Object.assign({}, _options);
-
-	if (Object.prototype.toString.call(options) === "[object, Object]") {
+    
+	if (Object.prototype.toString.call(options) === "[object Object]") {
 		config = Object.assign({}, config, options);
     }
     toastDiv = document.createElement("div");
