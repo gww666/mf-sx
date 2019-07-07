@@ -15,6 +15,8 @@ const systemSettings = resolve => require(['@/containers/systemSettings'], resol
 const ordersManagement = resolve => require(['@/containers/ordersManagement'], resolve);
 // 数据统计
 const statistics = resolve => require(['@/containers/statistics'], resolve);
+// 优惠促销
+const promotions = resolve => require(['@/containers/promotions'], resolve);
 
 const router = [
 	{
@@ -61,6 +63,11 @@ const router = [
         path: '/statistics',
         name: 'statistics',
         component: statistics
+    },
+	{
+        path: '/promotions',
+        name: 'promotions',
+        component: promotions
     },
 ]
 export default router;

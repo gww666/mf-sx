@@ -101,7 +101,7 @@ export default class Order extends Vue {
 		scrollTo(
 			this.$refs.rightList,
 			'scrollTop',
-			item.startIndex * liHeight + item.cateIndex * catLiHeight, // target scrollY (0 means top of the page)
+			item.startIndex * liHeight + item.cateIndex * catLiHeight + (item.cateIndex ? 1 : 0), // target scrollY (0 means top of the page)
 			500, // duration in ms
 			'easeInOutCirc',
 			() => {

@@ -19,7 +19,6 @@ export default class commonHeader extends Vue {
     }
     // 退出登录
     signOut() {
-        console.log("click")
         this.hideSignOut();
         this.$store.dispatch("qxz/updateUserInfo", {});
         localStorage.setItem("sessionId", "");
@@ -70,6 +69,7 @@ export default class commonHeader extends Vue {
         width: 140px;
         border-radius: 4px;
         position: absolute;
+        z-index: 3;
         right: 0;
         bottom: -46px;
         box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
@@ -79,7 +79,7 @@ export default class commonHeader extends Vue {
         height: 0;
         border-width: 0 5px 10px;
         border-style: solid;
-        border-color: transparent transparent #fff;
+        border-color: transparent transparent #FFF;
         top: -10px;
         right: 20px;
         position: absolute;

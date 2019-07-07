@@ -12,6 +12,7 @@ import commonHeader from "./components/commonHeader";
 })
 export default class App extends Vue {
     get isLoginPage() {
+        this.setViewStyle();
         return this.$route.name === "login";
     };
 	render() {
@@ -31,14 +32,25 @@ export default class App extends Vue {
             </div>
 		)
     };
-    setHeight() {
+    setRightStyle() {
         let rightSide = this.$refs.rightSide;
         rightSide.style.height = document.documentElement.offsetHeight + "px";
         rightSide.style.width = document.documentElement.offsetWidth - 120 + "px";
-        // this.$refs.routerView.style.height = document.documentElement.clientHeight - 0 + "px";
+    };
+    setViewStyle() {
+        let routerView = this.$refs.routerView;
+        if(this.$route.name !== "login") {
+            if(routerView) {
+                routerView.style.height = document.documentElement.clientHeight - 50 + "px";
+            }
+        }else {
+            if(routerView) {
+                routerView.style.height = document.documentElement.clientHeight + "px";
+            }
+        }
     };
     mounted() {
-        this.setHeight();
+        this.setRightStyle();
     };
 };
 </script>

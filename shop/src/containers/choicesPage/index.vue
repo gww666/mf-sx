@@ -6,6 +6,7 @@ import { getSettings, getOrder } from "./axios";
 @Component
 export default class Order extends Vue {
 	showPage = false;
+	loading = require("../../assets/images/loading.gif");
 	get unfinishedOrder() {
 		return this.$store.state.qxz.unfinishedOrder;
 	};
@@ -68,12 +69,18 @@ export default class Order extends Vue {
 		return (
 			this.showPage
 			?
-			<div class="choices-container">
-				<div class="choices" onClick={this.goOrderPage}>我要加菜</div>
-				<div class="choices" onClick={this.goCheckOrders}>查看已有订单</div>
+			<div>
+				<div class="tip">您有正在进行中的订单</div>
+				<div class="choices-container">
+					<div class="choices" onClick={this.goOrderPage}>我要加菜</div>
+					<div class="choices" onClick={this.goCheckOrders}>查看已有订单</div>
+				</div>
 			</div>
 			:
-			<div></div>
+			<div class="loading-box">
+				<img src={this.loading} style="width: 0.7rem;height: 0.7rem;" />
+				<p style="margin-top: .2rem;">加载中...</p>
+			</div>
 		)
 	};
 	created() {
@@ -84,11 +91,16 @@ export default class Order extends Vue {
 };
 </script>
 <style lang="less" scoped>
+	.tip{
+		font-size: .4rem;
+		text-align: center;
+		padding-top: 2rem;
+		color: rgba(0, 0, 0, 0.65);
+	}
 	.choices-container{
         font-size: .16rem;
 		width: 100%;
-		height: 100%;
-		background: #F5F5F5;
+		background: #FFF;
 		display: flex;
 		// align-items: center;
 		justify-content: space-between;
@@ -103,6 +115,17 @@ export default class Order extends Vue {
         text-align: center;
         color: #FFF;
         background: #1890ff;
-        margin: 5rem auto;
-    }
+        margin: 2rem auto;
+	}
+	.loading-box{
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+		background: #FFF;
+		justify-content: center;
+		font-size: .12rem;
+		color: rgba(0, 0, 0, 0.65);
+	}
 </style>

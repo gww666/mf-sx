@@ -61,6 +61,7 @@ export default class CheckOrderDetail extends Vue {
     }
     .content{
         flex: 1;
+        width: 100%;
         position: relative;
     }
     .literal-detail{
@@ -94,7 +95,7 @@ export default class CheckOrderDetail extends Vue {
         height: .4rem;
         border-radius: .2rem;
         text-align: center;
-        line-height: .41rem;
+        line-height: .36rem;
         font-size: .32rem;
         color: #FFF;
         background-color: rgba(0,0,0,.2);
