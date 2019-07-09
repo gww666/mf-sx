@@ -8,7 +8,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 * {
 	margin: 0;
 	padding: 0;
@@ -49,4 +49,14 @@ html {
 		font-size: 55.2px;
 	}
 }
+/* 重设设置页面的样式 */
+.settings-box {
+	.mint-cell:last-child {
+		background-image: unset;
+	}
+	.mint-cell-wrapper {
+		background-image: unset;
+	}
+} 
+
 </style>

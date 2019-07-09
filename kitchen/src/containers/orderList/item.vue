@@ -1,5 +1,5 @@
 <template>
-    <div class="order-item-box" :style="horizontal ? itemStyle : {}">
+    <div class="order-item-box" :style="horizontal ? itemStyle : verticalStyle">
         <div class="header">
             <div class="top">
                 <span class="tableNo">桌号：{{baseInfo.tableNo}}</span>
@@ -48,7 +48,9 @@ export default {
     },
     data() {
         return {
-            
+            verticalStyle: {
+				marginBottom: "0.2rem"
+			},
         }
     },
     computed: {

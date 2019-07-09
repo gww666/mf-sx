@@ -41,6 +41,12 @@ export default new Vuex.Store({
 	mutations: {
 		setOrderList(state, list) {
 			state.orderList = list;
+		},
+		setItemCount(state, count) {
+			state.settings = {
+				...state.settings,
+				itemCount: count
+			}
 		}	
 	},
 	actions: {

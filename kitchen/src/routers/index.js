@@ -3,6 +3,7 @@ import Vue from "vue";
 Vue.use(Router);
 const Login = () => import("../containers/login");
 const OrderList = () => import("../containers/orderList");
+const Settings = () => import("../containers/settings");
 export default new Router({
     routes: [
         {
@@ -12,10 +13,10 @@ export default new Router({
         {
             path: "/orderList",
             component: OrderList
+        },
+        {
+            path: "/settings",
+            component: Settings
         }
-        // {
-        //     path: "/settings",
-        //     component: Settings
-        // }
     ]
 });
