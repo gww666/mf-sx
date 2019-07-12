@@ -30,6 +30,8 @@ app.use((ctx, next) => __awaiter(this, void 0, void 0, function* () {
 }));
 //使用body中间件
 app.use(util_1.body());
+//注册各类获取redis缓存中key值的方法
+app.use(util_1.getKeys);
 //挂载路由
 app.use(login_1.default.routes()).use(login_1.default.allowedMethods());
 app.use(goods_1.default.routes()).use(goods_1.default.allowedMethods());

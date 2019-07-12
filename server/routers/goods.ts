@@ -9,7 +9,9 @@ import {
     insertGoods,
     deleteGoods,
     selectGoodsName,
-    getGoods
+    getGoods,
+    getTags,
+    updateTags
 } from "../db/model/goods";
 import {SucModel, ErrModel} from "../util/resModel";
 import {validateUser} from "../util";
@@ -119,6 +121,27 @@ router.get("/getGoods", validateUser, async ctx => {
     } catch (err) {
         console.log("err", err);
         ctx.body = new ErrModel([], "查询失败——" + JSON.stringify(err));
+    }
+});
+
+//获取通用菜品备注
+router.get("/getTags", validateUser, async ctx => {
+    try {
+        let data = await getTags(ctx);
+        ctx.body = new SucModel(data, "查询成功");
+    } catch (err) {
+        console.log("err", err);
+        ctx.body = new ErrModel([], "通用备注查询失败——" + JSON.stringify(err));
+    }
+});
+//新增或修改通用菜品备注
+router.post("/updateTags", validateUser, async ctx => {
+    try {
+        await updateTags(ctx);
+        ctx.body = new SucModel([], "查询成功");
+    } catch (err) {
+        console.log("err", err);
+        ctx.body = new ErrModel([], "通用备注操作失败——" + JSON.stringify(err));
     }
 });
 

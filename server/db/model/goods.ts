@@ -69,29 +69,29 @@ export const goodsList = async ctx => {
 //新增一个商品
 export const insertGoods = async ctx => {
     let mysql = ctx.db;
-    let {title, subTitle, images, thumbnail, state, price, salePrice, stock, categoryId, companyId} = ctx.params;
+    let {title, subTitle, images, thumbnail, state, price, salePrice, stock, tag = "", categoryId, companyId} = ctx.params;
     images = images ? images : "";
     let mainImg = images ? images.split(",")[0] : "";
     thumbnail = thumbnail ? thumbnail : "";
     salePrice = salePrice ? salePrice : null;
     let date = Date.now();
-    console.log(title, subTitle, mainImg, images, state, price, salePrice, stock, date, categoryId, companyId);
-    let sql = `insert into goods(id, title, sub_title, main_img, thumbnail, images, state, price, sale_price, stock, create_date, update_date, category_id, company_id) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    await mysql.execute(sql, [null, title, subTitle, mainImg, thumbnail, images, state, price, salePrice, stock, date, date, categoryId, companyId]);
+    console.log(title, subTitle, mainImg, images, state, price, salePrice, stock, tag, date, categoryId, companyId);
+    let sql = `insert into goods(id, title, sub_title, main_img, thumbnail, images, state, price, sale_price, stock, tag, sale_num, create_date, update_date, category_id, company_id) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    await mysql.execute(sql, [null, title, subTitle, mainImg, thumbnail, images, state, price, salePrice, stock, tag, 0, date, date, categoryId, companyId]);
 }
 
 //修改一个商品
 export const updateGoods = async ctx => {
     let mysql = ctx.db;
-    let {goodsId, title, subTitle, state, images, thumbnail, price, salePrice, stock, categoryId} = ctx.params;
+    let {goodsId, title, subTitle, state, images, thumbnail, price, salePrice, stock, tag = "", categoryId} = ctx.params;
     // console.log("打印updateCategory参数：", name, sort, categoryId, state);
     images = images ? images : "";
     let mainImg = images ? images.split(",")[0] : "";
     thumbnail = thumbnail ? thumbnail : "";
     salePrice = salePrice ? salePrice : null;
-    let sql = `update goods set title = ?, sub_title = ?, state = ?, main_img = ?, thumbnail = ?, images = ?, price = ?, sale_price = ?, stock = ?, update_date = ?, category_id = ? where id = ?`;
+    let sql = `update goods set title = ?, sub_title = ?, state = ?, main_img = ?, thumbnail = ?, images = ?, price = ?, sale_price = ?, stock = ?, tag = ?, update_date = ?, category_id = ? where id = ?`;
     let date = Date.now();
-    await mysql.execute(sql, [title, subTitle, state, mainImg, thumbnail, images, price, salePrice, stock, date, categoryId, goodsId]);
+    await mysql.execute(sql, [title, subTitle, state, mainImg, thumbnail, images, price, salePrice, stock, tag, date, categoryId, goodsId]);
 }
 
 //删除一个商品
@@ -118,4 +118,26 @@ export const getGoods = async ctx => {
     let sql = `select * from goods where id = ?`;
     let [rows] = await mysql.execute(sql, [goodsId]);
     return each(rows);
+}
+
+//获取菜品通用备注
+export const getTags = async ctx => {
+    let mysql = ctx.db;
+    let {companyId} = ctx.query;
+    let sql = `select * from tags where companyId = ?`;
+    let [rows] = await mysql.execute(sql, [companyId]);
+    return each(rows);
+}
+
+//新增或修改菜品通用备注
+export const updateTags = async ctx => {
+    let mysql = ctx.db;
+    let {id, tag, companyId} = ctx.params;
+    if (id) {
+        let sql = `update tags set tag = ? where companyId = ?`;
+        await mysql.execute(sql, [tag, companyId]);
+    } else {
+        let sql = `insert into tags(id, tag, companyId) values(?, ?, ?)`;
+        await mysql.execute(sql, [null, tag, companyId]);
+    }
 }

@@ -119,4 +119,26 @@ router.get("/getGoods", util_1.validateUser, (ctx) => __awaiter(this, void 0, vo
         ctx.body = new resModel_1.ErrModel([], "查询失败——" + JSON.stringify(err));
     }
 }));
+//获取通用菜品备注
+router.get("/getTags", util_1.validateUser, (ctx) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        let data = yield goods_1.getTags(ctx);
+        ctx.body = new resModel_1.SucModel(data, "查询成功");
+    }
+    catch (err) {
+        console.log("err", err);
+        ctx.body = new resModel_1.ErrModel([], "通用备注查询失败——" + JSON.stringify(err));
+    }
+}));
+//新增或修改通用菜品备注
+router.post("/updateTags", util_1.validateUser, (ctx) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        yield goods_1.updateTags(ctx);
+        ctx.body = new resModel_1.SucModel([], "查询成功");
+    }
+    catch (err) {
+        console.log("err", err);
+        ctx.body = new resModel_1.ErrModel([], "通用备注操作失败——" + JSON.stringify(err));
+    }
+}));
 exports.default = router;

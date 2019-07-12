@@ -24,6 +24,14 @@ export const body = (): Function => {
     }
 }
 
+export const getKeys = async (ctx, next) => {
+    ctx.getGoodsDataKey = companyId => "goodsData-" + companyId;
+    ctx.getSaleInfoKey = companyId => "saleInfo-" + companyId;
+    ctx.getOrderListKey = companyId => "orderList-" + companyId;
+
+    await next();
+}
+
 //允许跨域
 export const allowCORS = async (ctx, next) => {
     // ctx.set("Access-Control-Allow-Origin", "120.78.221.14,localhost:8080");
@@ -57,7 +65,7 @@ export const validateUser = async (ctx, next) => {
 }
 
 //时间戳格式化为yy-mm-dd hh-mm格式
-export const formatDate = (time: number | string): string => {
+export const formatDate = (time: number | string, format?: string): string => {
     if (typeof time === "string") time = Number(time);
     let date = new Date(time);
     let year = date.getFullYear();
@@ -65,6 +73,9 @@ export const formatDate = (time: number | string): string => {
     let day = date.getDate() > 9 ? date.getDate() : "0" + date.getDate();
     let hour = date.getHours() > 9 ? date.getHours() : "0" + date.getHours();
     let minutes = date.getMinutes() > 9 ? date.getMinutes() : "0" + date.getMinutes();
+    if (format === "yymmdd") {
+        return `${year}-${month}-${day}`;
+    }
     return `${year}-${month}-${day} ${hour}:${minutes}`;
 }
 
