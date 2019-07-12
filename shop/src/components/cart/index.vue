@@ -24,7 +24,7 @@
                         <span class="sale-price">{{item.salePrice || item.price}}</span>
                         <span class="price" v-if="item.salePrice">{{item.price}}</span>
                     </div>
-                    <handle-box :mStyle="{flex: 1}" :goods="item" @reduce="reduceGoods"/>
+                    <handle-box :mStyle="{flex: 1}" :goods="item" @reduce="reduceGoods" :fromCart="true"/>
                 </div>
             </div>
         </div>

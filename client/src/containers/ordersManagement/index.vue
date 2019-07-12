@@ -86,6 +86,7 @@ export default class OrdersManagement extends Vue {
         try {
             let res = await getRtOrdersList(this.userInfo.id);
             if(res.data.returnCode === 1) {
+                console.log(res.data, "rtData")
                 let data = res.data.data;
                 if(res.data.data.length) {
                     this.handleRtData(data[0]);
@@ -243,13 +244,17 @@ export default class OrdersManagement extends Vue {
                         ...item.baseInfo,
                         goods: []
                     };
-                    for(let gKey in item.goods) {
-                        let gObj = {
-                            id: gKey,
-                            ...item.goods[gKey]
-                        }
-                        orderObj.goods.push(gObj);
-                    }
+                    item.goods.forEach(ele => {
+                        ele.id = ele.goodsId;
+                        orderObj.goods.push(ele);
+                    });
+                    // for(let gKey in item.goods) {
+                    //     let gObj = {
+                    //         id: gKey,
+                    //         ...item.goods[gKey]
+                    //     }
+                    //     orderObj.goods.push(gObj);
+                    // }
                     obj.orderList.push(orderObj);
                 });
                 Arr.push(obj);

@@ -6,11 +6,13 @@ import { getCategoryList, getGoodsList } from "./axios";
 import scrollTo from "scrollto-with-animation";
 import cart from "../../components/cart";
 import handle from "../../components/cart/handle";
+import goodsOptions from "../../components/goodsOptions";
 import { Toast } from "../../utils/toast";
 
 @Component({
 	cart,
-	handle
+	handle,
+	goodsOptions
 })
 export default class Order extends Vue {
 	categoryList = [];
@@ -173,7 +175,7 @@ export default class Order extends Vue {
 												<p class="title">{item.title}</p>
 												<p class="sub-title">{item.subTitle}</p>
 											</div>
-											<div style="position: relative;">
+											<div class="price-box">
 												<span class={"price"}>￥{item.salePrice ? item.salePrice : item.price}</span>
 												{
 													item.salePrice 
@@ -182,7 +184,7 @@ export default class Order extends Vue {
 													:
 													<span></span>
 												}
-												<handle goods={item} mStyle={{width: "1.6rem", position: "absolute", right: 0, bottom: "-0.14rem"}} />
+												<handle goods={item} mStyle={{width: "1.6rem",marginBottom: "-0.16rem"}} />
 											</div>
 										</div>
 									</li>
@@ -321,6 +323,11 @@ export default class Order extends Vue {
 		margin-top: .1rem;
 		font-size: .2rem;
 		color: rgba(0, 0, 0, 0.65);
+	}
+	.price-box{
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
 	}
 	.price{
 		display: inline-block;

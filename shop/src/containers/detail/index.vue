@@ -24,16 +24,16 @@ export default class CheckOrderDetail extends Vue {
                     <div class="literal-detail">
                         <p class="title">{this.info.title}</p>
                         <p class="sub-title">{this.info.subTitle}</p>
-                        <div style="position: relative;margin-top: .3rem;">
+                        <div class="price-zone">
                             <span class={"price"}>￥{this.info.salePrice ? this.info.salePrice : this.info.price}</span>
                             {
-                                this.info.salePrice 
+                                this.info.salePrice
                                 ?
                                 <span class="sale-price">￥{this.info.price}</span>
                                 :
                                 <span></span>
                             }
-                            <handle goods={this.info} mStyle={{width: "1.6rem", position: "absolute", right: 0, bottom: "-0.14rem"}} />
+                            <handle goods={this.info} mStyle={{width: "1.6rem", float: "right"}} />
                         </div>
                     </div>
                 </div>
@@ -62,7 +62,6 @@ export default class CheckOrderDetail extends Vue {
     .content{
         flex: 1;
         width: 100%;
-        position: relative;
     }
     .literal-detail{
         width: 100%;
@@ -78,6 +77,11 @@ export default class CheckOrderDetail extends Vue {
             font-size: .24rem;
             color: #666;
         }
+    }
+    .price-zone{
+        height: .4rem;
+        margin-top: .3rem;
+        line-height: .4rem;
     }
     .price{
 		display: inline-block;

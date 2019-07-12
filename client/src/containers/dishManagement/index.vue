@@ -3,7 +3,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Tag, Table, Modal, Select, Input, message, Button, Pagination } from "ant-design-vue";
 import { tableColumns } from "./datas";
-import { getCategoryList, queryGoodsList, deleteGoods, searchGoods, getGoodsInfoById } from "./axios";
+import { getCategoryList, queryGoodsList, deleteGoods, searchGoods, getGoodsInfoById, getPublicTags, savePublicTags } from "./axios";
 import { operateGoods } from "./operateDish/axios";
 import { formateDate } from "../../utils/formateDate";
 Vue.use(Tag);
@@ -31,10 +31,60 @@ export default class DishCategory extends Vue {
     pageNum = 1;
     pageSize = 10;
     total = 0;
+    newTag = "";
+    // 备注信息
+    tagInfo = {};
+    previousPublicTags = [];
+    publicTags = [];
+    // 设置通用备注
+    memoModal = false;
     get userInfo() {
         return this.$store.state.qxz.userInfo;
     };
-    
+    // 获取通用备注
+    async queryPublicTags() {
+        try {
+            let res = await getPublicTags(this.userInfo.id);
+            if (res.data.returnCode === 1) {
+                let data = res.data.data[0];
+                if(data) {
+                    this.tagInfo = res.data.data[0];
+                    this.publicTags = res.data.data[0].tag.split(",");
+                    this.previousPublicTags = res.data.data[0].tag.split(",");
+                }
+            }
+        }catch (err) {
+            console.log(err, "获取通用备注err");
+        }
+    };
+    // 更新通用备注
+    async updatePublicTags() {
+        try {
+            if(!this.publicTags.length) {
+                message.warning("请添加备注");
+                return;
+            }
+            let params = {
+                companyId: this.userInfo.id,
+                tag: ""
+            }
+            if(this.tagInfo.id) {
+                params.id = this.tagInfo.id;
+            }
+            this.publicTags.forEach(item => {
+                params.tag += `${item},`
+            });
+            params.tag = params.tag.substr(0, params.tag.length - 1);
+
+            let res = await savePublicTags(params);
+            if (res.data.returnCode === 1) {
+                this.queryPublicTags();
+                this.memoModal = false;
+            }
+        }catch (err) {
+            console.log(err, "更新通用备注err");
+        }
+    };
     // 获取分类列表
     async queryCategoryList() {
         try {
@@ -63,7 +113,7 @@ export default class DishCategory extends Vue {
             } else {
                 this.categoryList = [];
             };
-        }catch(err) {
+        }catch (err) {
             console.log(err, "获取分类列表err");
         };
     };
@@ -145,7 +195,7 @@ export default class DishCategory extends Vue {
     // 选中相似内容
     handleChange (clue) {
         this.keyword = clue;
-    }
+    };
     // 跳转新增
     goCreate() {
         this.$router.push({name: "operateDish", query: {categoryList: JSON.stringify(this.categoryList), type: "create"}});
@@ -210,7 +260,7 @@ export default class DishCategory extends Vue {
         } catch (err) {
             console.log("修改状态err", err);
         };
-    }
+    };
     // 列表渲染
     tableRenderFn(text, record, item) {
         switch (item.key) {
@@ -257,7 +307,33 @@ export default class DishCategory extends Vue {
         this.pageNum = pageNum;
         this.queryGoodsList();
     };
-    // <a-button size="small" type="primary" onClick={this.queryGoodsList}>刷新</a-button>
+    // 设置通用配置
+    memoSetting() {
+        this.publicTags = this.previousPublicTags;
+        this.memoModal = true;
+    };
+    // 新增公共标签
+    addTag() {
+        let sameTag = false;
+        this.publicTags.forEach(item => {
+            if(item === this.newTag) {
+                message.warning("已有相同标签");
+                sameTag = true;
+            }
+        });
+        if(sameTag || !this.newTag) return;
+        this.publicTags.push(this.newTag);
+        this.newTag = "";
+    };
+    // 删除公共标签
+    deleteTag(tag) {
+        for(let i = 0;i < this.publicTags.length;i++) {
+            if(this.publicTags[i] === tag) {
+                this.publicTags.splice(i, 1);
+                break;
+            }
+        }
+    };
 	render() {
 		return (
             <div class="category-page">
@@ -297,6 +373,7 @@ export default class DishCategory extends Vue {
                         </a-select>
                         <a-button size="small" type="primary" onClick={this.doSearch}>搜索</a-button>
                         <p class="addBtn" onClick={this.goCreate}>添加菜品</p>
+                        <p class="addBtn" style="width: 96px;" onClick={this.memoSetting}>配置通用备注</p>
                     </p>
                 </div>
                 <Table 
@@ -344,6 +421,36 @@ export default class DishCategory extends Vue {
                 <div style="margin:10px auto;">
                     <a-pagination defaultCurrent={1} total={this.total} onChange={this.handelPageChange} />
                 </div>
+                <a-modal
+                    title="配置通用备注"
+                    centered={true}
+                    v-model={this.memoModal}
+                    width="60%"
+                    bodyStyle={{height: "350px", overflowY: "scroll"}}
+                >
+                    <div class="tags-content">
+                        <div class="saved-tags">
+                            {
+                                this.publicTags.map(ele => {
+                                    return (
+                                        <div class="tags" title={ele}>
+                                            <div class="tag-delete" onClick={() => {this.deleteTag(ele)}}>×</div>
+                                            {ele}
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                        <div class="create-tag">
+                            <Input v-model={this.newTag} placeholder="请输入要新增的公共标签，建议2~4个字" style="width: 280px;" />
+                            <Button type="primary" onClick={this.addTag}>添加</Button>
+                        </div>
+                    </div>
+                    <div slot="footer" style="text-align:center;">
+                        <Button type="primary" class="ant-btn ant-btn-default" onClick={() => {this.updatePublicTags()}}><span>保 存</span></Button>
+                        <Button type="default" class="ant-btn ant-btn-default" onClick={() => {this.memoModal = false;}}><span>取 消</span></Button>
+                    </div>
+                </a-modal>
             </div>
 		);
     };
@@ -356,6 +463,7 @@ export default class DishCategory extends Vue {
             this.timer = null;
         };
         this.queryCategoryList();
+        this.queryPublicTags();
     };
 }
 </script>
@@ -407,7 +515,7 @@ export default class DishCategory extends Vue {
         cursor: pointer;
     }
     .searcher{
-        width: 280px;
+        width: 380px;
     }
     .edit-btn{
         color: #1890ff;
@@ -437,5 +545,46 @@ export default class DishCategory extends Vue {
     .table {
         flex: 1;
         overflow-y: scroll;
+    }
+    .saved-tags{
+        width: 100%;
+        height: 200px;
+        overflow: auto;
+        .tags{
+            float: left;
+            min-width: 100px;
+            max-width: 200px;
+            height: 40px;
+            padding: 8px 10px;
+            margin: 5px 5px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #d9d9d9;
+            position: relative;
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;
+            .tag-delete{
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+                text-align: center;
+                line-height: 12px;
+                border-radius: 8px;
+                position: absolute;
+                right: 4px;
+                top: 2px;
+                border: 1px solid #ff4544;
+                color: #ff4544;
+                cursor: pointer;
+            }
+        }
+    }
+    .create-tag{
+        width: 360px;
+        margin: 30px auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
     }
 </style>

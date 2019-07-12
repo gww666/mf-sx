@@ -54,3 +54,26 @@ export const getGoodsInfoById = goodsId => {
     };
     return _axios(options);
 }
+// 获取通用标签
+export const getPublicTags = companyId => {
+    let options = {
+        url: `/api/getTags?companyId=${companyId}`,
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
+    };
+    return _axios(options);
+}
+// 保存通用标签
+export const savePublicTags = params => {
+    let options = {
+        url: `/api/updateTags`,
+        method: "POST",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        },
+        data: JSON.stringify(params)
+    };
+    return _axios(options);
+}

@@ -20,21 +20,59 @@ export default {
     },
     mutations: {
         addGoods(state, goods) {
-            //查找是否已存在菜品
-            let index = state.goodsList.findIndex(item => item.id === goods.id);
-            if (index > -1) {
-                //存在，数量加1
-                state.goodsList[index].count += 1;
-            } else {
+            console.log(state.goodsList, goods, "sddddddddd")
+            let isSame = false;
+            state.goodsList.forEach(item => {
+                let tempSame = true;
+                if(item.id === goods.id && item.tag && goods.tag) {
+                    let arr1 = item.tag.split(",");
+                    let arr2 = goods.tag.split(",");
+                    if(arr1.length === arr2.length) {
+                        arr1.forEach(ele => {
+                            let tagSame = false;
+                            arr2.forEach(element => {
+                                if(ele === element) {
+                                    tagSame = true;
+                                }
+                            })
+                            if(!tagSame) {
+                                tempSame = false;
+                            }
+                        })
+                    }else {
+                        tempSame = false;
+                    }
+                }else {
+                    tempSame = false;
+                }
+                if(tempSame) {
+                    isSame = true;
+                    item.count += 1;
+                }
+            })
+            if(!isSame) {
                 //不存在，添加到数组开头
                 state.goodsList.unshift({
                     ...goods,
                     count: 1
                 });
             }
+            console.log(state.goodsList, "sddddddddddddddddd")
+            //查找是否已存在菜品
+            // let index = state.goodsList.findIndex(item => item.id === goods.id);
+            // if (index > -1) {
+            //     //存在，数量加1
+            //     state.goodsList[index].count += 1;
+            // } else {
+            //     //不存在，添加到数组开头
+            //     state.goodsList.unshift({
+            //         ...goods,
+            //         count: 1
+            //     });
+            // }
         },
         reduceGoods(state, goods) {
-            let index = state.goodsList.findIndex(item => item.id === goods.id);
+            let index = state.goodsList.findIndex(item => item.id === goods.id && item.tag === goods.tag);
             if (index === -1) return console.warn("菜品数组中没有该商品");
             if (state.goodsList[index].count === 1) {
                 //数量为1，代表从数组中删除该菜品
@@ -64,7 +102,8 @@ export default {
                             title: item.title,
                             price: item.salePrice || item.price,
                             count: item.count,
-                            img: item.thumbnail || item.mainImg
+                            img: item.thumbnail || item.mainImg,
+                            tag: item.tag
                         }
                     }),
                     orderNo: rootState.qxz.unfinishedOrder.orderNo

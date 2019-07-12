@@ -83,6 +83,7 @@ export default class CheckOrderDetail extends Vue {
             try {
                 let res = await getOrderDetail(orderNo);
                 if(res.data.returnCode === 1) {
+                    console.log(res.data.data, "dataaaaaaa");
                     this.goodsList = res.data.data;
                 }
             } catch(err) {
