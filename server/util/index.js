@@ -34,6 +34,10 @@ exports.body = () => {
         yield next();
     });
 };
+exports.getKeys = (ctx, next) => __awaiter(this, void 0, void 0, function* () {
+    ctx.getGoodsDataKey = companyId => "goodsData-" + companyId;
+    yield next();
+});
 //允许跨域
 exports.allowCORS = (ctx, next) => __awaiter(this, void 0, void 0, function* () {
     // ctx.set("Access-Control-Allow-Origin", "120.78.221.14,localhost:8080");

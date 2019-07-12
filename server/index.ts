@@ -1,7 +1,7 @@
 const http = require("http");
 import koa = require("koa");
 import {getDB, getRedis} from "./db/connection";
-import {body} from "./util";
+import {body, getKeys} from "./util";
 import login from "./routers/login";
 import goods from "./routers/goods";
 import publicRouter from "./routers/public";
@@ -21,6 +21,9 @@ app.use(async (ctx, next) => {
 });
 //使用body中间件
 app.use(body());
+//注册各类获取redis缓存中key值的方法
+app.use(getKeys);
+
 //挂载路由
 app.use(login.routes()).use(login.allowedMethods());
 app.use(goods.routes()).use(goods.allowedMethods());

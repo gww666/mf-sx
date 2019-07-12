@@ -71,9 +71,12 @@ const insertOrderToRedis = async (ctx, {order, companyId}) => {
                     createDate: order.updateDate,
                     tableNo: order.tableNo
                 },
-                goods: {
+                // goods: {
+                //     ...order.goods
+                // }
+                goods: [
                     ...order.goods
-                }
+                ]
             });
         } else { 
             orderList[order.orderNo] = {
@@ -89,9 +92,12 @@ const insertOrderToRedis = async (ctx, {order, companyId}) => {
                             createDate: order.updateDate,
                             tableNo: order.tableNo
                         },
-                        goods: {
+                        // goods: {
+                        //     ...order.goods
+                        // }
+                        goods: [
                             ...order.goods
-                        }
+                        ]
                     }
                 ]
             };
@@ -111,9 +117,12 @@ const insertOrderToRedis = async (ctx, {order, companyId}) => {
                             createDate: order.updateDate,
                             tableNo: order.tableNo
                         },
-                        goods: {
+                        // goods: {
+                        //     ...order.goods
+                        // }
+                        goods: [
                             ...order.goods
-                        }
+                        ]
                     }
                 ]
             }
@@ -177,25 +186,45 @@ export const insertOrder = async ctx => {
     //要插入redis中的订单对象所包含的数据
     let order = {
         orderNo,
-        goods: {},
+        // goods: {},
+        goods: [],
         createDate: 0,
         payment: 0,
         updateDate: 0,
         tableNo
     };
     //生成订单详细记录
+    //因为item可能面临有相同goodsId的情况
+    //这里要做下记录
+    let c: {[goodsId: string]: number} = {};
     for (let item of goods) {
-        const {goodsId, title, price, img, count} = item;
+        const {goodsId, title, price, img, count, tag} = item;
+        c.goodsId = isNotUndefined(c.goodsId) ? c.goodsId + count : count;
         //叠加订单总价
         payment += Number(price) * count;
         //往缓存对象中追加一条商品记录，只保留必需的字段
-        order.goods[goodsId] = {
+        // order.goods[goodsId] = {
+        //     count,
+        //     price,
+        //     title
+        // };
+        order.goods.push({
+            goodsId,
             count,
             price,
-            title
-        };
-        let sql_detail = "insert into order_detail(id, order_no, goods_id, goods_title, goods_price, goods_count, goods_img) values(?, ?, ?, ?, ?, ?, ?)";
-        await mysql.execute(sql_detail, [null, orderNo, goodsId, title, price, count, img]);
+            title,
+            tag
+        });
+        if (c.goodsId > count) {
+            //代表已经插入过了，更新数量
+            let sql_update_detail = "update order_detail set goods_count = ? where order_no = ? and goods_id = ?";
+            await mysql.execute(sql_update_detail, [c.goodsId, orderNo, goodsId]);
+        } else {
+            //新增
+            let sql_insert_detail = "insert into order_detail(id, order_no, goods_id, goods_title, goods_price, goods_count, goods_img) values(?, ?, ?, ?, ?, ?, ?)";
+            await mysql.execute(sql_insert_detail, [null, orderNo, goodsId, title, price, count, img]);
+        }
+        
     }
     //生成订单记录
     let date = Date.now();
@@ -252,7 +281,8 @@ export const addGoodsForOrder = async ctx => {
     let cache = null;
     let payment = 0;
     //需要往redis中追加的菜品对象
-    let goodsForRedis = {};
+    // let goodsForRedis = {};
+    let goodsForRedis = [];
     let tableNo = "";
     //如果有缓存记录，判断哪些是新增，哪些是更新
     if (value) {
@@ -262,26 +292,37 @@ export const addGoodsForOrder = async ctx => {
         let countInfo = {};
         //原有菜的钱
         cache.goodsArray.forEach(item => {
-            for (let id in item.goods) {
-                let {price, count} = item.goods[id];
-                // console.log("原有菜", count);
-                countInfo[id] = countInfo[id] ? countInfo[id] + count : count;
+            // for (let id in item.goods) {
+            //     let {price, count} = item.goods[id];
+            //     // console.log("原有菜", count);
+            //     countInfo[id] = countInfo[id] ? countInfo[id] + count : count;
+            //     payment += Number(price) * count;
+            // }
+            for (let goodsItem of item.goods) {
+                let {price, count, goodsId} = goodsItem;
+                countInfo[goodsId] = isNotUndefined(countInfo[goodsId]) ? countInfo[goodsId] + count : count;
                 payment += Number(price) * count;
             }
         });
         //生成订单详细记录
         for (let item of goods) {
             let {goodsId, title, price, img, count} = item;
-            goodsForRedis[goodsId] = {
+            // goodsForRedis[goodsId] = {
+            //     title,
+            //     price,
+            //     count
+            // }
+            goodsForRedis.push({
+                goodsId,
                 title,
                 price,
                 count
-            }
+            });
             //判断该订单下有没有该商品
             let exist = false;
             for (let oldItem of cache.goodsArray) {
-                for (let id in oldItem.goods) {
-                    if (id == goodsId) {
+                for (let goodsItem of oldItem.goods) {
+                    if (goodsItem.goodsId == goodsId) {
                         exist = true;
                         break;
                     }
@@ -366,27 +407,38 @@ export const updateOrder = async ctx => {
         //修改菜品数据
         //更新redis里的数据
         //type代表操作类型，reduce，replace
-        const {index, count, type, goodsId, title, price, img, newGoodsId} = goods;
+        const {index, count, type, goodsId, title, price, img, newGoodsId, tag} = goods;
         //先判断缓存中有无该次加菜
         if (orderData.goodsArray[index]) {
             let goodsObject = orderData.goodsArray[index].goods;
-            let goodsItem = goodsObject[goodsId];
+            let goodsItem = null;
+            //找到该商品
+            let i = 0;
+            for (let _goodsItem of goodsObject) {
+                if (goodsId === _goodsItem.goodsId && tag === _goodsItem.tag) {
+                    goodsItem = _goodsItem;
+                    break;
+                }
+                i++;
+            }
 
             if (type === "reduce") {
                 //减菜
                 if (goodsItem.count === 1) {
                     //删除该商品
-                    delete goodsObject[goodsId];
-                    if (!Object.keys(goodsObject).length) {
+                    // delete goodsObject[goodsId];
+                    goodsObject.splice(i, 1);
+                    // if (!Object.keys(goodsObject).length) {
+                    if (!goodsObject.length) {
                         //该加菜组别中已经没有菜了，需要删除该次加菜记录
                         orderData.goodsArray.splice(index, 1);
                     }
                     let restCount = 0;
                     //这里需要判断数据库订单详情表中该订单下其他组别是否还有该商品
                     for (let oldItem of orderData.goodsArray) {
-                        for (let id in oldItem.goods) {
-                            if (id == goodsId) {
-                                restCount += oldItem.goods[id].count;
+                        for (let _goodsItem of oldItem.goods) {
+                            if (_goodsItem.goodsId == goodsId) {
+                                restCount += _goodsItem.count;
                             }
                         }
                     }
@@ -410,27 +462,33 @@ export const updateOrder = async ctx => {
                 console.log("换菜");
                 //先删除要替换的菜品
                 //更新要存入缓存的数据
-                delete goodsObject[goodsId];
-                if (goodsObject[newGoodsId]) {
-                    goodsObject[newGoodsId].count += count;
-                    goodsObject[newGoodsId].price = price;
+                // delete goodsObject[goodsId];
+                goodsObject.splice(i, 1);
+                //判断替换后的菜，原数组中是否已经有了
+                let i2 = goodsObject.findIndex(_goodsItem => {
+                    return newGoodsId === _goodsItem.goodsId && tag === _goodsItem.tag;
+                });
+                if (i2 > -1) {
+                    goodsObject[i2].count += count;
+                    goodsObject[i2].price = price;
                 } else {
-                    goodsObject[newGoodsId] = {
+                    goodsObject.push({
+                        goodsId: newGoodsId,
                         count,
                         title,
                         price
-                    }
+                    });
                 }
                 //这里需要判断数据库订单详情表中该订单下其他组别是否还有该商品
                 let restCount = 0;//被替换的菜的剩余数量
                 let totalCount = 0;//替换后的菜的数量
                 for (let oldItem of orderData.goodsArray) {
-                    for (let id in oldItem.goods) {
-                        if (id == goodsId) {
-                            restCount += oldItem.goods[id].count;
-                        } else if (id == newGoodsId) {
+                    for (let _goodsItem of oldItem.goods) {
+                        if (_goodsItem.goodsId == goodsId) {
+                            restCount += _goodsItem.count;
+                        } else if (_goodsItem.goodsId == newGoodsId) {
                             //已经有该新增的菜了
-                            totalCount += oldItem.goods[id].count;
+                            totalCount += _goodsItem.count;
                         }
                     }
                 }
@@ -465,8 +523,8 @@ export const updateOrder = async ctx => {
             //重新计算订单金额
             payment = 0;
             orderData.goodsArray.forEach(obj => {
-                for (let key in obj.goods) {
-                    payment += obj.goods[key].price * obj.goods[key].count
+                for (let _goodsItem of obj.goods) {
+                    payment += _goodsItem.price * _goodsItem.count
                 }
             });
             payment = payment.toFixed(2)
