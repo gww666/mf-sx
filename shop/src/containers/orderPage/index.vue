@@ -6,13 +6,15 @@ import { getCategoryList, getGoodsList } from "./axios";
 import scrollTo from "scrollto-with-animation";
 import cart from "../../components/cart";
 import handle from "../../components/cart/handle";
+import nineSquare from "../../components/nineSquare";
 import goodsOptions from "../../components/goodsOptions";
 import { Toast } from "../../utils/toast";
 
 @Component({
 	cart,
 	handle,
-	goodsOptions
+	goodsOptions,
+	nineSquare
 })
 export default class Order extends Vue {
 	categoryList = [];
@@ -194,6 +196,7 @@ export default class Order extends Vue {
 					</div>
 				</div>
 				<cart />
+				<nineSquare />
 			</div>
 		)
 	};
