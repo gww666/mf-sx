@@ -195,8 +195,8 @@ export default class Order extends Vue {
 						</ul>
 					</div>
 				</div>
-				<cart />
-				<nineSquare />
+					<cart />
+					
 			</div>
 		)
 	};
