@@ -43,9 +43,18 @@ export default {
         goodsCount() {
             if (Object.keys(this.goods).length) {
                 //根据id找到goodsList里对应的count数量
-                let goods = this.$store.state.gw.goodsList.find(item => item.id === this.goods.id && item.tag === this.goods.tag);
-                if (goods) {
-                    return goods.count;
+                let arr = [];
+                let count = 0;
+                this.$store.state.gw.goodsList.forEach(item => {
+                    if(item.id === this.goods.id) {
+                        arr.push(item);
+                    }
+                })
+                if(arr.length) {
+                    arr.forEach(item => {
+                        count += item.count;
+                    })
+                    return count;
                 }
             }
             return 0;

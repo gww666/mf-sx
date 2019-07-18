@@ -183,13 +183,14 @@ export default class DishCategory extends Vue {
                 <a-drawer
                     width={260}
                     placement="right"
+                    title="销量详情"
                     closable={true}
                     onClose={this.onClose}
                     visible={this.drawerVisible}
                 >
                     <div class="drawer-content">
-                        <div style="width: 100%;height: 30px;"></div>
                         <div class="title-list">
+                            <div class="items">商品名称</div>
                             {
                                 this.goodsData.map(item => (
                                     <div class="items">{item.title}</div>
@@ -197,9 +198,10 @@ export default class DishCategory extends Vue {
                             }
                         </div>
                         <div class="count-list">
+                            <div class="items right">销售份数</div>
                             {
                                 this.goodsData.map(item => (
-                                    <div class="items">￥{item.count}</div>
+                                    <div class="items" style="text-align:center;">{item.count}</div>
                                 ))
                             }
                         </div>
@@ -248,7 +250,15 @@ export default class DishCategory extends Vue {
             float: left;
         }
         .items{
-            
+            width: 100%;
+            height: 32px;
+            line-height: 32px;
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;
+        }
+        .right{
+            text-align: right;
         }
     }
 </style>
