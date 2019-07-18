@@ -121,7 +121,7 @@ export default class Order extends Vue {
 	// 抽完了奖
 	received() {
 		console.log("抽完了奖");
-		Toast("恭喜你抽中了吃屎啦");
+		Toast("恭喜你抽中“吃屎啦”一个");
 	};
 	// 关闭九宫格弹窗
 	closePopup() {
@@ -189,7 +189,7 @@ export default class Order extends Vue {
 													:
 													<span></span>
 												}
-												<handle goods={item} mStyle={{width: "1.6rem",marginBottom: "-0.16rem"}} />
+												<handle isOrderPage={true} goods={item} mStyle={{width: "1.6rem",marginBottom: "-0.16rem"}} />
 											</div>
 										</div>
 									</li>

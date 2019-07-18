@@ -20,7 +20,6 @@ export default {
     },
     mutations: {
         addGoods(state, goods) {
-            console.log(state.goodsList, goods, "sddddddddd")
             let isSame = false;
             state.goodsList.forEach(item => {
                 let tempSame = true;
@@ -43,7 +42,10 @@ export default {
                         }else {
                             tempSame = false;
                         }
-                    }else {
+                    } else {
+                        tempSame = false;
+                    }
+                    if(!item.tag && !goods.tag) {
                         tempSame = true;
                     }
                 }else {
@@ -61,7 +63,6 @@ export default {
                     count: 1
                 });
             }
-            console.log(state.goodsList, "sddddddddddddddddd")
             //查找是否已存在菜品
             // let index = state.goodsList.findIndex(item => item.id === goods.id);
             // if (index > -1) {
@@ -76,7 +77,12 @@ export default {
             // }
         },
         reduceGoods(state, goods) {
-            let index = state.goodsList.findIndex(item => item.id === goods.id && item.tag === goods.tag);
+            let index;
+            if(goods.tag) {
+                index = state.goodsList.findIndex(item => item.id === goods.id && item.tag === goods.tag);
+            } else {
+                index = state.goodsList.findIndex(item => item.id === goods.id && !item.tag);
+            }
             if (index === -1) return console.warn("菜品数组中没有该商品");
             if (state.goodsList[index].count === 1) {
                 //数量为1，代表从数组中删除该菜品
