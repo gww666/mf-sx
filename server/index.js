@@ -18,6 +18,8 @@ const public_1 = require("./routers/public");
 const settings_1 = require("./routers/settings");
 const order_1 = require("./routers/order");
 const pay_1 = require("./routers/pay");
+const chart_1 = require("./routers/chart");
+const common_1 = require("./db/model/common");
 // import socketIo from "socket.io";
 const socketIo = require("socket.io");
 const app = new koa();
@@ -32,6 +34,7 @@ app.use((ctx, next) => __awaiter(this, void 0, void 0, function* () {
 app.use(util_1.body());
 //注册各类获取redis缓存中key值的方法
 app.use(util_1.getKeys);
+app.use(common_1.startInterval);
 //挂载路由
 app.use(login_1.default.routes()).use(login_1.default.allowedMethods());
 app.use(goods_1.default.routes()).use(goods_1.default.allowedMethods());
@@ -39,6 +42,7 @@ app.use(settings_1.default.routes()).use(settings_1.default.allowedMethods());
 app.use(public_1.default.routes()).use(public_1.default.allowedMethods());
 app.use(order_1.default.routes()).use(order_1.default.allowedMethods());
 app.use(pay_1.default.routes()).use(pay_1.default.allowedMethods());
+app.use(chart_1.default.routes()).use(chart_1.default.allowedMethods());
 let hostname = "172.18.249.80";
 let port = "2233";
 // console.log("socketIo", socketIo);

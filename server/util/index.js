@@ -36,6 +36,8 @@ exports.body = () => {
 };
 exports.getKeys = (ctx, next) => __awaiter(this, void 0, void 0, function* () {
     ctx.getGoodsDataKey = companyId => "goodsData-" + companyId;
+    ctx.getSaleInfoKey = companyId => "saleInfo-" + companyId;
+    ctx.getOrderListKey = companyId => "orderList-" + companyId;
     yield next();
 });
 //允许跨域
@@ -70,7 +72,7 @@ exports.validateUser = (ctx, next) => __awaiter(this, void 0, void 0, function* 
     }
 });
 //时间戳格式化为yy-mm-dd hh-mm格式
-exports.formatDate = (time) => {
+exports.formatDate = (time, format) => {
     if (typeof time === "string")
         time = Number(time);
     let date = new Date(time);
@@ -79,6 +81,9 @@ exports.formatDate = (time) => {
     let day = date.getDate() > 9 ? date.getDate() : "0" + date.getDate();
     let hour = date.getHours() > 9 ? date.getHours() : "0" + date.getHours();
     let minutes = date.getMinutes() > 9 ? date.getMinutes() : "0" + date.getMinutes();
+    if (format === "yymmdd") {
+        return `${year}-${month}-${day}`;
+    }
     return `${year}-${month}-${day} ${hour}:${minutes}`;
 };
 exports.isNotUndefined = (data) => {

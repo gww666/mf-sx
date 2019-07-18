@@ -15,6 +15,8 @@ const getLastCompany = async ctx => {
 }
 //缓存写入持久化存储
 const saveCache = async ctx => {
+    console.log("开始执行缓存写入数据库任务");
+    
     let mysql = ctx.db;
     let {companyId} = await getLastCompany(ctx);
     let get = promisify(ctx.redis.get).bind(ctx.redis);
@@ -40,36 +42,31 @@ const saveCache = async ctx => {
         //将昨天的营业额写入数据库
         let saleInfoKey = ctx.getSaleInfoKey(i);
         let saleInfo = await get(saleInfoKey);
-        // if (!saleInfo) {
-        //     saleInfo = {
-        //         arr: []
-        //     }
-        // }
-        // //从数据库中查询近七天的营业额数据，放到缓存中
-        // let select_sql = "select year, month, day, money where company_id = ? order by create_date desc limit 0, 7";
-        // let [rows] = await mysql.execute(select_sql, [i, ]);
+        let yestoady = new Date(Date.now() - 1000 * 60 * 60 * 24);
+        let yCreateDate2 = formatDate(yestoady.getTime(), "yymmdd");
+        let [year, month, day] = yCreateDate2.split("-");
+        let date = Date.now();
         if (saleInfo) {
             saleInfo = JSON.parse(saleInfo);
-            let yestoady = new Date(Date.now() - 1000 * 60 * 60 * 24);
-            let yCreateDate2 = formatDate(yestoady.getTime(), "yymmdd");
             let infoItem = saleInfo.arr.find(item => item.createDate2 === yCreateDate2);
             //找到该天的销售额纪录，将其写入数据库
             let money = 0;
             if (infoItem) {
                 money = infoItem.money;
             }
-            let [year, month, day] = yCreateDate2.split("-");
-            let date = Date.now();
             let sql = "insert into turnover(id, year, month, day, money, create_date, company_id) values(?, ?, ?, ?, ?, ?, ?)";
-            await mysql.execute(sql, [null, year, month, day, money, date, ]);
+            await mysql.execute(sql, [null, year, month, day, money, date, companyId]);
+        } else {
+            //没有缓存，营业额就直接存0
+            let sql = "insert into turnover(id, year, month, day, money, create_date, company_id) values(?, ?, ?, ?, ?, ?, ?)";
+            await mysql.execute(sql, [null, year, month, day, 0, date, companyId]);
         }
     }
     
 }
 
-export const startInterval = async ctx => {
+export const startInterval = async (ctx, next) => {
     //从数据库中查询菜品数据做初始化使用
-    
     //持久化存储到mysql数据库中
     // 开启一个定时任务，每天凌晨三点钟更新当天营业额记录和菜品销量纪录
     // 这个定时任务通过一个延时器开启
@@ -88,5 +85,5 @@ export const startInterval = async ctx => {
             saveCache(ctx);
         }, time2);
     }, time);
-
+    await next();
 }
