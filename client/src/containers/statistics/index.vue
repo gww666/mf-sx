@@ -1,11 +1,12 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Modal, Drawer } from "ant-design-vue";
+import { Modal, Drawer, Button } from "ant-design-vue";
 import echarts from 'echarts';
 import { getTurnover, getGoodsData } from "./axios";
 Vue.use(Modal);
 Vue.use(Drawer);
+Vue.use(Button);
 
 @Component
 export default class DishCategory extends Vue {
@@ -38,10 +39,7 @@ export default class DishCategory extends Vue {
         },
         xAxis: {
             type: 'category',
-            data: ['7-01', '7-02', '7-03', '7-04', '7-05', '7-06', '7-07'],
-            // axisTick: {
-            //     alignWithLabel: true
-            // }
+            data: [],
         },
         yAxis: {
             type: 'value',
@@ -49,19 +47,17 @@ export default class DishCategory extends Vue {
                 formatter: '￥{value}'
             }
         },
-        series: [
-            {
-                name: '营业额',
-                data: [820, 932, 901, 934, 1290, 1330, 1320],
-                type: 'line',
-                markPoint: {
-                    data: [
-                        {type: 'max', name: '最大值'},
-                        {type: 'min', name: '最小值'}
-                    ]
-                }
+        series: {
+            name: '营业额',
+            data: [],
+            type: 'line',
+            markPoint: {
+                data: [
+                    {type: 'max', name: '最大值'},
+                    {type: 'min', name: '最小值'}
+                ]
             }
-        ]
+        }
     };
     chart2Option = {
         color: ['#3398DB'],
@@ -77,31 +73,25 @@ export default class DishCategory extends Vue {
         legend: {
             data:['最高销量','最低销量']
         },
-        xAxis : [
-            {
-                type : 'category',
-                // data : ['炒鸡蛋', '炒番茄', '水煮肉', '水煮鱼', '柴火鸡', '大龙虾', '小龙虾', '鸡腿', '鸭腿', '猪脚饭', '炒鸡蛋', '炒番茄', '水煮肉', '水煮鱼', '柴火鸡', '大龙虾', '小龙虾', '鸡腿', '鸭腿', '猪脚饭'],
-                data : [],
-                axisTick: {
-                    alignWithLabel: true
-                }
+        xAxis : {
+            type : 'category',
+            data : [],
+            axisTick: {
+                alignWithLabel: true
             }
-        ],
+        },
         yAxis : {
             type : 'value',
             axisLabel: {
                 formatter: '{value} 份'
             }
         },
-        series : [
-            {
-                name: '销售份数',
-                type: 'bar',
-                barWidth: '60%',
-                // data: [34, 52, 200, 334, 390, 330, 220, 45, 78, 36, 34, 52, 200, 334, 390, 330, 220, 45, 78, 36],
-                data: [],
-            }
-        ]
+        series : {
+            name: '销售份数',
+            type: 'bar',
+            barWidth: '60%',
+            data: [],
+        }
     };
     get userInfo() {
         return this.$store.state.qxz.userInfo;
@@ -124,7 +114,21 @@ export default class DishCategory extends Vue {
         try {
             let res = await getTurnover(this.userInfo.id);
             if(res.data.returnCode === 1) {
-                console.log(res.data, "turnoverRequest")
+                let data = res.data.data[0];
+                if(Array.isArray(data.arr)) {
+                    let dates = [];
+                    let money = [];
+                    this.chart1Option.xAxis.data = [];
+                    this.chart1Option.series.data = [];
+                    data.arr.forEach(item => {
+                        dates.push(item.createDate2);
+                        money.push(item.money);
+                    })
+                    this.chart1Option.xAxis.data = dates;
+                    this.chart1Option.series.data = money;
+                    console.log(this.chart1Option, "ssssssssssss")
+                }
+                this.drawCharts();
             }
         }catch(err) {
             console.log("获取营业额统计数据err:", err)
@@ -136,8 +140,8 @@ export default class DishCategory extends Vue {
             let res = await getGoodsData(this.userInfo.id);
             if(res.data.returnCode === 1) {
                 let data = res.data.data[0];
-                this.chart2Option.xAxis[0].data = [];
-                this.chart2Option.series[0].data = [];
+                this.chart2Option.xAxis.data = [];
+                this.chart2Option.series.data = [];
                 let goodsData = [];
                 for(let key in data) {
                     if(key != "merge") {
@@ -153,8 +157,8 @@ export default class DishCategory extends Vue {
                 this.goodsData = goodsData;
                 // 前十个在表格中展示
                 for(let i = 0;i < goodsData.length;i++) {
-                    this.chart2Option.series[0].data.push(goodsData[i].count);
-                    this.chart2Option.xAxis[0].data.push(goodsData[i].title);
+                    this.chart2Option.series.data.push(goodsData[i].count);
+                    this.chart2Option.xAxis.data.push(goodsData[i].title);
                     if(i > 9) break;
                 };
                 this.drawCharts();
@@ -175,11 +179,14 @@ export default class DishCategory extends Vue {
                         <p class="addBtn"></p>
                     </p>
                 </div>
+                
                 <div ref="myChart1" class="charts"></div>
-                <div class="toolBox" onClick={this.switchChart}>
-                    详情
+                <div style="position: relative;">
+                    <Button type="primary" class="toolBox" onClick={this.switchChart}>
+                        详情
+                    </Button>
+                    <div ref="myChart2" class="charts"></div>
                 </div>
-                <div ref="myChart2" class="charts"></div>
                 <a-drawer
                     width={260}
                     placement="right"
@@ -236,6 +243,13 @@ export default class DishCategory extends Vue {
     .charts{
         width: 100%;
         height: 390px;
+    }
+    .toolBox{
+        width: 70px;
+        position: absolute;
+        top: -5px;
+        right: 40px;
+        z-index: 1;
     }
     .drawer-content{
         width: 100%;
