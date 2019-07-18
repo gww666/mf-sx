@@ -21,6 +21,7 @@ export default class Order extends Vue {
 	goodsList = [];
 	currentCategory = "";
 	defaultPic = require("../../assets/images/noPic.jpg");
+	showNineSquare = false;
 	get selectedGoodsList () {
 		return this.$store.state.gw.goodsList;
 	};
@@ -115,15 +116,17 @@ export default class Order extends Vue {
 	};
 	// 跳转详情
 	goDetail(item) {
-		// Toast("你是真的操作成功了啊，小伙子！")
-		// Toast({
-		// 	message: "你是真的操作成功了啊，伙子小！",
-		// 	duration: 1500,
-		// 	type: "default"
-		// });
-		// return
 		this.$router.push({name: "detail", params: {info: item}});
 	};
+	// 抽完了奖
+	received() {
+		console.log("抽完了奖");
+		Toast("恭喜你抽中了吃屎啦");
+	};
+	// 关闭九宫格弹窗
+	closePopup() {
+		this.showNineSquare = false;
+	}
 	handleUlScroll(e) {
 		let length = this.categoryList.length;
 		let catLiHeight = document.querySelector(".category-name").offsetHeight;
@@ -195,8 +198,14 @@ export default class Order extends Vue {
 						</ul>
 					</div>
 				</div>
-					<cart />
-					
+				<cart />
+				{
+					this.showNineSquare
+					?
+					<nineSquare onReceived={this.received} onClose={this.closePopup} />
+					:
+					<div></div>
+				}
 			</div>
 		)
 	};

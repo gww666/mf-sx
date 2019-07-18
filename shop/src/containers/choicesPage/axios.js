@@ -5,7 +5,10 @@ import { getFormateDate } from "../../utils/getFormateDate";
 export const getSettings = () => {
     let options = {
         url: `/api/getSettings?companyId=${1}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
@@ -14,7 +17,10 @@ export const getOrder = (companyId, tableNo, date) => {
     let options = {
         url: `/api/getOrder?companyId=${companyId}&tableNo=${tableNo}&createDate2=${getFormateDate(date)}`,
         // url: `/api/getOrder?companyId=${companyId}&tableNo=${tableNo}&createDate2=2019-06-21`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };

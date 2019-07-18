@@ -4,7 +4,10 @@ import _axios from "../../utils/_axios";
 export const getOrderDetail = orderNo => {
     let options = {
         url: `/api/getOrderDetail?orderNo=${orderNo}`,
-        method: "GET"
+        method: "GET",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        }
     };
     return _axios(options);
 };
@@ -13,6 +16,9 @@ export const doPay = data => {
     let options = {
         url: `/api/pay`,
         method: "POST",
+        headers: {
+            "Content-Type": 'application/json', "Accept": 'application/json'
+        },
         data: JSON.stringify(data)
     };
     return _axios(options);

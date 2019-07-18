@@ -1,13 +1,18 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Modal } from "ant-design-vue";
+import { Modal, Drawer } from "ant-design-vue";
 import echarts from 'echarts';
+import { getTurnover, getGoodsData } from "./axios";
 Vue.use(Modal);
+Vue.use(Drawer);
 
 @Component
 export default class DishCategory extends Vue {
     switchFlag = true;
+    drawerVisible = false;
+    turnover = [];
+    goodsData = [];
     chart1Option = {
         color: ['#3398DB'],
         title: {
@@ -75,7 +80,8 @@ export default class DishCategory extends Vue {
         xAxis : [
             {
                 type : 'category',
-                data : ['炒鸡蛋', '炒番茄', '水煮肉', '水煮鱼', '柴火鸡', '大龙虾', '小龙虾', '鸡腿', '鸭腿', '猪脚饭', '炒鸡蛋', '炒番茄', '水煮肉', '水煮鱼', '柴火鸡', '大龙虾', '小龙虾', '鸡腿', '鸭腿', '猪脚饭'],
+                // data : ['炒鸡蛋', '炒番茄', '水煮肉', '水煮鱼', '柴火鸡', '大龙虾', '小龙虾', '鸡腿', '鸭腿', '猪脚饭', '炒鸡蛋', '炒番茄', '水煮肉', '水煮鱼', '柴火鸡', '大龙虾', '小龙虾', '鸡腿', '鸭腿', '猪脚饭'],
+                data : [],
                 axisTick: {
                     alignWithLabel: true
                 }
@@ -92,15 +98,13 @@ export default class DishCategory extends Vue {
                 name: '销售份数',
                 type: 'bar',
                 barWidth: '60%',
-                data: [34, 52, 200, 334, 390, 330, 220, 45, 78, 36, 34, 52, 200, 334, 390, 330, 220, 45, 78, 36],
-                // markPoint: {
-                //     data: [
-                //         {type: 'max', name: '最大值'},
-                //         {type: 'min', name: '最小值'}
-                //     ]
-                // }
+                // data: [34, 52, 200, 334, 390, 330, 220, 45, 78, 36, 34, 52, 200, 334, 390, 330, 220, 45, 78, 36],
+                data: [],
             }
         ]
+    };
+    get userInfo() {
+        return this.$store.state.qxz.userInfo;
     };
     drawCharts() {
         let myChart1 = echarts.init(this.$refs.myChart1);
@@ -113,14 +117,55 @@ export default class DishCategory extends Vue {
         myChart2.setOption(this.chart2Option);
     };
     switchChart() {
-        this.switchFlag = !this.switchFlag;
-        if(this.switchFlag) {
-            this.$refs.myChart2.style.display = "block";
-            this.$refs.dataTable.style.display = "none";
-        } else {
-            this.$refs.myChart2.style.display = "none";
-            this.$refs.dataTable.style.display = "block";
+        this.drawerVisible = true;
+    };
+    // 获取营业额统计数据
+    async turnoverRequest() {
+        try {
+            let res = await getTurnover(this.userInfo.id);
+            if(res.data.returnCode === 1) {
+                console.log(res.data, "turnoverRequest")
+            }
+        }catch(err) {
+            console.log("获取营业额统计数据err:", err)
         }
+    };
+    // 获取菜品统计数据
+    async goodsDataRequest() {
+        try {
+            let res = await getGoodsData(this.userInfo.id);
+            if(res.data.returnCode === 1) {
+                let data = res.data.data[0];
+                this.chart2Option.xAxis[0].data = [];
+                this.chart2Option.series[0].data = [];
+                let goodsData = [];
+                for(let key in data) {
+                    if(key != "merge") {
+                        let obj = {
+                            goodsId: key,
+                            ...data[key]
+                        }
+                        goodsData.push(obj);
+                    }
+                }
+                // 降序排列
+                goodsData = goodsData.sort((a, b) => {return b.count - a.count});
+                this.goodsData = goodsData;
+                // 前十个在表格中展示
+                for(let i = 0;i < goodsData.length;i++) {
+                    this.chart2Option.series[0].data.push(goodsData[i].count);
+                    this.chart2Option.xAxis[0].data.push(goodsData[i].title);
+                    if(i > 9) break;
+                };
+                this.drawCharts();
+            }
+        }catch(err) {
+            console.log("获取菜品统计数据err:", err)
+        }
+    };
+    // 关闭drawer
+    onClose() {
+        this.drawerVisible = false;
     };
 	render() {
 		return (
@@ -135,13 +180,37 @@ export default class DishCategory extends Vue {
                     详情
                 </div>
                 <div ref="myChart2" class="charts"></div>
-                <div ref="dataTable" class="charts" style="display: none;">
-                    
-                </div>
+                <a-drawer
+                    width={260}
+                    placement="right"
+                    closable={true}
+                    onClose={this.onClose}
+                    visible={this.drawerVisible}
+                >
+                    <div class="drawer-content">
+                        <div style="width: 100%;height: 30px;"></div>
+                        <div class="title-list">
+                            {
+                                this.goodsData.map(item => (
+                                    <div class="items">{item.title}</div>
+                                ))
+                            }
+                        </div>
+                        <div class="count-list">
+                            {
+                                this.goodsData.map(item => (
+                                    <div class="items">￥{item.count}</div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                </a-drawer>
             </div>
 		);
     };
     mounted() {
+        this.turnoverRequest();
+        this.goodsDataRequest();
         this.drawCharts();
     };
 }
@@ -165,5 +234,21 @@ export default class DishCategory extends Vue {
     .charts{
         width: 100%;
         height: 390px;
+    }
+    .drawer-content{
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        .title-list{
+            width: 70%;
+            float: left;
+        }
+        .count-list{
+            width: 30%;
+            float: left;
+        }
+        .items{
+            
+        }
     }
 </style>

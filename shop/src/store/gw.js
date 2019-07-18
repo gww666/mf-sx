@@ -24,23 +24,27 @@ export default {
             let isSame = false;
             state.goodsList.forEach(item => {
                 let tempSame = true;
-                if(item.id === goods.id && item.tag && goods.tag) {
-                    let arr1 = item.tag.split(",");
-                    let arr2 = goods.tag.split(",");
-                    if(arr1.length === arr2.length) {
-                        arr1.forEach(ele => {
-                            let tagSame = false;
-                            arr2.forEach(element => {
-                                if(ele === element) {
-                                    tagSame = true;
+                if(item.id === goods.id) {
+                    if(item.tag && goods.tag) {
+                        let arr1 = item.tag.split(",");
+                        let arr2 = goods.tag.split(",");
+                        if(arr1.length === arr2.length) {
+                            arr1.forEach(ele => {
+                                let tagSame = false;
+                                arr2.forEach(element => {
+                                    if(ele === element) {
+                                        tagSame = true;
+                                    }
+                                })
+                                if(!tagSame) {
+                                    tempSame = false;
                                 }
                             })
-                            if(!tagSame) {
-                                tempSame = false;
-                            }
-                        })
+                        }else {
+                            tempSame = false;
+                        }
                     }else {
-                        tempSame = false;
+                        tempSame = true;
                     }
                 }else {
                     tempSame = false;

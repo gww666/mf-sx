@@ -1,24 +1,23 @@
 import _axios from "../../utils/_axios";
-
-// 获取分类列表
-export const getCategoryList = companyId => {
+// 获取营业额统计数据
+export const getTurnover = companyId => {
     let options = {
-        url: `/api/categoryList?companyId=${companyId}`,
+        url: `/api/getTurnover?companyId=${companyId}`,
         method: "GET",
         headers: {
             "Content-Type": 'application/json', "Accept": 'application/json'
         }
     };
     return _axios(options);
-};
-// 获取商品列表
-export const getGoodsList = companyId => {
+}
+// 获取菜品统计数据
+export const getGoodsData = companyId => {
     let options = {
-        url: `/api/goodsList?companyId=${companyId}`,
+        url: `/api/getGoodsData?companyId=${companyId}`,
         method: "GET",
         headers: {
             "Content-Type": 'application/json', "Accept": 'application/json'
         }
     };
     return _axios(options);
-};
+}
