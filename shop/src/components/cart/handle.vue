@@ -31,6 +31,10 @@ export default {
         fromCart: {
             type: Boolean,
             default: false
+        },
+        isOrderPage: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -47,7 +51,12 @@ export default {
                 let count = 0;
                 this.$store.state.gw.goodsList.forEach(item => {
                     if(item.id === this.goods.id) {
-                        arr.push(item);
+                        if(this.isOrderPage) {
+                            arr.push(item);
+                        } else {
+                            if(!item.tag && !this.goods.tag) arr.push(item);
+                            if(item.tag && item.tag === this.goods.tag) arr.push(item);
+                        }
                     }
                 })
                 if(arr.length) {
@@ -62,8 +71,6 @@ export default {
     },
     methods: {
         addGoods() {
-            // this.$store.commit("gw/addGoods", this.goods);
-            // this.goodsCount += 1;
             if(this.fromCart) {
                 this.$store.commit("gw/addGoods", this.goods);
                 return;
@@ -77,7 +84,6 @@ export default {
         },
         reduceGoods() {
             this.$store.commit("gw/reduceGoods", this.goods);
-            // this.goodsCount -= 1;
             this.$emit("reduce");
         },
 
@@ -93,7 +99,6 @@ export default {
             if(!choosed) {
                 this.choosedTag.push(item);
             }
-            console.log(this.choosedTag)
         },
         isSelected(item) {
             let choosed = false;

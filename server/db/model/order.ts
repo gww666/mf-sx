@@ -142,9 +142,6 @@ export const getOrderFromRedis = async (ctx, params: handleRedisOrderParams) => 
     return isNotUndefined(orderNo) ? JSON.parse(orderList)[orderNo] : JSON.parse(orderList);
 }
 
-const updateOrderFromRedis = async (ctx) => {
-
-}
 //生成订单号
 const generateOrderNo = async (ctx, {companyId}) => {
     //拿到年月日时分，例如：201910231232
@@ -189,7 +186,7 @@ export const insertOrder = async ctx => {
         // goods: {},
         goods: [],
         createDate: 0,
-        payment: 0,
+        payment: "0.00",
         updateDate: 0,
         tableNo
     };
@@ -229,18 +226,19 @@ export const insertOrder = async ctx => {
     //生成订单记录
     let date = Date.now();
     let createDate2 = formatDate(date).split(" ")[0];
+    let paymentValue = payment.toFixed(2);
     //补充order对象
     order.createDate = date;
     order.updateDate = date;
-    order.payment = payment;
+    order.payment = paymentValue;
     //存入redis中
     insertOrderToRedis(ctx, {companyId, order});
     let sql = `insert into m_order(id, order_no, company_id, food_type, payment, table_no, status, create_date, create_date2, update_date, payment_date) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    await mysql.execute(sql, [null, orderNo, companyId, foodType, payment, tableNo, 1, date, createDate2, date, null]);
+    await mysql.execute(sql, [null, orderNo, companyId, foodType, paymentValue, tableNo, 1, date, createDate2, date, null]);
     return {
         orderNo,
         tableNo,
-        payment,
+        payment: paymentValue,
         companyId,
         foodType,
         createDate2,

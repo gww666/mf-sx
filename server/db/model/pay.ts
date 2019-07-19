@@ -15,12 +15,17 @@ const updateRedisSaleInfo = async (ctx, {orderList}) => {
     let saleInfoKey = ctx.getSaleInfoKey(companyId);
     let goodsDataKey = ctx.getGoodsDataKey(companyId);
     let info = await get(saleInfoKey);
+    // console.log("从redis中获取的缓存", info);
+    
     let goodsData = await get(goodsDataKey);
     if (!info) {
+        // console.log("没有缓存，新建一个对象");
+        
         info = {
+            merge: false,
             arr: [
                 {
-                    createDate2: formatDate(Date.now()),
+                    createDate2: formatDate(Date.now(), "yymmdd"),
                     money: ""
                 }
             ]
@@ -30,19 +35,21 @@ const updateRedisSaleInfo = async (ctx, {orderList}) => {
     }
     let createDate2 = formatDate(Date.now(), "yymmdd");
     let index = info.arr.findIndex(item => item.createDate2 === createDate2);
+    // console.log("index", index);
     if (index > -1) {
         //直接修改
         info.arr[index].money = (Number(info.arr[index].money) + Number(orderList[orderNo].baseInfo.payment)).toFixed(2)
+        // console.log("价格", info.arr[index].money);
     } else {
         //向数组末尾推入一个新的元素
         if (info.arr.length > 7) {
             //删除开头的元素
             info.arr.shift();
-            info.arr.push({
-                createDate2: formatDate(Date.now()),
-                money: orderList[orderNo].baseInfo.payment
-            });
         }
+        info.arr.push({
+            createDate2: formatDate(Date.now(), "yymmdd"),
+            money: Number(orderList[orderNo].baseInfo.payment).toFixed(2)
+        });
     }
 
     if (!goodsData) {
@@ -58,18 +65,18 @@ const updateRedisSaleInfo = async (ctx, {orderList}) => {
     goodsArray.forEach(item => {
         for (let goodsItem of item.goods) {
             // goodsData[goodsItem.id] = goodsData[goodsItem.id] ? 
-            if (goodsData[goodsItem.id]) {
-                goodsData[goodsItem.id].count += goodsItem.count;
+            if (goodsData[goodsItem.goodsId]) {
+                goodsData[goodsItem.goodsId].count += goodsItem.count;
             } else {
-                goodsData[goodsItem.id] = {
+                goodsData[goodsItem.goodsId] = {
                     count: goodsItem.count,
                     title: goodsItem.title
                 }
             }
         }
     });
-    ctx.redis.set(saleInfoKey, JSON.stringify(orderList));
-    ctx.redis.set(goodsDataKey, JSON.stringify(orderList));
+    ctx.redis.set(saleInfoKey, JSON.stringify(info));
+    ctx.redis.set(goodsDataKey, JSON.stringify(goodsData));
 
 }
 export const updateOrderInfo = async ctx => {
@@ -97,7 +104,7 @@ export const updateOrderInfo = async ctx => {
         let _io = global["mIo"];
         _io.in(`room-${companyId}`).emit("orderChange", JSON.stringify(orderList));
         let result = await mysql.query("COMMIT");
-        console.log("事务操作", result);
+        // console.log("事务操作", result);
     } catch (err) {
         console.log("err-执行回滚操作", err);
         await mysql.query("ROLLBACK");

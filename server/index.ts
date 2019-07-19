@@ -8,6 +8,8 @@ import publicRouter from "./routers/public";
 import settingsRouter from "./routers/settings";
 import orderRouter from "./routers/order";
 import payRouter from "./routers/pay";
+import chartRouter from "./routers/chart";
+import {startInterval} from "./db/model/common";
 // import socketIo from "socket.io";
 import socketIo = require("socket.io");
 
@@ -24,6 +26,8 @@ app.use(body());
 //注册各类获取redis缓存中key值的方法
 app.use(getKeys);
 
+app.use(startInterval);
+
 //挂载路由
 app.use(login.routes()).use(login.allowedMethods());
 app.use(goods.routes()).use(goods.allowedMethods());
@@ -31,6 +35,7 @@ app.use(settingsRouter.routes()).use(settingsRouter.allowedMethods());
 app.use(publicRouter.routes()).use(publicRouter.allowedMethods());
 app.use(orderRouter.routes()).use(orderRouter.allowedMethods());
 app.use(payRouter.routes()).use(payRouter.allowedMethods());
+app.use(chartRouter.routes()).use(chartRouter.allowedMethods());
 let hostname = "172.18.249.80";
 let port = "2233";
 // console.log("socketIo", socketIo);
