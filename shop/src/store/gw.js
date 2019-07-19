@@ -20,7 +20,7 @@ export default {
     },
     mutations: {
         addGoods(state, goods) {
-            console.log(state.goodsList, goods, "sddddddddd")
+            // console.log(state.goodsList, goods, "sddddddddd")
             let isSame = false;
             state.goodsList.forEach(item => {
                 let tempSame = true;

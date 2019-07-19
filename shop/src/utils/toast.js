@@ -1,7 +1,7 @@
 let toastDiv;
 let timer = null;
 export const Toast = (options) => {
-    let container = document.querySelector(".project-container");
+    let container = document.body;
     if (container.querySelector(".toast-box")) {
 		container.removeChild(container.querySelector(".toast-box"));
 		clearTimeout(timer);
