@@ -30,7 +30,7 @@ export default {
             userInfo: {
                 phone: "12345678901",
                 id: "12132",
-                name: "gay齐"
+                name: "gay郭"
             }
         }
     },
