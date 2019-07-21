@@ -69,7 +69,7 @@ export default class Order extends Vue {
 		return (
 			this.showPage
 			?
-			<div>
+			<div class="page-container">
 				<div class="tip">您有正在进行中的订单</div>
 				<div class="choices-container">
 					<div class="choices" onClick={this.goOrderPage}>我要加菜</div>
@@ -96,6 +96,11 @@ export default class Order extends Vue {
 		text-align: center;
 		padding-top: 2rem;
 		color: rgba(0, 0, 0, 0.65);
+	}
+	.page-container{
+		width: 100%;
+		height: 100%;
+		background: #FFF;
 	}
 	.choices-container{
         font-size: .16rem;

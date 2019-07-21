@@ -43,7 +43,9 @@ export default class CheckOrderDetail extends Vue {
 		return (
             <div class="order-container">
                 <div class="page-title">
-                    <div class="go-back" onClick={this.goBack}>{'‹'}</div>
+                    <div class="go-back" onClick={this.goBack}>
+                        <span class="iconfont icon-left"></span>
+                    </div>
                     订单详情
                 </div>
                 <div class="ul-title">
@@ -121,7 +123,7 @@ export default class CheckOrderDetail extends Vue {
         height: 100%;
         width: 1rem;
         font-size: .8rem;
-        line-height: .7rem;
+        line-height: .5rem;
         position: absolute;
         left: 0;
         top: 0;

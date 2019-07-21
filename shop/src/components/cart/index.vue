@@ -148,7 +148,7 @@ export default {
     background: #fff;
     display: flex;
     position: relative;
-
+    box-shadow:0px 2px 14px 0px rgba(0, 0, 0, 0.1);
     .left {
         flex: 1;
         height: 100%;

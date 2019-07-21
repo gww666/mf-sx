@@ -1,17 +1,25 @@
 <template>
     <div class="handle-box" :style="mStyle">
-        <span class="reduce" v-show="goodsCount" @click="reduceGoods">-</span>
+        <span class="reduce" v-show="goodsCount" @click="reduceGoods">―</span>
         <span class="goods-count" v-show="goodsCount">{{goodsCount}}</span>
-        <span class="add" @click="addGoods">+</span>
+        <span class="add" @click="addGoods">＋</span>
 
-        <div class="options-shadow" v-if="visible">
+        <div class="options-shadow" @click.self="close" v-if="visible">
             <div class="options-box">
-                <div class="options-title">{{goods.title}}<p class="close-btn" @click="close">×</p></div>
+                <div class="options-title">
+                    <div class="thumbnail-box">
+                        <img :src="goods.thumbnail ? `http://120.78.221.14:2233${goods.thumbnail}` : defaultPic">
+                    </div>
+                    <p>{{goods.title}}</p>
+                    <p class="sub-title">{{goods.subTitle}}</p>
+                    <!-- <p class="close-btn" >×</p> -->
+                </div>
                 <div class="options-zone">
+                    <div class="tag-title">偏好<span>（可多选）</span></div>
                     <div :class="isSelected(item) ? 'options choosen' : 'options'" v-for="item in goods.tag.split(',')" :key="item" @click="tagClick(item)">{{item}}</div>
                 </div>
                 <div class="opertion-bar">
-                    <p class="price-zone">￥{{goods.price}}</p><p class="addToCart" @click="addToCart">加入购物车</p>
+                    <p class="price-zone">￥{{goods.price}}</p><p class="addToCart" @click="addToCart">选好了</p>
                 </div>
             </div>
         </div>
@@ -40,11 +48,13 @@ export default {
     data() {
         return {
             visible: false,
+            defaultPic: require("../../assets/images/noPic.jpg"),
             choosedTag: []
         }
     },
     computed: {
         goodsCount() {
+            console.log(this.goods, "ddddddddddddddfdfdf");
             if (Object.keys(this.goods).length) {
                 //根据id找到goodsList里对应的count数量
                 let arr = [];
@@ -153,8 +163,8 @@ export default {
     }
     .add {
         box-sizing: border-box;
-        width: 0.52rem;
-        height: 0.52rem;
+        width: 0.5rem;
+        height: 0.5rem;
         border-radius: 50%;
         background: #ff4d4d;
         color: #fff;
@@ -170,7 +180,6 @@ export default {
         text-align: center;
         
     }
-
     .options-shadow{
         width: 100%;
         height: 100%;
@@ -178,12 +187,11 @@ export default {
         top: 0;
         left: 0;
         z-index: 3;
-        background: rgba($color: #000000, $alpha: .2)
+        background: rgba($color: #000000, $alpha: .6)
     }
     .options-box {
         width: 100%;
         height: 8rem;
-        border-radius: .4rem .4rem 0 0;
         background: #FFF;
         position: absolute;
         left: 0;
@@ -217,9 +225,17 @@ export default {
     }
     .options-zone{
         width: 100%;
-        height: 6.24rem;
+        height: 5.73rem;
         box-sizing: border-box;
         padding: .3rem;
+        .tag-title{
+            margin-bottom: 0.3rem;
+            font-size: 0.3rem;
+            margin-left: 0.2rem;
+            span{
+                color: #c44f6c;
+            }
+        }
     }
     .close-btn{
         font-size: .6rem;
@@ -234,13 +250,42 @@ export default {
     }
     .options-title{
         width: 100%;
-        height: .88rem;
+        height: 1.4rem;
         text-align: center;
-        line-height: .88rem;
-        font-weight: bold;
-        font-size: .32rem;
+        line-height: 0.7rem;
+        // font-weight: bold;
+        font-size: .3rem;
         position: relative;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+        color: #3b3b3b;
+        border-bottom: 1px solid #eaeaea;
+        .thumbnail-box{
+            width: 1.8rem;
+            height: 1.8rem;
+            border-radius: 0.2rem;
+            overflow: hidden;
+            border: 1px solid #FFF;
+            position: absolute;
+            left: 0.4rem;
+            top: -0.6rem;
+            img{
+                width: 100%;
+                height: 100%;
+            }
+        }
+        p{
+            width: 60%;
+            height: 46%;
+            margin-left: 2.4rem;
+            text-align: left;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            color: #333333;
+        }
+        .sub-title{
+            font-size: 0.26rem;
+            color: rgba(0, 0, 0, 0.65);
+        }
     }
     .options{
         min-width: 1.4rem;
@@ -249,12 +294,12 @@ export default {
         float: left;
         border-radius: .2rem;
         margin: 0 .2rem;
+        background: #f8f6f7;
         border: 1px solid transparent;
     }
     .choosen{
         border-color: #E8A06F;
         background: #FEEBDA;
-
     }
 }
 </style>

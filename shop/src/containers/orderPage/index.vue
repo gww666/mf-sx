@@ -168,7 +168,9 @@ export default class Order extends Vue {
 									item.isCategory
 									?
 									<li class="category-name">
-										{item.name}
+										<div></div>
+										<p>{item.name}</p>
+										<div></div>
 									</li>
 									:
 									<li class="goods-item">
@@ -246,12 +248,22 @@ export default class Order extends Vue {
 				min-height: 1rem;
 				display: flex;
 				align-items: center;
-				padding: 0 .24rem;
+				padding: 0 .2rem;
 				box-sizing: border-box;
 				position: relative;
+				font-size: 0.28rem;
 			}
 			.choosen-class{
 				background: #fff;
+				position: relative;
+				&:after{
+					content: '';
+					width: 0.07rem;
+					background: #FF6427;
+					height: 0.36rem;
+					position: absolute;
+					left: 0;
+				}
 			}
 		}
 	}
@@ -266,8 +278,8 @@ export default class Order extends Vue {
 		line-height: .3rem;
 		font-size: .1rem;
 		color: #FFF;
-		right: .16rem;
-		top: .16rem;
+		right: .1rem;
+		top: .1rem;
 	}
 	.list-right{
 		width: 78%;
@@ -292,14 +304,26 @@ export default class Order extends Vue {
 	}
 	.category-name{
 		width: 100%;
-		height: .7rem;
-		line-height: .7rem;
+		height: 1rem;
+		line-height: 1rem;
 		box-sizing: border-box;
-		font-size: .26rem;
+		font-size: .28rem;
 		font-weight: bold;
 		padding: 0 2%;
 		background: #FFF;
 		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #333333;
+		div{
+			width: 0.4rem;
+			height: 1px;
+			background: #E3E3E3;
+		}
+		p{
+			margin: 0 0.12rem;
+		}
 		// border-top: 1px solid #f2f2f2;
 		// border-bottom: 1px solid #f2f2f2;
 	}
