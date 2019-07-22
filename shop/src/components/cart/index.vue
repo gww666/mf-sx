@@ -3,7 +3,7 @@
         <div class="left">
             <div class="cart-o-circle" @click="showGoodsList">
                 <span class="cart-i-circle">
-                    <span class="iconfont icon-cart"></span>
+                    <span class="iconfont icon-cart" :style="{color: cartCount ? '#ff4d4d' : '#FFF'}"></span>
                     <!-- 数量 -->
                     <span class="cart-count">{{cartCount}}</span>
                 </span>
@@ -155,7 +155,6 @@ export default {
         background: #f2f2f2;
         display: flex;
         align-items: center;
-
         .cart-o-circle {
             width: 1rem;
             height: 1rem;
@@ -181,6 +180,7 @@ export default {
 
                 .iconfont {
                     font-size: 0.4rem;
+                    font-weight: bold;
                     color: #999999;
                 }
 

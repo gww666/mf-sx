@@ -48,30 +48,32 @@ export default class CheckOrderDetail extends Vue {
                     </div>
                     订单详情
                 </div>
-                <div class="ul-title">
-                    已点菜品：
-                </div>
-                <ul class="content-ul">
-                    {
-                        this.goodsList.map(item => (
-                            <li class="goods-item">
-                                <div class="content">
-                                    <p class="title">{item.goodsTitle}</p>
-                                    <p class="count"><span>×{item.goodsCount}</span></p>
-                                    <p class="price">￥{item.goodsPrice}</p>
-                                </div>
-                            </li>
-                        ))
-                    }
-                    <li class="order-infos">
+                <div class="mid-content">
+                    <div class="ul-title">
+                        已点菜品：
+                    </div>
+                    <ul class="content-ul">
+                        {
+                            this.goodsList.map(item => (
+                                <li class="goods-item">
+                                    <div class="content">
+                                        <p class="title">{item.goodsTitle}</p>
+                                        <p class="count"><span>×{item.goodsCount}</span></p>
+                                        <p class="price">￥{item.goodsPrice}</p>
+                                    </div>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                    <div class="split-line"></div>
+                    <div class="order-infos">
                         <p class="info-title">订单信息：</p>
                         <p><span>订单号：</span><span>{this.unfinishedOrder.orderNo}</span></p>
                         <p><span>下单时间：</span><span>{this.unfinishedOrder.createDate ? formatDateTime(Number(this.unfinishedOrder.createDate)) : ""}</span></p>
-                    </li>
-                </ul>
-                
+                    </div>
+                </div>
                 <div class="payment-infos">
-                    <p style="margin-right: .2rem;"><span>需要支付：</span><span>￥{this.payment}</span></p>
+                    <p><span>共需支付：</span><span class="sum">￥ {this.payment}</span></p>
                     <div class="payment-btn" onClick={this.goPayment}>去结算</div>
                 </div>
 			</div>
@@ -111,13 +113,13 @@ export default class CheckOrderDetail extends Vue {
         width: 100%;
         height: .88rem;
         text-align: center;
-        line-height: .8rem;
-        font-size: 0.4rem;
-        color: #666;
+        line-height: .88rem;
+        font-size: 0.34rem;
+        color: #333;
         background: #FFF;
-        border-bottom: 1px solid #e6e6e6;
+        border-bottom: 1px solid #E7E7E7;
         position: relative;
-        // background: linear-gradient(90deg, #0af, #0085ff);
+        // background: linear-gradient(90deg, #ED323D, #FF5B65);
     }
     .go-back{
         height: 100%;
@@ -129,13 +131,19 @@ export default class CheckOrderDetail extends Vue {
         top: 0;
     }
     .ul-title{
-        font-size: .3rem;
-        color: #333;
+        font-size: .28rem;
+        height: 0.9rem;
+        line-height: 0.9rem;
+        color: #333333;
         box-sizing: border-box;
-        padding: .2rem 5%;
+        width: 92%;
+        margin: 0 auto;
+        border-bottom: 1px solid #E7E7E7;
+    }
+    .mid-content{
+        flex: 1;
     }
     .content-ul{
-        flex: 1;
         overflow-y: scroll;
         width: 100%;
         box-sizing: border-box;
@@ -154,13 +162,14 @@ export default class CheckOrderDetail extends Vue {
 		justify-content: space-between;
     }
 	.content{
+        font-size: 0.24rem;
 		width: 100%;
 		height: 100%;
 		box-sizing: border-box;
-		padding: .24rem 0;
+		padding: .26rem 0;
 		display: flex;
         justify-content: space-between;
-        color: #333;
+        color: #333333;
 	}
 	.title{
 		flex: 1;
@@ -179,31 +188,43 @@ export default class CheckOrderDetail extends Vue {
 		color: rgba(0, 0, 0, 0.65);
 	}
 	.price{
-        width: 1.8rem;
+        width: 1.3rem;
         text-align: right;
 		font-size: .26rem;
     }
     .count{
+        color: #999999;
         width: .8rem;
         font-size: .24rem;
         text-align: right;
     }
-    .order-infos{
+    .split-line{
         width: 100%;
+        height: 0.2rem;
+        background: #EEEEEE;
+    }
+    .order-infos{
+        margin: 0 auto;
+        width: 92%;
         height: 2rem;
         box-sizing: border-box;
-        // padding: .2rem 5%;
         color: #6e6e6e;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
         .info-title{
+            height: 0.94rem;
+            line-height: 0.94rem;
             font-size: .3rem;
             color: #333;
+            border-bottom: 1px solid #E7E7E7;
         }
         p{
+            height: 0.85rem;
+            line-height: 0.85rem;
             font-size: .28rem;
+            border-bottom: 1px solid #E7E7E7;
         }
+    }
+    .sum{
+        color: #EC313C;
     }
     .payment-infos{
         width: 100%;
@@ -218,6 +239,11 @@ export default class CheckOrderDetail extends Vue {
         justify-content: flex-end;
         box-sizing: border-box;
         border-top: 1px solid #e6e6e6;
+        p{
+            text-align: left;
+            width: 100%;
+            padding-left: 2%;
+        }
     }
     .payment-btn{
         color: #FFF;
