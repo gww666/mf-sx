@@ -14,6 +14,7 @@
             </div>
         </div>
         <!-- cell -->
+        <cell icon="qianyue" iconColor="rgb(239, 173, 7)" text="签约" @click="qianyue"></cell>
         <cell icon="xingzhuang" iconColor="rgb(239, 173, 7)" text="我的客户" @click="detail"></cell>
         <cell icon="shouyi" iconColor="rgb(245, 58, 61)" text="我的收益" @click="settings"></cell>
         <cell icon="mingpian" iconColor="rgb(6, 95, 218)" text="我的名片" @click="detail"></cell>
@@ -30,11 +31,14 @@ export default {
             userInfo: {
                 phone: "12345678901",
                 id: "12132",
-                name: "gay郭"
+                name: "gay齐"
             }
         }
     },
     methods: {
+        qianyue() {
+            this.$router.push("/add");
+        },
         detail() {
             //跳转到申请记录页面
             console.log("跳转到申请记录页面");

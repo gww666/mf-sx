@@ -10,7 +10,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 * {
 	margin: 0;
 	padding: 0;
@@ -65,4 +65,26 @@ html, body {
 	background: #FFF;
 }
 /* toast弹出框样式 */
+
+/* 重设设置页面的样式 */
+.info-add-box {
+	.mint-cell-wrapper {
+		background-image: unset;
+	}
+	.mint-field {
+		border-bottom: 1px solid #e0e0e0;
+	}
+	.mint-radiolist-title {
+		color: black;
+		font-size: 16px;
+		
+	}
+	// .mint-cell:last-child {
+	// 	background-image: unset;
+	// }
+	// .mint-cell-wrapper {
+	// 	background-image: unset;
+	// }
+}
+
 </style>
