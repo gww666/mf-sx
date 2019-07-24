@@ -208,7 +208,7 @@ export default {
             text-align: center;
             line-height: 0.88rem;
             height: 100%;
-            font-size: .28rem;
+            font-size: .38rem;
             color: #FFF;
             // font-weight: bold;
             background: #ff4d4d;
@@ -290,16 +290,19 @@ export default {
     .options{
         min-width: 1.4rem;
         text-align: center;
-        padding: .2rem .2rem;
+        padding: 0 .2rem;
         float: left;
-        border-radius: .2rem;
+        height: 0.62rem;
+        line-height: 0.62rem;
+        border-radius: .31rem;
         margin: 0 .2rem;
-        background: #f8f6f7;
+        background: #F5F5F5;
         border: 1px solid transparent;
     }
     .choosen{
-        border-color: #E8A06F;
-        background: #FEEBDA;
+        border-color: #ff4d4d;
+        background: #ff4d4d;
+        color: #FFF;
     }
 }
 </style>

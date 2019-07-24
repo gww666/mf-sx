@@ -228,10 +228,10 @@ export default class CheckOrderDetail extends Vue {
     }
     .payment-infos{
         width: 100%;
-        height: .8rem;
-        line-height: .8rem;
+        height: .88rem;
+        line-height: .88rem;
         text-align: right;
-        font-size: .3rem;
+        font-size: 0.38rem;
         color: #333;
         background: #FFF;
         display: flex;
@@ -240,6 +240,7 @@ export default class CheckOrderDetail extends Vue {
         box-sizing: border-box;
         border-top: 1px solid #e6e6e6;
         p{
+            font-size: 0.32rem;
             text-align: left;
             width: 100%;
             padding-left: 2%;

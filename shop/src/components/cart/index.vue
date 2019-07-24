@@ -186,7 +186,7 @@ export default {
 
                 .cart-count {
                     position: absolute;
-                    font-size: 12px;
+                    font-size: 0.24rem;
                     background: #ff4d4d;
                     color: #fff;
                     width: 0.4rem;
@@ -212,7 +212,7 @@ export default {
     .right {
         width: 2.3rem;
         height: 100%;
-        font-size: 0.4rem;
+        font-size: 0.38rem;
         // font-weight: bold;
         display: flex;
         justify-content: center;
