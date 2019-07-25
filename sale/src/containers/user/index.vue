@@ -15,7 +15,8 @@
         </div>
         <!-- cell -->
         <cell icon="qianyue" iconColor="rgb(239, 173, 7)" text="签约" @click="qianyue"></cell>
-        <cell icon="xingzhuang" iconColor="rgb(239, 173, 7)" text="我的客户" @click="detail"></cell>
+        <cell icon="xingzhuang" iconColor="rgb(239, 173, 7)" text="我的客户" @click="customer"></cell>
+        <cell icon="dd_active" iconColor="rgb(247, 144, 4)" text="我的订单" @click="detail"></cell>
         <cell icon="shouyi" iconColor="rgb(245, 58, 61)" text="我的收益" @click="settings"></cell>
         <cell icon="mingpian" iconColor="rgb(6, 95, 218)" text="我的名片" @click="detail"></cell>
         <cell icon="tuandui" iconColor="#9481ff" text="我的团队" @click="settings"></cell>
@@ -44,6 +45,10 @@ export default {
             console.log("跳转到申请记录页面");
             
         },
+        customer() {
+            //跳转到客户界面
+            this.$router.push("/customer");
+        },
         settings() {
             //跳转到设置页面
             console.log("跳转到设置页面");
@@ -60,6 +65,7 @@ export default {
         } else {
             //跳转到登录界面
             Toast("登录信息失效！");
+            this.$router.replace("/login");
             // location.href = "./login.html";
         }
     },

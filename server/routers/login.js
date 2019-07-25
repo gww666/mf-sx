@@ -52,4 +52,50 @@ router.post("/cLogin", (ctx) => __awaiter(this, void 0, void 0, function* () {
         ctx.body = new resModel_1.ErrModel([], "获取用户信息失败——" + JSON.stringify(err));
     }
 }));
+router.post("/saleLoginByPwd", (ctx) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        //从头部获取sessionId
+        let { sessionid } = ctx.headers;
+        if (sessionid) {
+            let get = promisify(ctx.redis.get).bind(ctx.redis);
+            let userInfo = yield get(sessionid);
+            if (userInfo) {
+                ctx.body = new resModel_1.SucModel([JSON.parse(userInfo)], "success");
+            }
+            else {
+                ctx.body = new resModel_1.ErrModel([], "登录信息失效", 401);
+            }
+        }
+        else {
+            let data = yield user_1.saleLogin(ctx);
+            if (!data.length) {
+                ctx.body = new resModel_1.ErrModel([], "用户名或密码错误");
+            }
+            else {
+                //存储到redis中
+                let redis = ctx.redis;
+                let getKey = ctx.getSaleSessionIdKey;
+                let sessionId = getKey(data[0].id);
+                data[0].sessionId = sessionId;
+                redis.set(sessionId, JSON.stringify(data[0]), "EX", 60 * 60);
+                ctx.body = new resModel_1.SucModel(data, "success");
+            }
+        }
+    }
+    catch (err) {
+        console.log("err", err);
+        ctx.body = new resModel_1.ErrModel([], "获取用户信息失败——" + JSON.stringify(err));
+    }
+}));
+//获取商户信息列表
+router.get("/getCompanyInfoList", (ctx) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        let data = yield user_1.getCompanyInfoList(ctx);
+        ctx.body = new resModel_1.SucModel(data, "success");
+    }
+    catch (err) {
+        console.log("err", err);
+        ctx.body = new resModel_1.ErrModel([], "获取商户列表失败——" + JSON.stringify(err));
+    }
+}));
 exports.default = router;

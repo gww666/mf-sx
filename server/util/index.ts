@@ -28,6 +28,8 @@ export const getKeys = async (ctx, next) => {
     ctx.getGoodsDataKey = companyId => "goodsData-" + companyId;
     ctx.getSaleInfoKey = companyId => "saleInfo-" + companyId;
     ctx.getOrderListKey = companyId => "orderList-" + companyId;
+    //获取销售人员sessionId前缀
+    ctx.getSaleSessionIdKey = saleId => "saleurd" + saleId;
 
     await next();
 }

@@ -38,6 +38,8 @@ exports.getKeys = (ctx, next) => __awaiter(this, void 0, void 0, function* () {
     ctx.getGoodsDataKey = companyId => "goodsData-" + companyId;
     ctx.getSaleInfoKey = companyId => "saleInfo-" + companyId;
     ctx.getOrderListKey = companyId => "orderList-" + companyId;
+    //获取销售人员sessionId前缀
+    ctx.getSaleSessionIdKey = saleId => "saleurd" + saleId;
     yield next();
 });
 //允许跨域
