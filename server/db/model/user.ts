@@ -14,7 +14,7 @@ export const getCompanyInfo = async (ctx) => {
 export const getCompanyInfoList = async ctx => {
     let mysql = ctx.db;
     let {saleId} = ctx.query;
-    let columns = ["id", "name", "phone", "permission", "end_date", "address", "phone", "state", "sale_id", "pay_type"].join(",");
+    let columns = ["id", "name", "phone", "permission", "create_date", "end_date", "address", "phone", "state", "sale_id", "pay_type"].join(",");
     let where = saleId ? " where sale_id = ?" : "";
     let params = saleId ? [saleId] : [];
     let sql = `select ${columns} from company${where}`;

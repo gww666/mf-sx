@@ -43,6 +43,12 @@ import TableNoModal from "../../components/modal/slot";
 import Btn from "../../components/button/btn1";
 // import TableNoModal from "../../components/modal/test";
 export default {
+    props: {
+        companyId: {
+            type: Number | String,
+            default: ""
+        }
+    },
     data() {
         return {
             name: "",
@@ -53,6 +59,15 @@ export default {
             peopleNum: "",
             tableNum: "",
             tableNo: []
+        }
+    },
+    computed: {
+        userInfo() {
+            if (localStorage.getItem("userInfo")) {
+                return JSON.parse(localStorage.getItem("userInfo"));
+            } else {
+                return {}
+            }
         }
     },
     methods: {
@@ -70,7 +85,26 @@ export default {
             this.tableNum = "";
         },
         submit() {
-            console.log("submit");
+            let tableNo = [];
+            this.tableNo.forEach(item => {
+                for (let i = 0; i < item.tableNum; i++) {
+                    for (let j = 0; j < item.peopleNum; j++) {
+                        tableNo.push(`${i}-${j}`);
+                    }
+                }
+            });
+            let params = {
+                saleId: this.userInfo.id,
+                name: this.name,
+                address: this.address,
+                phone: this.phone,
+                payType: this.payType,
+                tableNo: tableNo.join(",")
+            }
+            if (companyId) {
+                params.companyId = this.companyId;
+            }
+            // console.log("submit");
         }
     },
     components: {
@@ -82,9 +116,7 @@ export default {
         Btn
     },
     watch: {
-        visible(newVal) {
-            console.log("visible", newVal);
-        }
+
     }
 }
 </script>

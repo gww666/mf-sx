@@ -6,20 +6,20 @@
                 <span class="name">{{info.name}}</span>
                 
                 <!-- 日期 -->
-                <span class="date">{{info.verifyDate}}</span>
+                <span class="date">{{info.date}}</span>
             </div>
             <div class="bottom">
                 <div class="mobile-box">
-                    <span class="mobile">{{info.mobile}}</span>
+                    <span class="mobile">{{info.phone}}</span>
                     <!-- 没有推荐人就在这里显示电话小图标 -->
-                    <a :href="'tel:' + info.originData.mobile">
+                    <a :href="'tel:' + info.phone">
                         <img src="../../../public/images/phone.png">
                     </a>
                 </div>
                 
                 <span class="state" 
                     :style="{color: '#1db3f7'}">
-                    当前状态：{{info.actName || "暂无"}}
+                    当前状态：{{info.state || "暂无"}}
                 </span>
             </div>
         </div>
@@ -79,24 +79,12 @@ export default {
             display: flex;
             align-items: center;
             // height: 50%;
+            justify-content: space-between;
 
             .name {
                 color: #333;
                 font-size: 0.3rem;
                 width: 1.8rem;
-            }
-            
-            .star-box {
-                display: flex;
-                // margin-bottom: 0.16rem;
-                flex: 1;
-                height: 0.3rem;
-
-                img {
-                    width: 0.3rem;
-                    height: 0.3rem;
-                    margin-right: 3px;
-                }
             }
 
             .date {
