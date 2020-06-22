@@ -22,6 +22,7 @@ export default class Order extends Vue {
 	currentCategory = "";
 	defaultPic = require("../../assets/images/noPic.jpg");
 	showNineSquare = false;
+	timer = null;
 	get selectedGoodsList () {
 		return this.$store.state.gw.goodsList;
 	};
@@ -99,34 +100,27 @@ export default class Order extends Vue {
 	};
 	// 切换分类
 	handleCategoryClick(item) {
-		this.currentCategory = item.id;
-		this.$refs.rightList.onscroll = null;
-		let liHeight = document.querySelector(".goods-item").offsetHeight;
-		let catLiHeight = document.querySelector(".category-name").offsetHeight;
-		scrollTo(
-			this.$refs.rightList,
-			'scrollTop',
-			item.startIndex * liHeight + item.cateIndex * catLiHeight + (item.cateIndex ? 1 : 0), // target scrollY (0 means top of the page)
-			500, // duration in ms
-			'easeInOutCirc',
-			() => {
-				this.$refs.rightList.onscroll = e => {this.handleUlScroll(e)};
-			}
-		);
+		if(this.timer) {
+			clearTimeout(this.timer);
+			this.timer = null;
+		}
+		this.timer = setTimeout(() => {
+			this.currentCategory = item.id;
+			this.$refs.rightList.onscroll = null;
+			let liHeight = document.querySelector(".goods-item").offsetHeight;
+			let catLiHeight = document.querySelector(".category-name").offsetHeight;
+			scrollTo(
+				this.$refs.rightList,
+				'scrollTop',
+				item.startIndex * liHeight + item.cateIndex * catLiHeight + (item.cateIndex ? 1 : 0), // target scrollY (0 means top of the page)
+				250, // duration in ms
+				'easeInOutCirc',
+				() => {
+					this.$refs.rightList.onscroll = e => {this.handleUlScroll(e)};
+				}
+			);
+		}, 200);
 	};
-	// 跳转详情
-	goDetail(item) {
-		this.$router.push({name: "detail", params: {info: item}});
-	};
-	// 抽完了奖
-	received() {
-		console.log("抽完了奖");
-		Toast("恭喜你抽中“吃屎啦”一个");
-	};
-	// 关闭九宫格弹窗
-	closePopup() {
-		this.showNineSquare = false;
-	}
 	handleUlScroll(e) {
 		let length = this.categoryList.length;
 		let catLiHeight = document.querySelector(".category-name").offsetHeight;
@@ -139,6 +133,19 @@ export default class Order extends Vue {
 			};
 		};
 	};
+	// 抽完了奖
+	received() {
+		console.log("抽完了奖");
+		Toast("恭喜你抽中“吃屎啦”一个");
+	};
+	// 跳转详情
+	goDetail(item) {
+		this.$router.push({name: "detail", params: {info: item}});
+	};
+	// 关闭九宫格弹窗
+	closePopup() {
+		this.showNineSquare = false;
+	}
 	render() {
 		return (
 			<div class="order-container">
@@ -256,10 +263,11 @@ export default class Order extends Vue {
 			.choosen-class{
 				background: #fff;
 				position: relative;
+				font-weight: bold;
 				&:after{
 					content: '';
 					width: 0.07rem;
-					background: #FF6427;
+					background: #FF0C00;
 					height: 0.36rem;
 					position: absolute;
 					left: 0;

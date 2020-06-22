@@ -2,7 +2,7 @@
     <div class="handle-box" :style="mStyle">
         <span class="reduce" v-show="goodsCount" @click="reduceGoods">―</span>
         <span class="goods-count" v-show="goodsCount">{{goodsCount}}</span>
-        <span class="add" @click="addGoods">＋</span>
+        <span class="add" @click="addGoods">+</span>
 
         <div class="options-shadow" @click.self="close" v-if="visible">
             <div class="options-box">
@@ -54,7 +54,6 @@ export default {
     },
     computed: {
         goodsCount() {
-            console.log(this.goods, "ddddddddddddddfdfdf");
             if (Object.keys(this.goods).length) {
                 //根据id找到goodsList里对应的count数量
                 let arr = [];
@@ -150,28 +149,26 @@ export default {
 
     .reduce {
         box-sizing: border-box;
-        width: 0.5rem;
-        height: 0.5rem;
-        border: 1px solid #ff4d4d;
+        width: 0.44rem;
+        height: 0.44rem;
+        border: 1px solid #FF0C00;
         border-radius: 50%;
         background: #fff;
-        color: #ff4d4d;
+        color: #FF0C00;
         font-size: 0.4rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        text-align: center;
+        line-height: 0.44rem;
     }
     .add {
         box-sizing: border-box;
-        width: 0.5rem;
-        height: 0.5rem;
+        width: 0.44rem;
+        height: 0.44rem;
         border-radius: 50%;
-        background: #ff4d4d;
+        background: #FF0C00;
         color: #fff;
         font-size: 0.4rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        text-align: center;
+        line-height: 0.42rem;
     }
     .goods-count {
         color: #999;
@@ -211,7 +208,7 @@ export default {
             font-size: .38rem;
             color: #FFF;
             // font-weight: bold;
-            background: #ff4d4d;
+            background: #FF0C00;
         }
         .price-zone{
             text-align: left;
@@ -220,7 +217,7 @@ export default {
             box-sizing: border-box;
             padding-left: .2rem;
             font-size: .32rem;
-            color: #ff4d4d;
+            color: #FF0C00;
         }
     }
     .options-zone{
@@ -300,8 +297,8 @@ export default {
         border: 1px solid transparent;
     }
     .choosen{
-        border-color: #ff4d4d;
-        background: #ff4d4d;
+        border-color: #FF0C00;
+        background: #FF0C00;
         color: #FFF;
     }
 }

@@ -3,15 +3,15 @@
         <div class="left">
             <div class="cart-o-circle" @click="showGoodsList">
                 <span class="cart-i-circle">
-                    <span class="iconfont icon-cart" :style="{color: cartCount ? '#ff4d4d' : '#FFF'}"></span>
+                    <span class="iconfont icon-cart" :style="{color: cartCount ? '#FF0C00' : '#FFF'}"></span>
                     <!-- 数量 -->
                     <span class="cart-count">{{cartCount}}</span>
                 </span>
             </div>
-            <span class="msg" :style="{color: cartCount ? '#ff4d4d' : '#999999'}">{{msg}}</span>
+            <span class="msg" :style="{color: cartCount ? '#FF0C00' : '#999999'}">{{msg}}</span>
         </div>
         <div class="right" @click="pay" 
-            :style="{background: cartCount ? '#ff4d4d' : '#e6e6e6', color: cartCount ? '#fff' : '#999999'}">
+            :style="{background: cartCount ? '#FF0C00' : '#e6e6e6', color: cartCount ? '#fff' : '#999999'}">
             <span>去下单</span>
         </div>
         <div class="cart-cover">
@@ -187,10 +187,10 @@ export default {
                 .cart-count {
                     position: absolute;
                     font-size: 0.24rem;
-                    background: #ff4d4d;
+                    background: #FF0C00;
                     color: #fff;
-                    width: 0.4rem;
-                    height: 0.4rem;
+                    width: 0.37rem;
+                    height: 0.37rem;
                     border-radius: 50%;
                     // line-height: 0.4rem;
                     // text-align: center;
@@ -258,7 +258,7 @@ export default {
                         font-size: 12px;
                     }
                     .sale-price {
-                        color: #ff4d4d;
+                        color: #FF0C00;
                     }
                 }
             }

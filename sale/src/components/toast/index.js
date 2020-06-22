@@ -40,7 +40,7 @@ export default (options) => {
 
 	let text = document.createElement("div");
 	//成功和失败是两种不同的样式
-	let textStyle = `text-align: center;font-size: .14rem;line-height: .3rem;`;
+	let textStyle = `text-align: center;font-size: .26rem;line-height: .3rem;`;
     text.setAttribute("style", textStyle);
     
     text.innerHTML = config.message;

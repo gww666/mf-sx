@@ -64,22 +64,26 @@ export default class Order extends Vue {
 			};
 		};
 	};
-	// <p>您有尚未支付的订单，您可以选择继续点餐</p>
+	// <p class="iconfont icon-chushi1"></p>
 	render() {
 		return (
 			this.showPage
 			?
 			<div class="page-container">
-				<div class="tip">您有正在进行中的订单</div>
+				<div class="top-pad"></div>
+				<div class="title">
+					<p class="iconfont icon-wankuai"></p>
+					<p class="tip">您有正在进行中的订单...</p>
+				</div>
 				<div class="choices-container">
 					<div class="choices" onClick={this.goOrderPage}>我要加菜</div>
-					<div class="choices" onClick={this.goCheckOrders}>查看已有订单</div>
+					<div class="choices hyaline-bg" onClick={this.goCheckOrders}>查看已有订单</div>
 				</div>
 			</div>
 			:
 			<div class="loading-box">
 				<img src={this.loading} style="width: 0.7rem;height: 0.7rem;" />
-				<p style="margin-top: .2rem;">加载中...</p>
+				<p class="loading-text">加载中...</p>
 			</div>
 		)
 	};
@@ -92,35 +96,49 @@ export default class Order extends Vue {
 </script>
 <style lang="less" scoped>
 	.tip{
-		font-size: .4rem;
+		margin-top: 0.53rem;
+		font-size: .36rem;
 		text-align: center;
-		padding-top: 2rem;
-		color: rgba(0, 0, 0, 0.65);
+		color: #FFFFFF;
+		opacity: 0.8;
+	}
+	.top-pad{
+		width: 100%;
+		height: 2.18rem;
 	}
 	.page-container{
 		width: 100%;
 		height: 100%;
-		background: #FFF;
+		position: relative;
+		background: #EC313C;
+		background: linear-gradient(to bottom, #EC313C, #FF5B65);
 	}
 	.choices-container{
+		margin-top: 2.27rem;
         font-size: .16rem;
 		width: 100%;
-		background: #FFF;
-		display: flex;
-		// align-items: center;
-		justify-content: space-between;
 	}
     .choices{
-        width: 2rem;
-        height: .68rem;
-        border-radius: .34rem;
-		line-height: .71rem;
-		font-size: .24rem;
-		font-weight: bold;
+        width: 5.5rem;
+        height: .86rem;
+        border-radius: .1rem;
+		line-height: .86rem;
+		font-size: .38rem;
         text-align: center;
-        color: #FFF;
-        background: #1890ff;
-        margin: 2rem auto;
+        color: #ED323D;
+		margin: 0rem auto;
+		background: #FFF;
+		border: 1px solid #FFF;
+	}
+	.hyaline-bg{
+		margin: 0.5rem auto;
+		color: #FFF;
+		background: rgba(0, 0, 0, 0);
+	}
+	.title{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 	.loading-box{
 		width: 100%;
@@ -128,9 +146,30 @@ export default class Order extends Vue {
 		display: flex;
 		align-items: center;
 		flex-direction: column;
-		background: #FFF;
+		background: #EC313C;
+		background: linear-gradient(to bottom, #EC313C, #FF5B65);
 		justify-content: center;
 		font-size: .12rem;
 		color: rgba(0, 0, 0, 0.65);
+	}
+	.icon-wankuai{
+		width: 1.8rem;
+		height: 1.8rem;
+		text-align: center;
+		line-height: 1.8rem;
+		font-size: 1.4rem;
+		color: #FFF;
+		border-radius: 50%;
+		box-shadow: 0 0 0.2rem #FFF;
+	}
+	.icon-chushi1 {
+		color: #FFF;
+		opacity: 0.4;
+		font-size: 1.8rem;
+	}
+	.loading-text{
+		margin-top: .2rem;
+		color: #FFF;
+		font-size: 0.34rem;
 	}
 </style>
